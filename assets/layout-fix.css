@@ -1,0 +1,43 @@
+/*
+ * Keep the puzzle board square without relying on aspect-ratio.
+ * Some grid layout engines resolve the board's intrinsic block size from its
+ * children first, which previously collapsed the board to a thin strip.
+ */
+.board-wrap {
+  container-type: inline-size;
+}
+
+.puzzle-board {
+  box-sizing: border-box;
+  aspect-ratio: auto;
+  width: min(100%, 590px);
+  height: 590px;
+  min-width: 0;
+  min-height: 0;
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+/* Modern browsers: derive both axes from the board container's exact width. */
+@supports (width: 1cqw) {
+  .puzzle-board {
+    width: min(100cqw, 590px);
+    height: min(100cqw, 590px);
+  }
+}
+
+/* Fallback for browsers without container-query units. */
+@supports not (width: 1cqw) {
+  @media (max-width: 860px) {
+    .puzzle-board {
+      width: min(100%, calc(100vw - 120px), 590px);
+      height: min(calc(100vw - 120px), 590px);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .puzzle-board {
+      width: min(100%, calc(100vw - 50px), 590px);
+      height: min(calc(100vw - 50px), 590px);
+    }
+  }
+}
