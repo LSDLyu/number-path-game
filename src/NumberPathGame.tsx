@@ -13,6 +13,7 @@ import rawPuzzles from "./number-path-puzzles.json";
 import styles from "./NumberPathGame.module.css";
 
 type Size = 3 | 4 | 5 | 6;
+type Locale = "zh" | "en";
 type Point = [number, number];
 type Clue = [number, number, number];
 type Puzzle = { number: number; clues: Clue[]; route: Point[] };
@@ -25,14 +26,165 @@ type SavedProgress = {
 
 const puzzles = rawPuzzles as Record<`${Size}`, Puzzle[]>;
 const sizes: Size[] = [3, 4, 5, 6];
-const sizeInfo: Record<Size, { label: string; end: number; color: string }> = {
-  3: { label: "见习", end: 4, color: "butter" },
-  4: { label: "巡查", end: 5, color: "peach" },
-  5: { label: "推理", end: 8, color: "sage" },
-  6: { label: "怪探", end: 11, color: "lavender" },
+const sizeInfo: Record<Size, { end: number; color: string }> = {
+  3: { end: 4, color: "butter" },
+  4: { end: 5, color: "peach" },
+  5: { end: 8, color: "sage" },
+  6: { end: 11, color: "lavender" },
 };
 const emptyProgress: SavedProgress = { paths: {}, completed: {} };
 const storageKey = "zide-number-path-progress-v1";
+
+const gameCopy = {
+  zh: {
+    levels: { 3: "见习", 4: "巡查", 5: "推理", 6: "怪探" } as Record<Size, string>,
+    initial: "先找到数字 1，怪探从这里出发。最大数字要留到最后。",
+    catLabel: "豆豆猫怪探正在查看线索",
+    archived: (time: string) => `这宗谜案已归档，用时 ${time}。你可以重走一次，或换下一题。`,
+    resume: (number: number, length: number, end: number) => `继续勘察第 ${number} 题：已走 ${length} 格，数字 ${end} 是终点。`,
+    success: (total: number, end: number) => `破案成功！${total} 格全部走过，数字 ${end} 正好落在最后一格。`,
+    backed: "已沿原路退回一格。重新观察四个方向。",
+    repeated: "路线不能重复经过同一格；需要回退时请沿原路退一格。",
+    adjacentOnly: "怪探不能斜走或跳格，只能走到上下左右相邻格。",
+    earlyEnd: (end: number) => `数字 ${end} 是终点，现在还没填满全部格子，先绕开它。`,
+    wrongClue: (clue: number, expected: number) => `还不能到数字 ${clue}，请先找到数字 ${expected}。`,
+    wrongLast: (end: number) => `只剩最后一格时，必须抵达最大的数字 ${end}。`,
+    clueMatched: (clue: number) => `线索吻合：已经找到数字 ${clue}，接着找数字 ${clue + 1}。`,
+    routeProgress: (length: number) => `路线已走 ${length} 格，继续观察相邻空格。`,
+    reset: (end: number) => `重新勘察：从 1 出发，数字 ${end} 必须最后抵达。`,
+    atStart: "已经回到起点 1 了。",
+    closedUndo: "已归档的谜案如需重走，请选择“重新开始”。",
+    undone: "撤回一步。现在从路线末端继续。",
+    deviated: (step: number) => `第 ${step} 步偏离了可靠线索。沿原路退回，再换一个方向试试。`,
+    hint: "豆豆猫找到一枚脚印：闪烁格可以作为下一步。",
+    startCase: (end: number) => `从 1 出发，下一站找数字 2；数字 ${end} 是终点。`,
+    eyebrow: "数学路径怪探 · 数字顺序与空间推理",
+    heroLead: "每一格都是线索，",
+    heroEnd: "最大数字才是终点。",
+    lede: "从 1 出发，只走上下左右，按顺序经过数字；不漏格、不重走，最后抵达最大的数字。",
+    verifiedLabel: "题库经过程序验证",
+    cases: "宗谜案",
+    verified: "程序逐题验证",
+    sizeNav: "选择棋盘大小",
+    sizeTab: (level: string, end: number) => `${level} · 终点 ${end}`,
+    caseFiles: "谜案档案",
+    caseTitle: "CASE FILES",
+    caseAria: (number: number, complete: boolean) => `第 ${number} 题${complete ? "，已完成" : ""}`,
+    caseLevel: (level: string, size: number) => `${level}级谜案 · ${size}×${size}`,
+    question: (number: number) => `第 ${number} 题`,
+    previous: "上一题",
+    next: "下一题",
+    quick: "快速选题",
+    quickAria: "快速选择题目",
+    option: (number: number, complete: boolean) => `第 ${String(number).padStart(2, "0")} 题${complete ? " · 已完成" : ""}`,
+    boardAria: (size: number) => `${size}乘${size}数字路径棋盘，方向键也可以继续路线`,
+    cellAria: (row: number, column: number, clue: number | undefined, end: number, selected: boolean, pathIndex: number) =>
+      `${row} 行 ${column} 列${clue ? `，数字 ${clue}${clue === end ? "，终点" : ""}` : "，空格"}${selected ? `，路线第 ${pathIndex + 1} 格` : ""}`,
+    explored: "已勘察",
+    squares: "格",
+    progressAria: (percent: number) => `完成进度 ${percent}%`,
+    statusWarn: "停一下，核对线索",
+    statusGood: "线索吻合",
+    statusGuide: "豆豆猫提示",
+    undo: "撤回一步",
+    giveHint: "给我一条线索",
+    restart: "重新开始",
+    notesTitle: "DETECTIVE NOTES",
+    notes: "怪探手记",
+    currentTask: "当前任务",
+    closed: "谜案归档",
+    findNumber: (number: number) => `寻找数字 ${number}`,
+    bestTime: (time: string) => `最佳用时 ${time}`,
+    endNote: (end: number, total: number) => `终点是 ${end}，抵达前要填满 ${total} 格。`,
+    numberOrder: "数字顺序",
+    numberOrderNote: (end: number) => `依次经过 1 到 ${end}`,
+    fullCoverage: "全部覆盖",
+    everySquare: "每格都有路线",
+    remaining: (count: number) => `还差 ${count} 格`,
+    finishCheck: "终点核验",
+    finishNote: (end: number) => `数字 ${end} 必须最后抵达`,
+    rules: "怪探守则",
+    ruleStart: "从数字 1 开始。",
+    ruleMove: "只能走上下左右相邻格。",
+    ruleOrder: "按数字顺序经过，不重复、不漏格。",
+    ruleEnd: "最大的数字是终点。",
+    inputNote: "电脑可按住鼠标拖动；手机可滑动或逐格点击；键盘可用方向键。",
+  },
+  en: {
+    levels: { 3: "Rookie", 4: "Scout", 5: "Sleuth", 6: "Master" } as Record<Size, string>,
+    initial: "Find number 1 first. That is where the detective starts. Save the largest number for last.",
+    catLabel: "Detective Doudou Cat is examining the clues",
+    archived: (time: string) => `This case is closed. Best time: ${time}. Replay it or choose another case.`,
+    resume: (number: number, length: number, end: number) => `Continue Case ${number}: ${length} squares explored. Number ${end} is the finish.`,
+    success: (total: number, end: number) => `Case solved! You covered all ${total} squares and reached number ${end} last.`,
+    backed: "You moved back one square along your path. Check all four directions again.",
+    repeated: "A path cannot visit the same square twice. To go back, move one square along your path.",
+    adjacentOnly: "No diagonal moves or jumps. Move only to the next square up, down, left, or right.",
+    earlyEnd: (end: number) => `Number ${end} is the finish. Some squares are still empty, so go around it for now.`,
+    wrongClue: (clue: number, expected: number) => `You cannot reach number ${clue} yet. Find number ${expected} first.`,
+    wrongLast: (end: number) => `The last square must be the largest number, ${end}.`,
+    clueMatched: (clue: number) => `Clue matched: you found number ${clue}. Now look for number ${clue + 1}.`,
+    routeProgress: (length: number) => `${length} squares explored. Keep checking the neighboring empty squares.`,
+    reset: (end: number) => `Restarted: begin at 1 and reach number ${end} last.`,
+    atStart: "You are already back at the starting square, 1.",
+    closedUndo: "To replay a closed case, choose “Restart”.",
+    undone: "One move undone. Continue from the end of the path.",
+    deviated: (step: number) => `Move ${step} left the reliable trail. Back up along your path and try another direction.`,
+    hint: "Doudou Cat found a footprint. The flashing square can be your next move.",
+    startCase: (end: number) => `Start at 1 and look for number 2 next. Number ${end} is the finish.`,
+    eyebrow: "NUMBER PATH DETECTIVES · SEQUENCES & SPATIAL REASONING",
+    heroLead: "Every square is a clue. ",
+    heroEnd: "The largest number is the finish.",
+    lede: "Start at 1. Move only up, down, left, or right and visit the numbers in order. Fill every square once, then reach the largest number last.",
+    verifiedLabel: "Puzzle set verified by program",
+    cases: "cases",
+    verified: "every puzzle verified",
+    sizeNav: "Choose a board size",
+    sizeTab: (level: string, end: number) => `${level} · Finish ${end}`,
+    caseFiles: "Case Files",
+    caseTitle: "CASE FILES",
+    caseAria: (number: number, complete: boolean) => `Case ${number}${complete ? ", completed" : ""}`,
+    caseLevel: (level: string, size: number) => `${level} case · ${size}×${size}`,
+    question: (number: number) => `Case ${number}`,
+    previous: "Previous",
+    next: "Next",
+    quick: "Quick select",
+    quickAria: "Quickly choose a case",
+    option: (number: number, complete: boolean) => `Case ${String(number).padStart(2, "0")}${complete ? " · completed" : ""}`,
+    boardAria: (size: number) => `${size} by ${size} number path board. You can also use the arrow keys.`,
+    cellAria: (row: number, column: number, clue: number | undefined, end: number, selected: boolean, pathIndex: number) =>
+      `row ${row}, column ${column}${clue ? `, number ${clue}${clue === end ? ", finish" : ""}` : ", empty square"}${selected ? `, path square ${pathIndex + 1}` : ""}`,
+    explored: "Explored",
+    squares: "squares",
+    progressAria: (percent: number) => `${percent}% complete`,
+    statusWarn: "Pause and check the clues",
+    statusGood: "Clue matched",
+    statusGuide: "Doudou Cat's tip",
+    undo: "Undo one move",
+    giveHint: "Give me a clue",
+    restart: "Restart",
+    notesTitle: "DETECTIVE NOTES",
+    notes: "Detective Notes",
+    currentTask: "Current task",
+    closed: "Case closed",
+    findNumber: (number: number) => `Find number ${number}`,
+    bestTime: (time: string) => `Best time ${time}`,
+    endNote: (end: number, total: number) => `Number ${end} is the finish. Cover all ${total} squares before reaching it.`,
+    numberOrder: "Number order",
+    numberOrderNote: (end: number) => `Visit 1 through ${end} in order`,
+    fullCoverage: "Full coverage",
+    everySquare: "Every square is on the path",
+    remaining: (count: number) => `${count} squares remaining`,
+    finishCheck: "Finish check",
+    finishNote: (end: number) => `Reach number ${end} last`,
+    rules: "Detective Rules",
+    ruleStart: "Start at number 1.",
+    ruleMove: "Move only up, down, left, or right.",
+    ruleOrder: "Visit the numbers in order without repeats or gaps.",
+    ruleEnd: "The largest number is the finish.",
+    inputNote: "On a computer, drag with the mouse. On a phone, swipe or tap one square at a time. You can also use the arrow keys.",
+  },
+};
 
 function samePoint(a: Point | undefined, b: Point | undefined) {
   return Boolean(a && b && a[0] === b[0] && a[1] === b[1]);
@@ -61,9 +213,9 @@ function validSavedPath(path: Point[] | undefined, puzzle: Puzzle, size: Size) {
   });
 }
 
-function DetectiveCat() {
+function DetectiveCat({ label }: { label: string }) {
   return (
-    <svg className={styles.cat} viewBox="0 0 120 96" role="img" aria-label="豆豆猫怪探正在查看线索">
+    <svg className={styles.cat} viewBox="0 0 120 96" role="img" aria-label={label}>
       <path d="M24 44 18 18l24 14M96 44l6-26-25 14" fill="#f7caa8" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
       <path d="M24 40c2-22 70-24 73 4 3 29-13 42-37 42S21 73 24 40Z" fill="#fffaf0" stroke="currentColor" strokeWidth="4" />
       <path d="M43 55h2M76 55h2" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
@@ -75,11 +227,12 @@ function DetectiveCat() {
   );
 }
 
-export function NumberPathGame() {
+export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
+  const copy = gameCopy[locale];
   const [size, setSize] = useState<Size>(3);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [path, setPath] = useState<Point[]>(() => [puzzles["3"][0].route[0]]);
-  const [message, setMessage] = useState("先找到数字 1，怪探从这里出发。最大数字要留到最后。");
+  const [message, setMessage] = useState(copy.initial);
   const [tone, setTone] = useState<Tone>("guide");
   const [hintCell, setHintCell] = useState<Point | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -92,6 +245,7 @@ export function NumberPathGame() {
   const puzzleList = puzzles[String(size) as `${Size}`];
   const puzzle = puzzleList[puzzleIndex];
   const info = sizeInfo[size];
+  const level = copy.levels[size];
   const total = size * size;
   const progressKey = `${size}-${puzzle.number}`;
 
@@ -150,16 +304,16 @@ export function NumberPathGame() {
       setPath(initialPath);
       startedAt.current = Date.now();
       if (storedProgress.completed[initialKey]) {
-        setMessage(`这宗谜案已归档，用时 ${formatTime(storedProgress.completed[initialKey])}。你可以重走一次，或换下一题。`);
+        setMessage(copy.archived(formatTime(storedProgress.completed[initialKey])));
         setTone("good");
       } else {
-        setMessage(`继续勘察第 ${initialPuzzle.number} 题：已走 ${initialPath.length} 格，数字 ${sizeInfo[initialSize].end} 是终点。`);
+        setMessage(copy.resume(initialPuzzle.number, initialPath.length, sizeInfo[initialSize].end));
         setTone("guide");
       }
       setHydrated(true);
     }, 0);
     return () => window.clearTimeout(load);
-  }, []);
+  }, [copy]);
 
   useEffect(() => {
     if (!hydrated || isComplete) return;
@@ -188,9 +342,9 @@ export function NumberPathGame() {
       lastCase: { size, number: puzzle.number },
     });
     setElapsed(seconds);
-    setMessage(`破案成功！${total} 格全部走过，数字 ${info.end} 正好落在最后一格。`);
+    setMessage(copy.success(total, info.end));
     setTone("good");
-  }, [info.end, persist, progress, progressKey, puzzle.number, size, total]);
+  }, [copy, info.end, persist, progress, progressKey, puzzle.number, size, total]);
 
   const moveTo = useCallback((point: Point) => {
     if (isComplete) return;
@@ -206,17 +360,17 @@ export function NumberPathGame() {
         pathRef.current = nextPath;
         setPath(nextPath);
         persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
-        setMessage("已沿原路退回一格。重新观察四个方向。");
+        setMessage(copy.backed);
         setTone("guide");
       } else {
-        setMessage("路线不能重复经过同一格；需要回退时请沿原路退一格。");
+        setMessage(copy.repeated);
         setTone("warn");
       }
       return;
     }
 
     if (distance(last, point) !== 1) {
-      setMessage("怪探不能斜走或跳格，只能走到上下左右相邻格。");
+      setMessage(copy.adjacentOnly);
       setTone("warn");
       return;
     }
@@ -227,17 +381,17 @@ export function NumberPathGame() {
       .filter((value): value is number => Boolean(value));
     const expectedClue = Math.min(info.end, Math.max(1, ...reachedClues) + 1);
     if (clue === info.end && currentPath.length + 1 < total) {
-      setMessage(`数字 ${info.end} 是终点，现在还没填满全部格子，先绕开它。`);
+      setMessage(copy.earlyEnd(info.end));
       setTone("warn");
       return;
     }
     if (clue && clue !== expectedClue) {
-      setMessage(`还不能到数字 ${clue}，请先找到数字 ${expectedClue}。`);
+      setMessage(copy.wrongClue(clue, expectedClue));
       setTone("warn");
       return;
     }
     if (currentPath.length + 1 === total && !samePoint(point, endPoint)) {
-      setMessage(`只剩最后一格时，必须抵达最大的数字 ${info.end}。`);
+      setMessage(copy.wrongLast(info.end));
       setTone("warn");
       return;
     }
@@ -249,13 +403,13 @@ export function NumberPathGame() {
     if (nextPath.length === total && samePoint(point, endPoint)) {
       completeCase(nextPath);
     } else if (clue) {
-      setMessage(`线索吻合：已经找到数字 ${clue}，接着找数字 ${clue + 1}。`);
+      setMessage(copy.clueMatched(clue));
       setTone("good");
     } else {
-      setMessage(`路线已走 ${nextPath.length} 格，继续观察相邻空格。`);
+      setMessage(copy.routeProgress(nextPath.length));
       setTone("guide");
     }
-  }, [clueMap, completeCase, endPoint, info.end, isComplete, persist, progress, progressKey, total]);
+  }, [clueMap, completeCase, copy, endPoint, info.end, isComplete, persist, progress, progressKey, total]);
 
   const pointFromTarget = (target: EventTarget | null): Point | null => {
     const element = target instanceof Element ? target.closest<HTMLElement>("[data-cell]") : null;
@@ -308,14 +462,14 @@ export function NumberPathGame() {
     setHintCell(null);
     startedAt.current = Date.now();
     setElapsed(0);
-    setMessage(`重新勘察：从 1 出发，数字 ${info.end} 必须最后抵达。`);
+    setMessage(copy.reset(info.end));
     setTone("guide");
   };
 
   const undo = () => {
     const currentPath = pathRef.current;
     if (currentPath.length <= 1 || isComplete) {
-      setMessage(currentPath.length <= 1 ? "已经回到起点 1 了。" : "已归档的谜案如需重走，请选择“重新开始”。");
+      setMessage(currentPath.length <= 1 ? copy.atStart : copy.closedUndo);
       setTone("guide");
       return;
     }
@@ -323,7 +477,7 @@ export function NumberPathGame() {
     pathRef.current = nextPath;
     setPath(nextPath);
     persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
-    setMessage("撤回一步。现在从路线末端继续。");
+    setMessage(copy.undone);
     setTone("guide");
   };
 
@@ -332,14 +486,14 @@ export function NumberPathGame() {
     while (prefix < path.length && samePoint(path[prefix], puzzle.route[prefix])) prefix += 1;
     if (prefix < path.length) {
       setHintCell(path[prefix]);
-      setMessage(`第 ${prefix + 1} 步偏离了可靠线索。沿原路退回，再换一个方向试试。`);
+      setMessage(copy.deviated(prefix + 1));
       setTone("warn");
       return;
     }
     const next = puzzle.route[path.length];
     if (!next) return;
     setHintCell(next);
-    setMessage("豆豆猫找到一枚脚印：闪烁格可以作为下一步。");
+    setMessage(copy.hint);
     setTone("guide");
   };
 
@@ -358,14 +512,14 @@ export function NumberPathGame() {
     startedAt.current = Date.now();
     setElapsed(0);
     if (progress.completed[nextKey]) {
-      setMessage(`这宗谜案已归档，用时 ${formatTime(progress.completed[nextKey])}。你可以重走一次，或换下一题。`);
+      setMessage(copy.archived(formatTime(progress.completed[nextKey])));
       setTone("good");
     } else {
-      setMessage(`从 1 出发，下一站找数字 2；数字 ${sizeInfo[nextSize].end} 是终点。`);
+      setMessage(copy.startCase(sizeInfo[nextSize].end));
       setTone("guide");
     }
     persist({ ...progress, lastCase: { size: nextSize, number: nextPuzzle.number } });
-  }, [persist, progress]);
+  }, [copy, persist, progress]);
 
   const selectPuzzle = (index: number) => {
     openCase(size, index);
@@ -379,16 +533,16 @@ export function NumberPathGame() {
     <div className={styles.page}>
       <header className={styles.hero}>
         <div>
-          <p className={styles.eyebrow}>数学路径怪探 · 数字顺序与空间推理</p>
-          <h1>每一格都是线索，<em>最大数字才是终点。</em></h1>
-          <p className={styles.lede}>从 1 出发，只走上下左右，按顺序经过数字；不漏格、不重走，最后抵达最大的数字。</p>
+          <p className={styles.eyebrow}>{copy.eyebrow}</p>
+          <h1>{copy.heroLead}<em>{copy.heroEnd}</em></h1>
+          <p className={styles.lede}>{copy.lede}</p>
         </div>
-        <div className={styles.heroStamp} aria-label="题库经过程序验证">
-          <strong>319</strong><span>宗谜案</span><small>程序逐题验证</small>
+        <div className={styles.heroStamp} aria-label={copy.verifiedLabel}>
+          <strong>319</strong><span>{copy.cases}</span><small>{copy.verified}</small>
         </div>
       </header>
 
-      <nav className={styles.sizeTabs} aria-label="选择棋盘大小">
+      <nav className={styles.sizeTabs} aria-label={copy.sizeNav}>
         {sizes.map((value) => (
           <button
             type="button"
@@ -398,7 +552,7 @@ export function NumberPathGame() {
             onClick={() => openCase(value, 0)}
           >
             <span>{value}×{value}</span>
-            <small>{sizeInfo[value].label} · 终点 {sizeInfo[value].end}</small>
+            <small>{copy.sizeTab(copy.levels[value], sizeInfo[value].end)}</small>
           </button>
         ))}
       </nav>
@@ -406,7 +560,7 @@ export function NumberPathGame() {
       <div className={styles.workspace}>
         <aside className={styles.caseRail} aria-labelledby="case-title">
           <div className={styles.panelHeading}>
-            <div><p>CASE FILES</p><h2 id="case-title">谜案档案</h2></div>
+            <div><p>{copy.caseTitle}</p><h2 id="case-title">{copy.caseFiles}</h2></div>
             <span>{completedForSize}/{puzzleList.length}</span>
           </div>
           <div className={styles.caseGrid}>
@@ -418,7 +572,7 @@ export function NumberPathGame() {
                   type="button"
                   key={item.number}
                   className={`${index === puzzleIndex ? styles.activeCase : ""} ${complete ? styles.completeCase : ""}`}
-                  aria-label={`第 ${item.number} 题${complete ? "，已完成" : ""}`}
+                  aria-label={copy.caseAria(item.number, complete)}
                   aria-current={index === puzzleIndex ? "true" : undefined}
                   onClick={() => selectPuzzle(index)}
                 >
@@ -433,24 +587,23 @@ export function NumberPathGame() {
         <section className={styles.boardPanel} aria-labelledby="board-title">
           <div className={styles.boardHeading}>
             <div>
-              <p className={styles.kicker}>{info.label}级谜案 · {size}×{size}</p>
-              <h2 id="board-title">第 {puzzle.number} 题</h2>
+              <p className={styles.kicker}>{copy.caseLevel(level, size)}</p>
+              <h2 id="board-title">{copy.question(puzzle.number)}</h2>
             </div>
             <div className={styles.pager}>
-              <button type="button" onClick={() => selectPuzzle(puzzleIndex - 1)}>上一题</button>
+              <button type="button" onClick={() => selectPuzzle(puzzleIndex - 1)}>{copy.previous}</button>
               <span>{puzzle.number} / {puzzleList.length}</span>
-              <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>下一题</button>
+              <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.next}</button>
               <label className={styles.quickCase}>
-                快速选题
+                {copy.quick}
                 <select
                   value={puzzleIndex}
                   onChange={(event) => selectPuzzle(Number(event.target.value))}
-                  aria-label="快速选择题目"
+                  aria-label={copy.quickAria}
                 >
                   {puzzleList.map((item, index) => (
                     <option key={item.number} value={index}>
-                      第 {String(item.number).padStart(2, "0")} 题
-                      {progress.completed[`${size}-${item.number}`] ? " · 已完成" : ""}
+                      {copy.option(item.number, Boolean(progress.completed[`${size}-${item.number}`]))}
                     </option>
                   ))}
                 </select>
@@ -471,7 +624,7 @@ export function NumberPathGame() {
             onKeyDown={handleKeyboard}
             role="grid"
             tabIndex={0}
-            aria-label={`${size}乘${size}数字路径棋盘，方向键也可以继续路线`}
+            aria-label={copy.boardAria(size)}
           >
             <svg className={styles.pathLayer} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
               <polyline points={polyline} fill="none" vectorEffect="non-scaling-stroke" />
@@ -491,7 +644,7 @@ export function NumberPathGame() {
                   data-row={row}
                   data-column={column}
                   className={`${styles.cell} ${selected ? styles.selectedCell : ""} ${last ? styles.lastCell : ""} ${hinted ? styles.hintCell : ""}`}
-                  aria-label={`${row + 1} 行 ${column + 1} 列${clue ? `，数字 ${clue}${clue === info.end ? "，终点" : ""}` : "，空格"}${selected ? `，路线第 ${pathIndex + 1} 格` : ""}`}
+                  aria-label={copy.cellAria(row + 1, column + 1, clue, info.end, selected, pathIndex)}
                   onClick={() => moveTo([row, column])}
                 >
                   {clue && <strong>{clue}</strong>}
@@ -502,52 +655,52 @@ export function NumberPathGame() {
           </div>
 
           <div className={styles.progressRow}>
-            <span>已勘察 <strong>{path.length}</strong> / {total} 格</span>
-            <div className={styles.progressTrack} aria-label={`完成进度 ${percent}%`}><i style={{ width: `${percent}%` }} /></div>
+            <span>{copy.explored} <strong>{path.length}</strong> / {total} {copy.squares}</span>
+            <div className={styles.progressTrack} aria-label={copy.progressAria(percent)}><i style={{ width: `${percent}%` }} /></div>
             <span>{percent}%</span>
           </div>
 
           <div className={`${styles.message} ${styles[tone]}`} role="status" aria-live="polite">
-            <DetectiveCat />
-            <div><strong>{tone === "warn" ? "停一下，核对线索" : tone === "good" ? "线索吻合" : "豆豆猫提示"}</strong><p>{message}</p></div>
+            <DetectiveCat label={copy.catLabel} />
+            <div><strong>{tone === "warn" ? copy.statusWarn : tone === "good" ? copy.statusGood : copy.statusGuide}</strong><p>{message}</p></div>
           </div>
 
           <div className={styles.actions}>
-            <button type="button" onClick={undo}>撤回一步</button>
-            <button type="button" onClick={showHint}>给我一条线索</button>
-            <button type="button" onClick={resetCase}>重新开始</button>
+            <button type="button" onClick={undo}>{copy.undo}</button>
+            <button type="button" onClick={showHint}>{copy.giveHint}</button>
+            <button type="button" onClick={resetCase}>{copy.restart}</button>
           </div>
         </section>
 
         <aside className={styles.notebook} aria-labelledby="notebook-title">
           <div className={styles.panelHeading}>
-            <div><p>DETECTIVE NOTES</p><h2 id="notebook-title">怪探手记</h2></div>
+            <div><p>{copy.notesTitle}</p><h2 id="notebook-title">{copy.notes}</h2></div>
             <span>{formatTime(isComplete ? completedSeconds : elapsed)}</span>
           </div>
 
           <section className={styles.nextClue}>
-            <span>当前任务</span>
-            <strong>{isComplete ? "谜案归档" : `寻找数字 ${nextClue}`}</strong>
-            <p>{isComplete ? `最佳用时 ${formatTime(completedSeconds)}` : `终点是 ${info.end}，抵达前要填满 ${total} 格。`}</p>
+            <span>{copy.currentTask}</span>
+            <strong>{isComplete ? copy.closed : copy.findNumber(nextClue)}</strong>
+            <p>{isComplete ? copy.bestTime(formatTime(completedSeconds)) : copy.endNote(info.end, total)}</p>
           </section>
 
           <ol className={styles.checks}>
-            <li className={orderCheck ? styles.checked : ""}><span>{orderCheck ? "✓" : "1"}</span><div><strong>数字顺序</strong><small>依次经过 1 到 {info.end}</small></div></li>
-            <li className={fullCheck ? styles.checked : ""}><span>{fullCheck ? "✓" : "2"}</span><div><strong>全部覆盖</strong><small>{fullCheck ? "每格都有路线" : `还差 ${total - path.length} 格`}</small></div></li>
-            <li className={endCheck ? styles.checked : ""}><span>{endCheck ? "✓" : "3"}</span><div><strong>终点核验</strong><small>数字 {info.end} 必须最后抵达</small></div></li>
+            <li className={orderCheck ? styles.checked : ""}><span>{orderCheck ? "✓" : "1"}</span><div><strong>{copy.numberOrder}</strong><small>{copy.numberOrderNote(info.end)}</small></div></li>
+            <li className={fullCheck ? styles.checked : ""}><span>{fullCheck ? "✓" : "2"}</span><div><strong>{copy.fullCoverage}</strong><small>{fullCheck ? copy.everySquare : copy.remaining(total - path.length)}</small></div></li>
+            <li className={endCheck ? styles.checked : ""}><span>{endCheck ? "✓" : "3"}</span><div><strong>{copy.finishCheck}</strong><small>{copy.finishNote(info.end)}</small></div></li>
           </ol>
 
           <details className={styles.rules} open>
-            <summary>怪探守则</summary>
+            <summary>{copy.rules}</summary>
             <ul>
-              <li>从数字 1 开始。</li>
-              <li>只能走上下左右相邻格。</li>
-              <li>按数字顺序经过，不重复、不漏格。</li>
-              <li><strong>最大的数字是终点。</strong></li>
+              <li>{copy.ruleStart}</li>
+              <li>{copy.ruleMove}</li>
+              <li>{copy.ruleOrder}</li>
+              <li><strong>{copy.ruleEnd}</strong></li>
             </ul>
           </details>
 
-          <p className={styles.inputNote}>电脑可按住鼠标拖动；手机可滑动或逐格点击；键盘可用方向键。</p>
+          <p className={styles.inputNote}>{copy.inputNote}</p>
         </aside>
       </div>
     </div>
