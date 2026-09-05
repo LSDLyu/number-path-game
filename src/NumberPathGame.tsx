@@ -9,6 +9,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { Celebration } from "./Celebration";
+import { celebrationLevels, feedbackKey, hasForwardMove, loadFeedback, type FeedbackSettings } from "./gameFeedback";
 import rawPuzzles from "./number-path-puzzles.json";
 import styles from "./NumberPathGame.module.css";
 
@@ -37,6 +39,18 @@ const storageKey = "zide-number-path-progress-v1";
 
 const gameCopy = {
   zh: {
+    settings: "体验设置",
+    effects: "通关动效",
+    haptics: "震动反馈",
+    focus: "自动聚焦棋盘",
+    vibrationUnavailable: "当前浏览器不支持震动，仍会显示视觉提示。",
+    vibrationNote: "是否震动还取决于设备和系统设置。",
+    testVibration: "试一下震动",
+    reducedMotion: "已跟随系统减少动态效果。",
+    deadEnd: "这条路暂时走不通了：没有可继续的相邻格。退回一步，换个方向试试。",
+    solved: "破案成功！",
+    continueCase: "挑战下一题",
+    focusOn: "专注中",
     levels: { 3: "见习", 4: "巡查", 5: "推理", 6: "怪探" } as Record<Size, string>,
     initial: "先找到数字 1，怪探从这里出发。最大数字要留到最后。",
     catLabel: "豆豆猫怪探正在查看线索",
@@ -111,6 +125,18 @@ const gameCopy = {
     inputNote: "电脑可按住鼠标拖动；手机可滑动或逐格点击；键盘可用方向键。",
   },
   en: {
+    settings: "Experience settings",
+    effects: "Celebration effects",
+    haptics: "Vibration feedback",
+    focus: "Auto-focus the board",
+    vibrationUnavailable: "This browser does not support vibration. Visual feedback is still available.",
+    vibrationNote: "Vibration also depends on your device and system settings.",
+    testVibration: "Test vibration",
+    reducedMotion: "Following your system’s reduced-motion preference.",
+    deadEnd: "This path has no legal next square. Undo one move and try another direction.",
+    solved: "Case solved!",
+    continueCase: "Try the next case",
+    focusOn: "Focused",
     levels: { 3: "Rookie", 4: "Scout", 5: "Sleuth", 6: "Master" } as Record<Size, string>,
     initial: "Find number 1 first. That is where the detective starts. Save the largest number for last.",
     catLabel: "Detective Doudou Cat is examining the clues",
@@ -238,6 +264,11 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const [elapsed, setElapsed] = useState(0);
   const [progress, setProgress] = useState<SavedProgress>(emptyProgress);
   const [hydrated, setHydrated] = useState(false);
+  const [feedback, setFeedback] = useState(loadFeedback);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const lastDeadEnd = useRef("");
+  const supportsVibration = typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
   const startedAt = useRef(0);
   const pathRef = useRef<Point[]>([puzzles["3"][0].route[0]]);
   const draggingRef = useRef(false);
@@ -270,6 +301,54 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const orderCheck = visitedClues.length === info.end && visitedClues.every((value, index) => value === index + 1);
   const endCheck = fullCheck && samePoint(path.at(-1), endPoint);
   const percent = Math.round((path.length / total) * 100);
+
+  const deadEnd = !isComplete && !hasForwardMove(path, size, clueMap, info.end);
+  const focused = feedback.focus && path.length > 1 && !isComplete;
+
+  const vibrate = useCallback((pattern: number[]) => {
+    if (!feedback.haptics || !supportsVibration || document.hidden) return;
+    try { navigator.vibrate(pattern); } catch { /* Unsupported or blocked vibration is optional. */ }
+  }, [feedback.haptics, supportsVibration]);
+
+  const updateFeedback = (key: keyof FeedbackSettings, value: boolean) => {
+    const next = { ...feedback, [key]: value };
+    setFeedback(next);
+    try { window.localStorage.setItem(feedbackKey, JSON.stringify(next)); } catch { /* Optional storage. */ }
+    if (key === "effects" && !value) setCelebrating(false);
+    if (key === "haptics" && !value && supportsVibration) {
+      try { navigator.vibrate(0); } catch { /* Optional hardware. */ }
+    }
+  };
+
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => { setReducedMotion(query.matches); if (query.matches) setCelebrating(false); };
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!celebrating) return;
+    const timer = window.setTimeout(() => setCelebrating(false), celebrationLevels[size].duration);
+    return () => window.clearTimeout(timer);
+  }, [celebrating, size]);
+
+  useEffect(() => {
+    const stop = () => {
+      if (document.hidden) {
+        setCelebrating(false);
+        draggingRef.current = false;
+        if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
+      }
+    };
+    document.addEventListener("visibilitychange", stop);
+    return () => {
+      document.removeEventListener("visibilitychange", stop);
+      if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
+    };
+  }, [supportsVibration]);
 
   useEffect(() => {
     const load = window.setTimeout(() => {
@@ -341,13 +420,16 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       completed: { ...progress.completed, [progressKey]: best },
       lastCase: { size, number: puzzle.number },
     });
+    draggingRef.current = false;
+    setCelebrating(feedback.effects && !reducedMotion);
+    vibrate(celebrationLevels[size].vibration);
     setElapsed(seconds);
     setMessage(copy.success(total, info.end));
     setTone("good");
-  }, [copy, info.end, persist, progress, progressKey, puzzle.number, size, total]);
+  }, [copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
 
   const moveTo = useCallback((point: Point) => {
-    if (isComplete) return;
+    if (!hydrated || isComplete) return;
     setHintCell(null);
     const currentPath = pathRef.current;
     const last = currentPath.at(-1);
@@ -360,6 +442,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
         pathRef.current = nextPath;
         setPath(nextPath);
         persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
+        lastDeadEnd.current = "";
         setMessage(copy.backed);
         setTone("guide");
       } else {
@@ -402,6 +485,12 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
     if (nextPath.length === total && samePoint(point, endPoint)) {
       completeCase(nextPath);
+    } else if (!hasForwardMove(nextPath, size, clueMap, info.end)) {
+      const signature = `${progressKey}:${nextPath.map((step) => step.join(",")).join(";")}`;
+      if (lastDeadEnd.current !== signature) vibrate([30, 65, 30]);
+      lastDeadEnd.current = signature;
+      setMessage(copy.deadEnd);
+      setTone("warn");
     } else if (clue) {
       setMessage(copy.clueMatched(clue));
       setTone("good");
@@ -409,7 +498,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setMessage(copy.routeProgress(nextPath.length));
       setTone("guide");
     }
-  }, [clueMap, completeCase, copy, endPoint, info.end, isComplete, persist, progress, progressKey, total]);
+  }, [clueMap, completeCase, copy, endPoint, hydrated, info.end, isComplete, persist, progress, progressKey, size, total, vibrate]);
 
   const pointFromTarget = (target: EventTarget | null): Point | null => {
     const element = target instanceof Element ? target.closest<HTMLElement>("[data-cell]") : null;
@@ -419,7 +508,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     const point = pointFromTarget(event.target);
-    if (!point) return;
+    if (!point || !event.isPrimary || event.button !== 0) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     draggingRef.current = true;
@@ -449,6 +538,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   };
 
   const resetCase = () => {
+    setCelebrating(false);
+    lastDeadEnd.current = "";
+    draggingRef.current = false;
     const initial = [puzzle.route[0]] as Point[];
     const completed = { ...progress.completed };
     delete completed[progressKey];
@@ -477,6 +569,8 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     pathRef.current = nextPath;
     setPath(nextPath);
     persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
+    lastDeadEnd.current = "";
+    setHintCell(null);
     setMessage(copy.undone);
     setTone("guide");
   };
@@ -498,6 +592,10 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   };
 
   const openCase = useCallback((nextSize: Size, index: number) => {
+    setCelebrating(false);
+    lastDeadEnd.current = "";
+    draggingRef.current = false;
+    if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
     const nextList = puzzles[String(nextSize) as `${Size}`];
     const nextIndex = (index + nextList.length) % nextList.length;
     const nextPuzzle = nextList[nextIndex];
@@ -519,7 +617,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setTone("guide");
     }
     persist({ ...progress, lastCase: { size: nextSize, number: nextPuzzle.number } });
-  }, [copy, persist, progress]);
+  }, [copy, persist, progress, supportsVibration]);
 
   const selectPuzzle = (index: number) => {
     openCase(size, index);
@@ -530,7 +628,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const cells = Array.from({ length: total }, (_, index) => [Math.floor(index / size), index % size] as Point);
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${focused ? styles.focused : ""} ${!feedback.effects || reducedMotion ? styles.quiet : ""}`}>
       <header className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>{copy.eyebrow}</p>
@@ -541,6 +639,21 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
           <strong>319</strong><span>{copy.cases}</span><small>{copy.verified}</small>
         </div>
       </header>
+
+      <div className={styles.experienceBar}>
+        <span>{focused ? copy.focusOn : copy.caseLevel(level, size)}</span>
+        <details className={styles.settings}>
+          <summary>{copy.settings}</summary>
+          <div className={styles.settingsPanel}>
+            <label><span>{copy.effects}</span><input type="checkbox" checked={feedback.effects} onChange={(event) => updateFeedback("effects", event.target.checked)} /></label>
+            <label><span>{copy.haptics}</span><input type="checkbox" checked={feedback.haptics && supportsVibration} disabled={!supportsVibration} onChange={(event) => updateFeedback("haptics", event.target.checked)} /></label>
+            <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
+            {supportsVibration && <button type="button" disabled={!feedback.haptics} onClick={() => vibrate([30, 65, 30])}>{copy.testVibration}</button>}
+            <label><span>{copy.focus}</span><input type="checkbox" checked={feedback.focus} onChange={(event) => updateFeedback("focus", event.target.checked)} /></label>
+            {reducedMotion && <p>{copy.reducedMotion}</p>}
+          </div>
+        </details>
+      </div>
 
       <nav className={styles.sizeTabs} aria-label={copy.sizeNav}>
         {sizes.map((value) => (
@@ -612,7 +725,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
           </div>
 
           <div
-            className={`${styles.board} ${styles[info.color]}`}
+            className={`${styles.board} ${styles[info.color]} ${deadEnd ? styles.deadEnd : ""} ${isComplete ? styles.solvedBoard : ""}`}
             style={{
               gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
               gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
@@ -621,11 +734,13 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             onPointerMove={handlePointerMove}
             onPointerUp={stopDragging}
             onPointerCancel={stopDragging}
+            onLostPointerCapture={stopDragging}
             onKeyDown={handleKeyboard}
             role="grid"
             tabIndex={0}
             aria-label={copy.boardAria(size)}
           >
+            {celebrating && <Celebration size={size} />}
             <svg className={styles.pathLayer} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
               <polyline points={polyline} fill="none" vectorEffect="non-scaling-stroke" />
             </svg>
@@ -654,15 +769,20 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             })}
           </div>
 
+          {isComplete && <div className={styles.successCard}>
+            <div><strong>{copy.solved}</strong><span>{copy.caseLevel(level, size)} · {formatTime(completedSeconds)}</span></div>
+            <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}</button>
+          </div>}
+
           <div className={styles.progressRow}>
             <span>{copy.explored} <strong>{path.length}</strong> / {total} {copy.squares}</span>
             <div className={styles.progressTrack} aria-label={copy.progressAria(percent)}><i style={{ width: `${percent}%` }} /></div>
             <span>{percent}%</span>
           </div>
 
-          <div className={`${styles.message} ${styles[tone]}`} role="status" aria-live="polite">
+          <div className={`${styles.message} ${styles[deadEnd ? "warn" : tone]}`} role="status" aria-live="polite">
             <DetectiveCat label={copy.catLabel} />
-            <div><strong>{tone === "warn" ? copy.statusWarn : tone === "good" ? copy.statusGood : copy.statusGuide}</strong><p>{message}</p></div>
+            <div><strong>{deadEnd || tone === "warn" ? copy.statusWarn : tone === "good" ? copy.statusGood : copy.statusGuide}</strong><p>{deadEnd ? copy.deadEnd : message}</p></div>
           </div>
 
           <div className={styles.actions}>

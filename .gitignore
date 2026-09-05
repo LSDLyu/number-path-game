@@ -2,3 +2,19 @@ node_modules/
 dist/
 *.tsbuildinfo
 .DS_Store
+
+# Local secrets and authentication must never be committed.
+.env
+.env.*
+!.env.example
+.npmrc
+.netrc
+.git-credentials
+credentials.json
+auth.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.log
+.wrangler/
