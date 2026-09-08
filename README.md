@@ -19,6 +19,13 @@ pnpm dev
 
 从数字 1 出发，只走上下左右，按顺序经过数字；不漏格、不重走，最后抵达最大的数字。
 
+- 3×3、4×4、5×5、6×6 分别独立解锁。每个类别初始只开放第 1 题，按顺序通关后开放下一题；未解锁题目在列表和快捷选择中禁用。
+- 可以重玩已解锁题目。“重新开始”只重置当前路线，保留通关记录、最佳成绩和已解锁关卡；刷新后继续保存的路线。
+- 旧版记录继续保留。若此前跳过了前面的题目，需要补完缺少的题目后才能继续后面的关卡；刷新时会回到可进入的关卡。
+- 进度保存在当前浏览器，本地存储不可用时仍可游玩，但刷新后无法保留进度。
+
+Each board size unlocks independently. Solve cases in order to unlock the next one. Replaying a case keeps your completion record, best time, and unlocked cases. Existing records are retained, but any earlier unsolved cases must be completed before moving on.
+
 自得学园出品｜ChatGPT 协力 · 人工复核
 
 ## 通关反馈与专注体验
@@ -30,4 +37,8 @@ pnpm dev
 - 标准震动 API 仅在支持的浏览器和设备上尝试调用，实际效果受硬件与系统设置影响；不支持时禁用震动开关，保留文字与边框提示。可使用“试一下震动”在真机确认。
 - 开始走棋后弱化外围面板，悬停或键盘进入面板时恢复；不在拖动中折叠界面，避免棋盘位置变化。手机布局压缩标题和选题区，保留撤回、提示、重开及通关后的下一题入口。
 
-验证：`pnpm test` 覆盖全部 319 题的标准解路径、四档通关、死路回退、开关持久化、刷新不重播、无震动支持和减少动态效果；`pnpm build` 检查类型和生产构建。真实手机的震感需在设备上确认。
+验证：`pnpm test` 覆盖全部 319 题的标准解路径、四档通关、死路回退、开关持久化、刷新不重播、无震动支持和减少动态效果，以及各类别独立解锁、选题入口限制、旧记录兼容、重玩保留成绩和最后一题；`pnpm build` 检查类型和生产构建。真实手机的震感需在设备上确认。
+
+## GitHub Pages 发布配置
+
+仓库已包含 `.github/workflows/deploy-pages.yml`，会在 `main` 更新时构建并发布 `dist`。请在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**，无需再创建发布工作流。这样可避免“Deploy from a branch”的旧流程把源码覆盖到线上。[GitHub 官方配置说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)

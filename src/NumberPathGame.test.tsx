@@ -15,6 +15,10 @@ beforeEach(() => {
 
 describe("NumberPathGame progress persistence", () => {
   it("restores the last size, puzzle, and path after a refresh", async () => {
+    window.localStorage.setItem("zide-number-path-progress-v1", JSON.stringify({
+      paths: {},
+      completed: Object.fromEntries(rawPuzzles["6"].slice(0, 16).map((puzzle) => [`6-${puzzle.number}`, 30])),
+    }));
     const view = render(<NumberPathGame locale="zh" />);
     await screen.findByRole("heading", { name: "第 1 题" });
 

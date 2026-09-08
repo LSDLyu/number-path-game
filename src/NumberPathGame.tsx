@@ -50,6 +50,11 @@ const gameCopy = {
     deadEnd: "这条路暂时走不通了：没有可继续的相邻格。退回一步，换个方向试试。",
     solved: "破案成功！",
     continueCase: "挑战下一题",
+    locked: "未解锁",
+    unlockRule: "各类别独立闯关，完成前面的题目后解锁下一题。",
+    unlocked: (count: number, total: number) => `已解锁 ${count} / ${total} 题`,
+    unlockRequired: (number: number) => `请先完成第 ${number} 题，再继续后面的题目。`,
+    categoryComplete: "本类别已全部通关！可以重玩已完成的题目，或切换棋盘大小。",
     focusOn: "专注中",
     levels: { 3: "见习", 4: "巡查", 5: "推理", 6: "怪探" } as Record<Size, string>,
     initial: "先找到数字 1，怪探从这里出发。最大数字要留到最后。",
@@ -136,6 +141,11 @@ const gameCopy = {
     deadEnd: "This path has no legal next square. Undo one move and try another direction.",
     solved: "Case solved!",
     continueCase: "Try the next case",
+    locked: "Locked",
+    unlockRule: "Progress separately in each board size. Solve cases in order to unlock the next one.",
+    unlocked: (count: number, total: number) => `${count} / ${total} cases unlocked`,
+    unlockRequired: (number: number) => `Solve Case ${number} before continuing to later cases.`,
+    categoryComplete: "All cases in this board size are solved! Replay a case or choose another board size.",
     focusOn: "Focused",
     levels: { 3: "Rookie", 4: "Scout", 5: "Sleuth", 6: "Master" } as Record<Size, string>,
     initial: "Find number 1 first. That is where the detective starts. Save the largest number for last.",
@@ -226,6 +236,17 @@ function formatTime(seconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
 }
 
+function hasCompletedCase(completed: SavedProgress["completed"], size: Size, number: number) {
+  const seconds = completed[`${size}-${number}`];
+  return Number.isFinite(seconds) && seconds > 0;
+}
+
+function lastUnlockedIndex(size: Size, completed: SavedProgress["completed"]) {
+  const list = puzzles[String(size) as `${Size}`];
+  const firstIncomplete = list.findIndex((item) => !hasCompletedCase(completed, size, item.number));
+  return firstIncomplete < 0 ? list.length - 1 : firstIncomplete;
+}
+
 function validSavedPath(path: Point[] | undefined, puzzle: Puzzle, size: Size) {
   if (!path?.length || path.length > size * size || !samePoint(path[0], puzzle.route[0])) return false;
   const seen = new Set<string>();
@@ -279,6 +300,10 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const level = copy.levels[size];
   const total = size * size;
   const progressKey = `${size}-${puzzle.number}`;
+  const unlockedIndex = lastUnlockedIndex(size, progress.completed);
+  const canOpenNext = puzzleIndex < unlockedIndex;
+  const completedForSize = puzzleList.filter((item) => hasCompletedCase(progress.completed, size, item.number)).length;
+  const categoryComplete = completedForSize === puzzleList.length;
 
   const clueMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -287,7 +312,6 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   }, [puzzle]);
 
   const completedSeconds = progress.completed[progressKey];
-  const isComplete = Boolean(completedSeconds);
   const visitedClues = useMemo(
     () => path.map(([row, column]) => clueMap.get(`${row}-${column}`)).filter((value): value is number => Boolean(value)),
     [clueMap, path],
@@ -300,6 +324,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const fullCheck = path.length === total;
   const orderCheck = visitedClues.length === info.end && visitedClues.every((value, index) => value === index + 1);
   const endCheck = fullCheck && samePoint(path.at(-1), endPoint);
+  const isComplete = hasCompletedCase(progress.completed, size, puzzle.number) && fullCheck && orderCheck && endCheck;
   const percent = Math.round((path.length / total) * 100);
 
   const deadEnd = !isComplete && !hasForwardMove(path, size, clueMap, info.end);
@@ -371,7 +396,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       const initialList = puzzles[String(initialSize) as `${Size}`];
       const storedNumber = storedProgress.lastCase?.number;
       const initialIndex = initialList.findIndex((item) => item.number === storedNumber);
-      const safeIndex = initialIndex >= 0 ? initialIndex : 0;
+      const safeIndex = Math.min(initialIndex >= 0 ? initialIndex : 0, lastUnlockedIndex(initialSize, storedProgress.completed));
       const initialPuzzle = initialList[safeIndex];
       const initialKey = `${initialSize}-${initialPuzzle.number}`;
       const saved = storedProgress.paths[initialKey];
@@ -382,7 +407,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       pathRef.current = initialPath;
       setPath(initialPath);
       startedAt.current = Date.now();
-      if (storedProgress.completed[initialKey]) {
+      if (hasCompletedCase(storedProgress.completed, initialSize, initialPuzzle.number) && initialPath.length === initialSize * initialSize) {
         setMessage(copy.archived(formatTime(storedProgress.completed[initialKey])));
         setTone("good");
       } else {
@@ -542,11 +567,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     lastDeadEnd.current = "";
     draggingRef.current = false;
     const initial = [puzzle.route[0]] as Point[];
-    const completed = { ...progress.completed };
-    delete completed[progressKey];
     persist({
+      ...progress,
       paths: { ...progress.paths, [progressKey]: initial },
-      completed,
       lastCase: { size, number: puzzle.number },
     });
     pathRef.current = initial;
@@ -592,12 +615,20 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   };
 
   const openCase = useCallback((nextSize: Size, index: number) => {
+    if (!hydrated) return;
+    const nextList = puzzles[String(nextSize) as `${Size}`];
+    if (!Number.isInteger(index) || index < 0 || index >= nextList.length) return;
+    const nextUnlockedIndex = lastUnlockedIndex(nextSize, progress.completed);
+    if (index > nextUnlockedIndex) {
+      setMessage(copy.unlockRequired(nextList[nextUnlockedIndex].number));
+      setTone("guide");
+      return;
+    }
     setCelebrating(false);
     lastDeadEnd.current = "";
     draggingRef.current = false;
     if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
-    const nextList = puzzles[String(nextSize) as `${Size}`];
-    const nextIndex = (index + nextList.length) % nextList.length;
+    const nextIndex = index;
     const nextPuzzle = nextList[nextIndex];
     const nextKey = `${nextSize}-${nextPuzzle.number}`;
     const saved = progress.paths[nextKey];
@@ -609,7 +640,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     setHintCell(null);
     startedAt.current = Date.now();
     setElapsed(0);
-    if (progress.completed[nextKey]) {
+    if (hasCompletedCase(progress.completed, nextSize, nextPuzzle.number) && initial.length === nextSize * nextSize) {
       setMessage(copy.archived(formatTime(progress.completed[nextKey])));
       setTone("good");
     } else {
@@ -617,13 +648,12 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setTone("guide");
     }
     persist({ ...progress, lastCase: { size: nextSize, number: nextPuzzle.number } });
-  }, [copy, persist, progress, supportsVibration]);
+  }, [copy, hydrated, persist, progress, supportsVibration]);
 
   const selectPuzzle = (index: number) => {
     openCase(size, index);
   };
 
-  const completedForSize = Object.keys(progress.completed).filter((key) => key.startsWith(`${size}-`)).length;
   const polyline = path.map(([row, column]) => `${column + 0.5},${row + 0.5}`).join(" ");
   const cells = Array.from({ length: total }, (_, index) => [Math.floor(index / size), index % size] as Point);
 
@@ -676,21 +706,26 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             <div><p>{copy.caseTitle}</p><h2 id="case-title">{copy.caseFiles}</h2></div>
             <span>{completedForSize}/{puzzleList.length}</span>
           </div>
+          <p className={styles.unlockRule}>{copy.unlockRule}</p>
           <div className={styles.caseGrid}>
             {puzzleList.map((item, index) => {
-              const key = `${size}-${item.number}`;
-              const complete = Boolean(progress.completed[key]);
+              const complete = hasCompletedCase(progress.completed, size, item.number);
+              const locked = index > unlockedIndex;
               return (
                 <button
                   type="button"
                   key={item.number}
                   className={`${index === puzzleIndex ? styles.activeCase : ""} ${complete ? styles.completeCase : ""}`}
-                  aria-label={copy.caseAria(item.number, complete)}
+                  aria-label={`${copy.caseAria(item.number, complete)}${locked ? ` · ${copy.locked}` : ""}`}
                   aria-current={index === puzzleIndex ? "true" : undefined}
+                  disabled={!hydrated || locked}
+                  title={locked ? copy.unlockRequired(puzzleList[unlockedIndex].number) : undefined}
                   onClick={() => selectPuzzle(index)}
                 >
                   {String(item.number).padStart(2, "0")}
-                  {complete && <span aria-hidden="true">✓</span>}
+                  {locked ? <svg className={styles.lockIcon} viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v7H4Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                  </svg> : complete && <span aria-hidden="true">✓</span>}
                 </button>
               );
             })}
@@ -704,25 +739,28 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
               <h2 id="board-title">{copy.question(puzzle.number)}</h2>
             </div>
             <div className={styles.pager}>
-              <button type="button" onClick={() => selectPuzzle(puzzleIndex - 1)}>{copy.previous}</button>
+              <button type="button" disabled={!hydrated || puzzleIndex === 0} onClick={() => selectPuzzle(puzzleIndex - 1)}>{copy.previous}</button>
               <span>{puzzle.number} / {puzzleList.length}</span>
-              <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.next}</button>
+              <button type="button" disabled={!hydrated || !canOpenNext} onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.next}</button>
               <label className={styles.quickCase}>
                 {copy.quick}
                 <select
                   value={puzzleIndex}
                   onChange={(event) => selectPuzzle(Number(event.target.value))}
                   aria-label={copy.quickAria}
+                  disabled={!hydrated}
                 >
                   {puzzleList.map((item, index) => (
-                    <option key={item.number} value={index}>
-                      {copy.option(item.number, Boolean(progress.completed[`${size}-${item.number}`]))}
+                    <option key={item.number} value={index} disabled={index > unlockedIndex}>
+                      {copy.option(item.number, hasCompletedCase(progress.completed, size, item.number))}{index > unlockedIndex ? ` · ${copy.locked}` : ""}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
           </div>
+
+          <p className={styles.unlockProgress} role="status" aria-live="polite">{copy.unlocked(unlockedIndex + 1, puzzleList.length)}</p>
 
           <div
             className={`${styles.board} ${styles[info.color]} ${deadEnd ? styles.deadEnd : ""} ${isComplete ? styles.solvedBoard : ""}`}
@@ -771,7 +809,8 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
           {isComplete && <div className={styles.successCard}>
             <div><strong>{copy.solved}</strong><span>{copy.caseLevel(level, size)} · {formatTime(completedSeconds)}</span></div>
-            <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}</button>
+            {canOpenNext && <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}</button>}
+            {categoryComplete && puzzleIndex === puzzleList.length - 1 && <p>{copy.categoryComplete}</p>}
           </div>}
 
           <div className={styles.progressRow}>

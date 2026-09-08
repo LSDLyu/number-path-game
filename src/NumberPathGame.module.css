@@ -195,14 +195,25 @@
   font-weight: 900;
 }
 
-.caseGrid button:hover { background: #f9f0c7; }
+.caseGrid button:hover:not(:disabled) { background: #f9f0c7; }
 .caseGrid .activeCase {
   border-color: var(--game-ink);
   background: var(--game-ink);
   color: white;
 }
 
-.caseGrid .completeCase:not(.activeCase) { background: #dcebd8; }
+.caseGrid .completeCase:not(.activeCase):not(:disabled) { background: #dcebd8; }
+
+.caseGrid button:disabled {
+  border-style: dashed;
+  background: #f0f1ec;
+  color: #78817d;
+  cursor: not-allowed;
+}
+
+.lockIcon { width: 12px; height: 12px; margin-left: 2px; vertical-align: -1px; }
+.unlockRule { margin: 12px 14px 0; color: #56615e; font-size: 13px; line-height: 1.6; }
+.unlockProgress { margin: 12px 0 0; color: #56615e; font-size: 13px; }
 
 .caseGrid button span {
   position: absolute;
@@ -235,8 +246,10 @@
   font-weight: 900;
 }
 
-.pager button:hover,
+.pager button:hover:not(:disabled),
 .actions button:hover { background: #f9f0c7; }
+
+.pager button:disabled { border-color: var(--game-line); color: #78817d; background: #f0f1ec; cursor: not-allowed; }
 
 .pager span {
   font-family: var(--font-latin);
