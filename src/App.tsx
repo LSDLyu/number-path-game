@@ -66,8 +66,6 @@ export function App() {
           <strong>{copy.brand}<small>{copy.brandLatin}</small></strong>
         </a>
         <nav aria-label={copy.navLabel}>
-          <a href={liveHref}>{copy.live}</a>
-          <a href={locale === "zh" ? "https://edu.alading.org/" : "https://edu.alading.org/en"}>{copy.more}</a>
           <a
             href={`?lang=${alternateLocale}`}
             aria-label={copy.switchLabel}
@@ -87,6 +85,8 @@ export function App() {
           <span>{copy.footerNote}</span>
         </div>
         <nav aria-label={copy.footerLabel}>
+          <a href={liveHref}>{copy.live}</a>
+          <a href={locale === "zh" ? "https://edu.alading.org/" : "https://edu.alading.org/en"}>{copy.more}</a>
           <a href={locale === "zh" ? "https://edu.alading.org/apply" : "https://edu.alading.org/en/apply"}>{copy.apply}</a>
           <a href="https://alading.org/">{copy.back}</a>
         </nav>

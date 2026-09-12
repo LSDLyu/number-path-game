@@ -10,6 +10,9 @@ import {
   useState,
 } from "react";
 import { Celebration } from "./Celebration";
+import { GameDialog } from "./GameDialog";
+import { createPlayClock } from "./playClock";
+import { solveFromPath, type HintResult } from "./hintSolver";
 import { celebrationLevels, feedbackKey, hasForwardMove, loadFeedback, type FeedbackSettings } from "./gameFeedback";
 import rawPuzzles from "./number-path-puzzles.json";
 import styles from "./NumberPathGame.module.css";
@@ -23,6 +26,8 @@ type Tone = "guide" | "good" | "warn";
 type SavedProgress = {
   paths: Record<string, Point[]>;
   completed: Record<string, number>;
+  elapsedMs?: Record<string, number>;
+  lastCases?: Partial<Record<Size, number>>;
   lastCase?: { size: Size; number: number };
 };
 
@@ -39,6 +44,30 @@ const storageKey = "zide-number-path-progress-v1";
 
 const gameCopy = {
   zh: {
+    gameTitle: "数学路径怪探",
+    shortRules: "按顺序连接数字，走满每一格，最大数字最后到达。",
+    chooseCase: "选择关卡",
+    chooseShort: "关卡",
+    settingsShort: "设置",
+    help: "怎么玩",
+    close: "关闭面板",
+    resumeChallenge: "继续闯关",
+    currentTime: "本次用时",
+    nextNumber: "下一数字",
+    savedLocally: "进度自动保存在当前浏览器",
+    storageUnavailable: "当前浏览器无法保存进度，关闭页面后可能丢失。",
+    keepGoing: "从路线末端继续；点回已走的格子可以退回。",
+    restartTitle: "重新开始这一题？",
+    restartNote: "这次路线会清空，已通关记录、最佳成绩和解锁进度都会保留。",
+    cancelRestart: "继续游戏",
+    confirmRestart: "清空路线，重新开始",
+    hintBusy: "正在寻找线索…",
+    hintBlocked: "这条路线无法走满棋盘。请先撤回一步，再换个方向试试。",
+    hintUnknown: "暂时还没找到可靠的下一步。你可以继续尝试，或撤回一步再找线索。",
+    finishTag: "终点",
+    undoShort: "撤回",
+    hintShort: "提示",
+    restartShort: "重开",
     settings: "体验设置",
     effects: "通关动效",
     haptics: "震动反馈",
@@ -62,7 +91,7 @@ const gameCopy = {
     archived: (time: string) => `这宗谜案已归档，用时 ${time}。你可以重走一次，或换下一题。`,
     resume: (number: number, length: number, end: number) => `继续勘察第 ${number} 题：已走 ${length} 格，数字 ${end} 是终点。`,
     success: (total: number, end: number) => `破案成功！${total} 格全部走过，数字 ${end} 正好落在最后一格。`,
-    backed: "已沿原路退回一格。重新观察四个方向。",
+    backed: "已退回这格，从这里重新选择方向。",
     repeated: "路线不能重复经过同一格；需要回退时请沿原路退一格。",
     adjacentOnly: "怪探不能斜走或跳格，只能走到上下左右相邻格。",
     earlyEnd: (end: number) => `数字 ${end} 是终点，现在还没填满全部格子，先绕开它。`,
@@ -75,7 +104,7 @@ const gameCopy = {
     closedUndo: "已归档的谜案如需重走，请选择“重新开始”。",
     undone: "撤回一步。现在从路线末端继续。",
     deviated: (step: number) => `第 ${step} 步偏离了可靠线索。沿原路退回，再换一个方向试试。`,
-    hint: "豆豆猫找到一枚脚印：闪烁格可以作为下一步。",
+    hint: (row: number, column: number) => `豆豆猫找到线索：下一步可走第 ${row} 行、第 ${column} 列的标记格。`,
     startCase: (end: number) => `从 1 出发，下一站找数字 2；数字 ${end} 是终点。`,
     eyebrow: "数学路径怪探 · 数字顺序与空间推理",
     heroLead: "每一格都是线索，",
@@ -127,9 +156,33 @@ const gameCopy = {
     ruleMove: "只能走上下左右相邻格。",
     ruleOrder: "按数字顺序经过，不重复、不漏格。",
     ruleEnd: "最大的数字是终点。",
-    inputNote: "电脑可按住鼠标拖动；手机可滑动或逐格点击；键盘可用方向键。",
+    inputNote: "拖动或逐格点击连线；点回已走格可回退。键盘用方向键连线，Z 或退格键撤回。",
   },
   en: {
+    gameTitle: "Number Path Detectives",
+    shortRules: "Connect the numbers in order. Fill every square. Reach the largest number last.",
+    chooseCase: "Choose a case",
+    chooseShort: "Cases",
+    settingsShort: "Settings",
+    help: "How to play",
+    close: "Close panel",
+    resumeChallenge: "Continue your challenge",
+    currentTime: "Time played",
+    nextNumber: "Next number",
+    savedLocally: "Progress saves automatically in this browser",
+    storageUnavailable: "This browser cannot save progress. Closing the page may lose your game.",
+    keepGoing: "Continue from the end of your path. Tap a visited square to go back.",
+    restartTitle: "Restart this case?",
+    restartNote: "Your current path will be cleared. Completed cases, best times, and unlocks will stay.",
+    cancelRestart: "Keep playing",
+    confirmRestart: "Clear path and restart",
+    hintBusy: "Finding a clue…",
+    hintBlocked: "This path cannot cover the whole board. Undo a move and try another direction.",
+    hintUnknown: "No reliable next step found yet. Keep exploring, or undo a move and ask again.",
+    finishTag: "END",
+    undoShort: "Undo",
+    hintShort: "Hint",
+    restartShort: "Restart",
     settings: "Experience settings",
     effects: "Celebration effects",
     haptics: "Vibration feedback",
@@ -153,7 +206,7 @@ const gameCopy = {
     archived: (time: string) => `This case is closed. Best time: ${time}. Replay it or choose another case.`,
     resume: (number: number, length: number, end: number) => `Continue Case ${number}: ${length} squares explored. Number ${end} is the finish.`,
     success: (total: number, end: number) => `Case solved! You covered all ${total} squares and reached number ${end} last.`,
-    backed: "You moved back one square along your path. Check all four directions again.",
+    backed: "Back at this square. Choose a new direction from here.",
     repeated: "A path cannot visit the same square twice. To go back, move one square along your path.",
     adjacentOnly: "No diagonal moves or jumps. Move only to the next square up, down, left, or right.",
     earlyEnd: (end: number) => `Number ${end} is the finish. Some squares are still empty, so go around it for now.`,
@@ -166,7 +219,7 @@ const gameCopy = {
     closedUndo: "To replay a closed case, choose “Restart”.",
     undone: "One move undone. Continue from the end of the path.",
     deviated: (step: number) => `Move ${step} left the reliable trail. Back up along your path and try another direction.`,
-    hint: "Doudou Cat found a footprint. The flashing square can be your next move.",
+    hint: (row: number, column: number) => `Doudou Cat found a clue: try the marked square in row ${row}, column ${column}.`,
     startCase: (end: number) => `Start at 1 and look for number 2 next. Number ${end} is the finish.`,
     eyebrow: "NUMBER PATH DETECTIVES · SEQUENCES & SPATIAL REASONING",
     heroLead: "Every square is a clue. ",
@@ -218,7 +271,7 @@ const gameCopy = {
     ruleMove: "Move only up, down, left, or right.",
     ruleOrder: "Visit the numbers in order without repeats or gaps.",
     ruleEnd: "The largest number is the finish.",
-    inputNote: "On a computer, drag with the mouse. On a phone, swipe or tap one square at a time. You can also use the arrow keys.",
+    inputNote: "Drag or tap to draw. Tap a visited square to go back. Use arrow keys to draw and Z or Backspace to undo.",
   },
 };
 
@@ -248,13 +301,21 @@ function lastUnlockedIndex(size: Size, completed: SavedProgress["completed"]) {
 }
 
 function validSavedPath(path: Point[] | undefined, puzzle: Puzzle, size: Size) {
-  if (!path?.length || path.length > size * size || !samePoint(path[0], puzzle.route[0])) return false;
+  if (!Array.isArray(path) || !path.length || path.length > size * size || !samePoint(path[0], puzzle.route[0])) return false;
   const seen = new Set<string>();
+  const clues = new Map(puzzle.clues.map(([row, column, value]) => [`${row}-${column}`, value]));
+  const end = sizeInfo[size].end;
+  let expected = 1;
   return path.every((point, index) => {
+    if (!Array.isArray(point) || point.length !== 2) return false;
     const [row, column] = point;
     const key = `${row}-${column}`;
-    const valid = row >= 0 && row < size && column >= 0 && column < size && !seen.has(key)
-      && (index === 0 || distance(path[index - 1], point) === 1);
+    const clue = clues.get(key);
+    const valid = Number.isInteger(row) && Number.isInteger(column)
+      && row >= 0 && row < size && column >= 0 && column < size && !seen.has(key)
+      && (index === 0 || distance(path[index - 1], point) === 1)
+      && (!clue || clue === expected) && (clue !== end || index === size * size - 1);
+    if (clue) expected += 1;
     seen.add(key);
     return valid;
   });
@@ -290,9 +351,23 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const [celebrating, setCelebrating] = useState(false);
   const lastDeadEnd = useRef("");
   const supportsVibration = typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
-  const startedAt = useRef(0);
+  const progressRef = useRef<SavedProgress>(emptyProgress);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [panel, setPanel] = useState<"cases" | "settings" | "help" | "restart" | null>(null);
+  const [visible, setVisible] = useState(() => typeof document === "undefined" || !document.hidden);
+  const [storageAvailable, setStorageAvailable] = useState(true);
+  const [hinting, setHinting] = useState(false);
+  const hintJob = useRef<{ worker: Worker; timer: number } | null>(null);
+  const hintRequestId = useRef(0);
+  const cancelHint = useCallback(() => {
+    hintRequestId.current += 1;
+    if (hintJob.current) { hintJob.current.worker.terminate(); window.clearTimeout(hintJob.current.timer); hintJob.current = null; }
+    setHinting(false);
+  }, []);
+  useEffect(() => () => { if (hintJob.current) { hintJob.current.worker.terminate(); window.clearTimeout(hintJob.current.timer); } }, []);
   const pathRef = useRef<Point[]>([puzzles["3"][0].route[0]]);
   const draggingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
 
   const puzzleList = puzzles[String(size) as `${Size}`];
   const puzzle = puzzleList[puzzleIndex];
@@ -326,6 +401,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const endCheck = fullCheck && samePoint(path.at(-1), endPoint);
   const isComplete = hasCompletedCase(progress.completed, size, puzzle.number) && fullCheck && orderCheck && endCheck;
   const percent = Math.round((path.length / total) * 100);
+  const clock = useMemo(() => createPlayClock(progressRef.current.elapsedMs?.[progressKey] ?? 0), [progressKey, hydrated]);
 
   const deadEnd = !isComplete && !hasForwardMove(path, size, clueMap, info.end);
   const focused = feedback.focus && path.length > 1 && !isComplete;
@@ -362,7 +438,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
   useEffect(() => {
     const stop = () => {
+      setVisible(!document.hidden);
       if (document.hidden) {
+        cancelHint();
         setCelebrating(false);
         draggingRef.current = false;
         if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
@@ -373,7 +451,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       document.removeEventListener("visibilitychange", stop);
       if (supportsVibration) { try { navigator.vibrate(0); } catch { /* Optional hardware. */ } }
     };
-  }, [supportsVibration]);
+  }, [supportsVibration, cancelHint]);
 
   useEffect(() => {
     const load = window.setTimeout(() => {
@@ -386,6 +464,8 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             paths: parsed.paths ?? {},
             completed: parsed.completed ?? {},
             lastCase: parsed.lastCase,
+            lastCases: parsed.lastCases,
+            elapsedMs: parsed.elapsedMs,
           };
         }
       } catch {
@@ -401,12 +481,13 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       const initialKey = `${initialSize}-${initialPuzzle.number}`;
       const saved = storedProgress.paths[initialKey];
       const initialPath = validSavedPath(saved, initialPuzzle, initialSize) ? saved : [initialPuzzle.route[0]];
+      progressRef.current = storedProgress;
       setProgress(storedProgress);
       setSize(initialSize);
       setPuzzleIndex(safeIndex);
       pathRef.current = initialPath;
       setPath(initialPath);
-      startedAt.current = Date.now();
+
       if (hasCompletedCase(storedProgress.completed, initialSize, initialPuzzle.number) && initialPath.length === initialSize * initialSize) {
         setMessage(copy.archived(formatTime(storedProgress.completed[initialKey])));
         setTone("good");
@@ -419,30 +500,50 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     return () => window.clearTimeout(load);
   }, [copy]);
 
-  useEffect(() => {
-    if (!hydrated || isComplete) return;
-    const timer = window.setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [hydrated, isComplete, progressKey]);
-
   const persist = useCallback((next: SavedProgress) => {
+    progressRef.current = next;
     setProgress(next);
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(next));
     } catch {
-      // The game remains fully playable when storage is unavailable.
+      setStorageAvailable(false);
     }
   }, []);
 
+  const clockRunning = hydrated && path.length > 1 && !isComplete && !panel && visible;
+  useEffect(() => {
+    if (!hydrated) return;
+    const saveTime = () => {
+      const ms = clock.read();
+      const current = progressRef.current;
+      if (current.elapsedMs?.[progressKey] !== ms) persist({ ...current, elapsedMs: { ...current.elapsedMs, [progressKey]: ms } });
+    };
+    if (clockRunning) clock.start(); else clock.pause();
+    const tick = () => { setElapsed(Math.floor(clock.read() / 1000)); saveTime(); };
+    tick();
+    const timer = clockRunning ? window.setInterval(tick, 1000) : undefined;
+    const hide = () => { clock.pause(); saveTime(); };
+    const show = () => { if (clockRunning && !document.hidden) clock.start(); };
+    window.addEventListener("pagehide", hide);
+    window.addEventListener("pageshow", show);
+    return () => {
+      window.clearInterval(timer);
+      clock.pause(); saveTime();
+      window.removeEventListener("pagehide", hide);
+      window.removeEventListener("pageshow", show);
+    };
+  }, [clock, clockRunning, hydrated, persist, progressKey]);
+
   const completeCase = useCallback((nextPath: Point[]) => {
-    const seconds = Math.max(1, Math.floor((Date.now() - startedAt.current) / 1000));
+    const milliseconds = clock.pause();
+    const seconds = Math.max(1, Math.floor(milliseconds / 1000));
     const previous = progress.completed[progressKey];
     const best = previous ? Math.min(previous, seconds) : seconds;
     persist({
-      paths: { ...progress.paths, [progressKey]: nextPath },
-      completed: { ...progress.completed, [progressKey]: best },
+      ...progressRef.current,
+      paths: { ...progressRef.current.paths, [progressKey]: nextPath },
+      completed: { ...progressRef.current.completed, [progressKey]: best },
+      elapsedMs: { ...progressRef.current.elapsedMs, [progressKey]: milliseconds },
       lastCase: { size, number: puzzle.number },
     });
     draggingRef.current = false;
@@ -451,10 +552,11 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     setElapsed(seconds);
     setMessage(copy.success(total, info.end));
     setTone("good");
-  }, [copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
+  }, [clock, copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
 
   const moveTo = useCallback((point: Point) => {
-    if (!hydrated || isComplete) return;
+    if (!hydrated || isComplete || panel || pathRef.current.length === total) return;
+    cancelHint();
     setHintCell(null);
     const currentPath = pathRef.current;
     const last = currentPath.at(-1);
@@ -462,18 +564,13 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
     const existingIndex = currentPath.findIndex((step) => samePoint(step, point));
     if (existingIndex >= 0) {
-      if (existingIndex === currentPath.length - 2) {
-        const nextPath = currentPath.slice(0, -1);
-        pathRef.current = nextPath;
-        setPath(nextPath);
-        persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
-        lastDeadEnd.current = "";
-        setMessage(copy.backed);
-        setTone("guide");
-      } else {
-        setMessage(copy.repeated);
-        setTone("warn");
-      }
+      const nextPath = currentPath.slice(0, existingIndex + 1);
+      pathRef.current = nextPath;
+      setPath(nextPath);
+      persist({ ...progressRef.current, paths: { ...progressRef.current.paths, [progressKey]: nextPath } });
+      lastDeadEnd.current = "";
+      setMessage(copy.backed);
+      setTone("guide");
       return;
     }
 
@@ -504,10 +601,11 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       return;
     }
 
+    if (currentPath.length === 1) clock.start();
     const nextPath = [...currentPath, point];
     pathRef.current = nextPath;
     setPath(nextPath);
-    persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
+    persist({ ...progressRef.current, paths: { ...progressRef.current.paths, [progressKey]: nextPath } });
     if (nextPath.length === total && samePoint(point, endPoint)) {
       completeCase(nextPath);
     } else if (!hasForwardMove(nextPath, size, clueMap, info.end)) {
@@ -520,10 +618,10 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setMessage(copy.clueMatched(clue));
       setTone("good");
     } else {
-      setMessage(copy.routeProgress(nextPath.length));
+      setMessage(copy.keepGoing);
       setTone("guide");
     }
-  }, [clueMap, completeCase, copy, endPoint, hydrated, info.end, isComplete, persist, progress, progressKey, size, total, vibrate]);
+  }, [cancelHint, clock, clueMap, completeCase, copy, endPoint, hydrated, info.end, isComplete, panel, persist, progressKey, size, total, vibrate]);
 
   const pointFromTarget = (target: EventTarget | null): Point | null => {
     const element = target instanceof Element ? target.closest<HTMLElement>("[data-cell]") : null;
@@ -531,26 +629,49 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     return [Number(element.dataset.row), Number(element.dataset.column)];
   };
 
+  const movePointerTo = (point: Point) => {
+    const last = pathRef.current.at(-1);
+    if (!last) return;
+    // Fill only an unambiguous straight segment; never invent a diagonal turn.
+    if (last[0] !== point[0] && last[1] !== point[1]) { moveTo(point); return; }
+    const dr = Math.sign(point[0] - last[0]), dc = Math.sign(point[1] - last[1]);
+    for (let step = 1; step <= distance(last, point); step++) {
+      const next: Point = [last[0] + dr * step, last[1] + dc * step];
+      moveTo(next);
+      if (!samePoint(pathRef.current.at(-1), next) || !draggingRef.current) break;
+    }
+  };
+
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     const point = pointFromTarget(event.target);
-    if (!point || !event.isPrimary || event.button !== 0) return;
+    if (!point || !event.isPrimary || event.button !== 0 || !hydrated || isComplete || panel) return;
     event.preventDefault();
+    event.currentTarget.focus({ preventScroll: true });
     event.currentTarget.setPointerCapture(event.pointerId);
+    pointerIdRef.current = event.pointerId;
     draggingRef.current = true;
     moveTo(point);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!draggingRef.current) return;
-    const point = pointFromTarget(document.elementFromPoint(event.clientX, event.clientY));
-    if (point) moveTo(point);
+    if (!draggingRef.current || pointerIdRef.current !== event.pointerId) return;
+    const board = event.currentTarget, rect = board.getBoundingClientRect();
+    const samples = event.nativeEvent.getCoalescedEvents?.() ?? [];
+    for (const sample of [...samples, event.nativeEvent]) {
+      const column = Math.floor((sample.clientX - rect.left - board.clientLeft) / board.clientWidth * size);
+      const row = Math.floor((sample.clientY - rect.top - board.clientTop) / board.clientHeight * size);
+      if (row >= 0 && row < size && column >= 0 && column < size) movePointerTo([row, column]);
+      if (!draggingRef.current) break;
+    }
   };
 
   const stopDragging = () => {
     draggingRef.current = false;
+    pointerIdRef.current = null;
   };
 
   const handleKeyboard = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key.toLowerCase() === "z" || event.key === "Backspace") { event.preventDefault(); undo(); return; }
     const offsets: Record<string, Point> = {
       ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1],
     };
@@ -563,6 +684,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   };
 
   const resetCase = () => {
+    cancelHint();
+    clock.reset();
+    setPanel(null);
     setCelebrating(false);
     lastDeadEnd.current = "";
     draggingRef.current = false;
@@ -570,18 +694,20 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     persist({
       ...progress,
       paths: { ...progress.paths, [progressKey]: initial },
+      elapsedMs: { ...progressRef.current.elapsedMs, [progressKey]: 0 },
       lastCase: { size, number: puzzle.number },
     });
     pathRef.current = initial;
     setPath(initial);
     setHintCell(null);
-    startedAt.current = Date.now();
+
     setElapsed(0);
     setMessage(copy.reset(info.end));
     setTone("guide");
   };
 
   const undo = () => {
+    cancelHint();
     const currentPath = pathRef.current;
     if (currentPath.length <= 1 || isComplete) {
       setMessage(currentPath.length <= 1 ? copy.atStart : copy.closedUndo);
@@ -591,7 +717,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     const nextPath = currentPath.slice(0, -1);
     pathRef.current = nextPath;
     setPath(nextPath);
-    persist({ ...progress, paths: { ...progress.paths, [progressKey]: nextPath } });
+    persist({ ...progressRef.current, paths: { ...progressRef.current.paths, [progressKey]: nextPath } });
     lastDeadEnd.current = "";
     setHintCell(null);
     setMessage(copy.undone);
@@ -599,19 +725,38 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   };
 
   const showHint = () => {
-    let prefix = 0;
-    while (prefix < path.length && samePoint(path[prefix], puzzle.route[prefix])) prefix += 1;
-    if (prefix < path.length) {
-      setHintCell(path[prefix]);
-      setMessage(copy.deviated(prefix + 1));
-      setTone("warn");
+    if (!hydrated || isComplete || hinting) return;
+    cancelHint();
+    const snapshot = pathRef.current;
+    const requestId = hintRequestId.current;
+    const apply = (result: HintResult) => {
+      if (hintRequestId.current !== requestId || pathRef.current !== snapshot) return;
+      cancelHint();
+      if (result.status === "solved") {
+        const next = result.route[snapshot.length];
+        setHintCell(next ?? null);
+        setMessage(next ? copy.hint(next[0] + 1, next[1] + 1) : copy.hintUnknown); setTone("guide");
+      } else {
+        setHintCell(null);
+        setMessage(result.status === "blocked" ? copy.hintBlocked : copy.hintUnknown);
+        setTone(result.status === "blocked" ? "warn" : "guide");
+      }
+    };
+    if (snapshot.every((point, index) => samePoint(point, puzzle.route[index]))) {
+      apply({ status: "solved", route: puzzle.route });
       return;
     }
-    const next = puzzle.route[path.length];
-    if (!next) return;
-    setHintCell(next);
-    setMessage(copy.hint);
-    setTone("guide");
+    const request = { size, clues: puzzle.clues, path: snapshot };
+    if (typeof Worker === "undefined") { apply(solveFromPath(request, 5_000)); return; }
+    try {
+      setHinting(true);
+      const worker = new Worker(new URL("./hintWorker.ts", import.meta.url), { type: "module" });
+      const timer = window.setTimeout(() => apply({ status: "unknown" }), 1500);
+      hintJob.current = { worker, timer };
+      worker.onmessage = (event: MessageEvent<HintResult>) => apply(event.data);
+      worker.onerror = () => apply({ status: "unknown" });
+      worker.postMessage(request);
+    } catch { apply({ status: "unknown" }); }
   };
 
   const openCase = useCallback((nextSize: Size, index: number) => {
@@ -624,6 +769,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setTone("guide");
       return;
     }
+    cancelHint();
+    clock.pause();
+    setPanel(null);
     setCelebrating(false);
     lastDeadEnd.current = "";
     draggingRef.current = false;
@@ -638,7 +786,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     pathRef.current = initial;
     setPath(initial);
     setHintCell(null);
-    startedAt.current = Date.now();
+
     setElapsed(0);
     if (hasCompletedCase(progress.completed, nextSize, nextPuzzle.number) && initial.length === nextSize * nextSize) {
       setMessage(copy.archived(formatTime(progress.completed[nextKey])));
@@ -647,8 +795,19 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setMessage(copy.startCase(sizeInfo[nextSize].end));
       setTone("guide");
     }
-    persist({ ...progress, lastCase: { size: nextSize, number: nextPuzzle.number } });
-  }, [copy, hydrated, persist, progress, supportsVibration]);
+    persist({ ...progressRef.current, lastCase: { size: nextSize, number: nextPuzzle.number },
+      lastCases: { ...progressRef.current.lastCases, [size]: puzzle.number, [nextSize]: nextPuzzle.number } });
+    window.requestAnimationFrame(() => boardRef.current?.focus({ preventScroll: true }));
+  }, [cancelHint, clock, copy, hydrated, persist, progress, puzzle.number, size, supportsVibration]);
+
+  const resumeSize = (nextSize: Size) => {
+    if (nextSize === size) return;
+    const list = puzzles[String(nextSize) as `${Size}`];
+    const remembered = progress.lastCases?.[nextSize] ?? (progress.lastCase?.size === nextSize ? progress.lastCase.number : undefined);
+    const index = list.findIndex((item) => item.number === remembered);
+    const unlocked = lastUnlockedIndex(nextSize, progress.completed);
+    openCase(nextSize, index < 0 ? unlocked : Math.min(index, unlocked));
+  };
 
   const selectPuzzle = (index: number) => {
     openCase(size, index);
@@ -660,208 +819,141 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   return (
     <div className={`${styles.page} ${focused ? styles.focused : ""} ${!feedback.effects || reducedMotion ? styles.quiet : ""}`}>
       <header className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>{copy.eyebrow}</p>
-          <h1>{copy.heroLead}<em>{copy.heroEnd}</em></h1>
-          <p className={styles.lede}>{copy.lede}</p>
-        </div>
-        <div className={styles.heroStamp} aria-label={copy.verifiedLabel}>
-          <strong>319</strong><span>{copy.cases}</span><small>{copy.verified}</small>
-        </div>
+        <div><p className={styles.eyebrow}>{copy.eyebrow}</p><h1>{copy.gameTitle}</h1></div>
+        <button type="button" className={styles.helpButton} onClick={() => setPanel("help")}>{copy.help} <span aria-hidden="true">?</span></button>
       </header>
-
-      <div className={styles.experienceBar}>
-        <span>{focused ? copy.focusOn : copy.caseLevel(level, size)}</span>
-        <details className={styles.settings}>
-          <summary>{copy.settings}</summary>
-          <div className={styles.settingsPanel}>
-            <label><span>{copy.effects}</span><input type="checkbox" checked={feedback.effects} onChange={(event) => updateFeedback("effects", event.target.checked)} /></label>
-            <label><span>{copy.haptics}</span><input type="checkbox" checked={feedback.haptics && supportsVibration} disabled={!supportsVibration} onChange={(event) => updateFeedback("haptics", event.target.checked)} /></label>
-            <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
-            {supportsVibration && <button type="button" disabled={!feedback.haptics} onClick={() => vibrate([30, 65, 30])}>{copy.testVibration}</button>}
-            <label><span>{copy.focus}</span><input type="checkbox" checked={feedback.focus} onChange={(event) => updateFeedback("focus", event.target.checked)} /></label>
-            {reducedMotion && <p>{copy.reducedMotion}</p>}
-          </div>
-        </details>
-      </div>
+      <p className={styles.lede}>{copy.shortRules}</p>
 
       <nav className={styles.sizeTabs} aria-label={copy.sizeNav}>
-        {sizes.map((value) => (
-          <button
-            type="button"
-            key={value}
-            className={size === value ? styles.activeSize : ""}
-            aria-pressed={size === value}
-            onClick={() => openCase(value, 0)}
-          >
-            <span>{value}×{value}</span>
-            <small>{copy.sizeTab(copy.levels[value], sizeInfo[value].end)}</small>
-          </button>
-        ))}
+        {sizes.map((value) => <button type="button" key={value} className={size === value ? styles.activeSize : ""}
+          aria-pressed={size === value} disabled={!hydrated} onClick={() => resumeSize(value)}>
+          <span>{value}×{value}</span><small>{copy.levels[value]}</small>
+        </button>)}
       </nav>
 
-      <div className={styles.workspace}>
-        <aside className={styles.caseRail} aria-labelledby="case-title">
-          <div className={styles.panelHeading}>
-            <div><p>{copy.caseTitle}</p><h2 id="case-title">{copy.caseFiles}</h2></div>
-            <span>{completedForSize}/{puzzleList.length}</span>
+      <section className={styles.boardPanel} aria-labelledby="board-title">
+        <div className={styles.boardHeading}>
+          <div className={styles.caseIdentity}><p className={styles.kicker}>{level} · {size}×{size}</p><h2 id="board-title">{copy.question(puzzle.number)}</h2></div>
+          <div className={styles.boardTools}>
+            <button type="button" aria-label={copy.chooseCase} onClick={() => setPanel("cases")} disabled={!hydrated}>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h5v5H3Zm9 0h5v5h-5ZM3 12h5v5H3Zm9 0h5v5h-5Z" /></svg>{copy.chooseShort}
+            </button>
+            <button type="button" aria-label={copy.settings} onClick={() => setPanel("settings")}>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 15h14M7 2v6M13 12v6" /></svg>{copy.settingsShort}
+            </button>
           </div>
-          <p className={styles.unlockRule}>{copy.unlockRule}</p>
-          <div className={styles.caseGrid}>
-            {puzzleList.map((item, index) => {
-              const complete = hasCompletedCase(progress.completed, size, item.number);
-              const locked = index > unlockedIndex;
-              return (
-                <button
-                  type="button"
-                  key={item.number}
-                  className={`${index === puzzleIndex ? styles.activeCase : ""} ${complete ? styles.completeCase : ""}`}
-                  aria-label={`${copy.caseAria(item.number, complete)}${locked ? ` · ${copy.locked}` : ""}`}
-                  aria-current={index === puzzleIndex ? "true" : undefined}
-                  disabled={!hydrated || locked}
-                  title={locked ? copy.unlockRequired(puzzleList[unlockedIndex].number) : undefined}
-                  onClick={() => selectPuzzle(index)}
-                >
-                  {String(item.number).padStart(2, "0")}
-                  {locked ? <svg className={styles.lockIcon} viewBox="0 0 16 16" aria-hidden="true">
-                    <path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v7H4Z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                  </svg> : complete && <span aria-hidden="true">✓</span>}
-                </button>
-              );
-            })}
-          </div>
-        </aside>
+        </div>
 
-        <section className={styles.boardPanel} aria-labelledby="board-title">
-          <div className={styles.boardHeading}>
-            <div>
-              <p className={styles.kicker}>{copy.caseLevel(level, size)}</p>
-              <h2 id="board-title">{copy.question(puzzle.number)}</h2>
-            </div>
-            <div className={styles.pager}>
-              <button type="button" disabled={!hydrated || puzzleIndex === 0} onClick={() => selectPuzzle(puzzleIndex - 1)}>{copy.previous}</button>
-              <span>{puzzle.number} / {puzzleList.length}</span>
-              <button type="button" disabled={!hydrated || !canOpenNext} onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.next}</button>
-              <label className={styles.quickCase}>
-                {copy.quick}
-                <select
-                  value={puzzleIndex}
-                  onChange={(event) => selectPuzzle(Number(event.target.value))}
-                  aria-label={copy.quickAria}
-                  disabled={!hydrated}
-                >
-                  {puzzleList.map((item, index) => (
-                    <option key={item.number} value={index} disabled={index > unlockedIndex}>
-                      {copy.option(item.number, hasCompletedCase(progress.completed, size, item.number))}{index > unlockedIndex ? ` · ${copy.locked}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
+        <div className={styles.boardMeta}>
+          <span className={styles.nextClue}>{isComplete ? copy.closed : <>{copy.nextNumber} <strong>{nextClue}</strong></>}</span>
+          <span className={styles.playTime} aria-label={`${copy.currentTime} ${formatTime(elapsed)}`}><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M10 5v5l3 2" /></svg>{formatTime(elapsed)}</span>
+          <span>{copy.explored} <strong>{path.length}</strong> / {total} {copy.squares}</span>
+        </div>
 
-          <p className={styles.unlockProgress} role="status" aria-live="polite">{copy.unlocked(unlockedIndex + 1, puzzleList.length)}</p>
-
-          <div
-            className={`${styles.board} ${styles[info.color]} ${deadEnd ? styles.deadEnd : ""} ${isComplete ? styles.solvedBoard : ""}`}
-            style={{
-              gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
-            }}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={stopDragging}
-            onPointerCancel={stopDragging}
-            onLostPointerCapture={stopDragging}
-            onKeyDown={handleKeyboard}
-            role="grid"
-            tabIndex={0}
-            aria-label={copy.boardAria(size)}
-          >
-            {celebrating && <Celebration size={size} />}
-            <svg className={styles.pathLayer} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-              <polyline points={polyline} fill="none" vectorEffect="non-scaling-stroke" />
-            </svg>
-            {cells.map(([row, column]) => {
+        <div ref={boardRef} className={`${styles.board} ${styles[info.color]} ${deadEnd ? styles.deadEnd : ""} ${isComplete ? styles.solvedBoard : ""}`}
+          style={{ gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${size}, minmax(0, 1fr))` }}
+          onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={stopDragging} onPointerCancel={stopDragging}
+          onLostPointerCapture={stopDragging} onKeyDown={handleKeyboard} role="grid" tabIndex={0}
+          aria-rowcount={size} aria-colcount={size} aria-activedescendant={`cell-${size}-${path.at(-1)?.join("-")}`} aria-label={copy.boardAria(size)}>
+          {celebrating && <Celebration size={size} />}
+          <svg className={styles.pathLayer} viewBox={`0 0 ${size} ${size}`} aria-hidden="true"><polyline points={polyline} fill="none" vectorEffect="non-scaling-stroke" /></svg>
+          {Array.from({ length: size }, (_, row) => <div role="row" key={row} className={styles.boardRow}>
+            {cells.filter((point) => point[0] === row).map(([, column]) => {
               const clue = clueMap.get(`${row}-${column}`);
               const pathIndex = path.findIndex((point) => samePoint(point, [row, column]));
               const selected = pathIndex >= 0;
               const last = pathIndex === path.length - 1;
               const hinted = samePoint(hintCell ?? undefined, [row, column]);
-              return (
-                <button
-                  type="button"
-                  role="gridcell"
-                  key={`${row}-${column}`}
-                  data-cell="true"
-                  data-row={row}
-                  data-column={column}
-                  className={`${styles.cell} ${selected ? styles.selectedCell : ""} ${last ? styles.lastCell : ""} ${hinted ? styles.hintCell : ""}`}
-                  aria-label={copy.cellAria(row + 1, column + 1, clue, info.end, selected, pathIndex)}
-                  onClick={() => moveTo([row, column])}
-                >
-                  {clue && <strong>{clue}</strong>}
-                  {selected && !clue && <small>{pathIndex + 1}</small>}
-                </button>
-              );
+              return <button type="button" role="gridcell" key={`${row}-${column}`} id={`cell-${size}-${row}-${column}`} tabIndex={-1}
+                data-cell="true" data-row={row} data-column={column} aria-rowindex={row + 1} aria-colindex={column + 1} aria-selected={selected}
+                className={`${styles.cell} ${selected ? styles.selectedCell : ""} ${last ? styles.lastCell : ""} ${hinted ? styles.hintCell : ""} ${clue === nextClue && !isComplete ? styles.nextNumber : ""}`}
+                aria-label={copy.cellAria(row + 1, column + 1, clue, info.end, selected, pathIndex)}
+                onClick={(event) => { if (event.detail === 0) moveTo([row, column]); }}>
+                {clue && <strong>{clue}</strong>}
+                {selected && !clue && <small>{pathIndex + 1}</small>}
+                {clue === info.end && <span className={styles.finishTag} aria-hidden="true">{copy.finishTag}</span>}
+              </button>;
             })}
-          </div>
+          </div>)}
+        </div>
 
-          {isComplete && <div className={styles.successCard}>
-            <div><strong>{copy.solved}</strong><span>{copy.caseLevel(level, size)} · {formatTime(completedSeconds)}</span></div>
-            {canOpenNext && <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}</button>}
-            {categoryComplete && puzzleIndex === puzzleList.length - 1 && <p>{copy.categoryComplete}</p>}
-          </div>}
+        <div className={styles.progressTrack} role="progressbar" aria-label={copy.explored} aria-valuenow={path.length} aria-valuemin={0} aria-valuemax={total}><i style={{ width: `${percent}%` }} /></div>
+        {isComplete && <div className={styles.successCard} role="status">
+          <div><strong>{copy.solved}</strong><span>{copy.bestTime(formatTime(completedSeconds))}</span></div>
+          {canOpenNext && <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}<span aria-hidden="true"> →</span></button>}
+          {categoryComplete && puzzleIndex === puzzleList.length - 1 && <p>{copy.categoryComplete}</p>}
+        </div>}
 
-          <div className={styles.progressRow}>
-            <span>{copy.explored} <strong>{path.length}</strong> / {total} {copy.squares}</span>
-            <div className={styles.progressTrack} aria-label={copy.progressAria(percent)}><i style={{ width: `${percent}%` }} /></div>
-            <span>{percent}%</span>
-          </div>
+        <div className={styles.actions}>
+          <button type="button" onClick={undo} disabled={!hydrated || path.length <= 1 || isComplete} aria-label={copy.undo} title="Z / Backspace">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5-5 5 5 5M4 10h10a6 6 0 0 1 0 12" /></svg>{copy.undoShort}
+          </button>
+          <button type="button" className={styles.hintAction} onClick={showHint} disabled={!hydrated || isComplete || hinting} aria-label={copy.giveHint} aria-busy={hinting}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M8 14a7 7 0 1 1 8 0l-1 4H9Z" /></svg>{hinting ? copy.hintBusy : copy.hintShort}
+          </button>
+          <button type="button" onClick={() => { if (path.length > 1) setPanel("restart"); else resetCase(); }} disabled={!hydrated} aria-label={copy.restart}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9a8 8 0 1 1-1 7M4 3v6h6" /></svg>{copy.restartShort}
+          </button>
+        </div>
 
-          <div className={`${styles.message} ${styles[deadEnd ? "warn" : tone]}`} role="status" aria-live="polite">
-            <DetectiveCat label={copy.catLabel} />
-            <div><strong>{deadEnd || tone === "warn" ? copy.statusWarn : tone === "good" ? copy.statusGood : copy.statusGuide}</strong><p>{deadEnd ? copy.deadEnd : message}</p></div>
-          </div>
+        <div className={`${styles.message} ${styles[deadEnd ? "warn" : tone]}`} role="status" aria-live="polite">
+          <DetectiveCat label={copy.catLabel} />
+          <p>{deadEnd ? copy.deadEnd : message}</p>
+        </div>
+        <div className={styles.pager}>
+          <button type="button" disabled={!hydrated || puzzleIndex === 0} onClick={() => selectPuzzle(puzzleIndex - 1)} aria-label={copy.previous}>← {copy.previous}</button>
+          <span>{copy.unlocked(unlockedIndex + 1, puzzleList.length)}</span>
+          <button type="button" disabled={!hydrated || !canOpenNext} onClick={() => selectPuzzle(puzzleIndex + 1)} aria-label={copy.next}>{copy.next} →</button>
+        </div>
+      </section>
+      <p className={styles.saveNote} role={storageAvailable ? undefined : "status"}>{storageAvailable ? copy.savedLocally : copy.storageUnavailable}</p>
 
-          <div className={styles.actions}>
-            <button type="button" onClick={undo}>{copy.undo}</button>
-            <button type="button" onClick={showHint}>{copy.giveHint}</button>
-            <button type="button" onClick={resetCase}>{copy.restart}</button>
-          </div>
-        </section>
+      <GameDialog open={panel === "cases"} title={`${copy.chooseCase} · ${size}×${size}`} closeLabel={copy.close} onClose={() => setPanel(null)}>
+        <div className={styles.caseOverview}><p>{copy.unlockRule}</p><strong>{completedForSize} / {puzzleList.length} ✓</strong></div>
+        <button type="button" className={styles.continueButton} onClick={() => selectPuzzle(unlockedIndex)}>{copy.resumeChallenge} · {copy.question(puzzleList[unlockedIndex].number)} →</button>
+        <label className={styles.quickCase}>{copy.quick}<select value={puzzleIndex} aria-label={copy.quickAria} onChange={(event) => selectPuzzle(Number(event.target.value))}>
+          {puzzleList.map((item, index) => <option key={item.number} value={index} disabled={index > unlockedIndex}>
+            {copy.option(item.number, hasCompletedCase(progress.completed, size, item.number))}{index > unlockedIndex ? ` · ${copy.locked}` : ""}
+          </option>)}
+        </select></label>
+        <div className={styles.caseGrid}>
+          {puzzleList.map((item, index) => {
+            const complete = hasCompletedCase(progress.completed, size, item.number), locked = index > unlockedIndex;
+            return <button type="button" key={item.number} disabled={locked || !hydrated}
+              className={`${index === puzzleIndex ? styles.activeCase : ""} ${complete ? styles.completeCase : ""}`}
+              aria-label={`${copy.caseAria(item.number, complete)}${locked ? ` · ${copy.locked}` : ""}`} aria-current={index === puzzleIndex ? "true" : undefined}
+              title={locked ? copy.unlockRequired(puzzleList[unlockedIndex].number) : undefined} onClick={() => selectPuzzle(index)}>
+              {String(item.number).padStart(2, "0")}
+              {locked ? <svg className={styles.lockIcon} viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v7H4Z" /></svg> : complete && <span aria-hidden="true">✓</span>}
+            </button>;
+          })}
+        </div>
+      </GameDialog>
 
-        <aside className={styles.notebook} aria-labelledby="notebook-title">
-          <div className={styles.panelHeading}>
-            <div><p>{copy.notesTitle}</p><h2 id="notebook-title">{copy.notes}</h2></div>
-            <span>{formatTime(isComplete ? completedSeconds : elapsed)}</span>
-          </div>
+      <GameDialog open={panel === "settings"} title={copy.settings} closeLabel={copy.close} onClose={() => setPanel(null)}>
+        <div className={styles.settingsPanel}>
+          <label><span>{copy.effects}</span><input type="checkbox" checked={feedback.effects} onChange={(event) => updateFeedback("effects", event.target.checked)} /></label>
+          <label><span>{copy.haptics}</span><input type="checkbox" checked={feedback.haptics && supportsVibration} disabled={!supportsVibration} onChange={(event) => updateFeedback("haptics", event.target.checked)} /></label>
+          <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
+          {supportsVibration && <button type="button" disabled={!feedback.haptics} onClick={() => vibrate([30, 65, 30])}>{copy.testVibration}</button>}
+          <label><span>{copy.focus}</span><input type="checkbox" checked={feedback.focus} onChange={(event) => updateFeedback("focus", event.target.checked)} /></label>
+          {reducedMotion && <p>{copy.reducedMotion}</p>}
+        </div>
+      </GameDialog>
 
-          <section className={styles.nextClue}>
-            <span>{copy.currentTask}</span>
-            <strong>{isComplete ? copy.closed : copy.findNumber(nextClue)}</strong>
-            <p>{isComplete ? copy.bestTime(formatTime(completedSeconds)) : copy.endNote(info.end, total)}</p>
-          </section>
+      <GameDialog open={panel === "help"} title={copy.help} closeLabel={copy.close} onClose={() => setPanel(null)}>
+        <p className={styles.helpLead}>{copy.shortRules}</p>
+        <ol className={styles.rules}><li>{copy.ruleStart}</li><li>{copy.ruleMove}</li><li>{copy.ruleOrder}</li><li><strong>{copy.ruleEnd}</strong></li></ol>
+        <p>{copy.inputNote}</p><p>{copy.unlockRule}</p>
+        <div className={styles.helpFooter}><DetectiveCat label={copy.catLabel} /><span>319 {copy.cases} · {copy.verified}</span></div>
+      </GameDialog>
 
-          <ol className={styles.checks}>
-            <li className={orderCheck ? styles.checked : ""}><span>{orderCheck ? "✓" : "1"}</span><div><strong>{copy.numberOrder}</strong><small>{copy.numberOrderNote(info.end)}</small></div></li>
-            <li className={fullCheck ? styles.checked : ""}><span>{fullCheck ? "✓" : "2"}</span><div><strong>{copy.fullCoverage}</strong><small>{fullCheck ? copy.everySquare : copy.remaining(total - path.length)}</small></div></li>
-            <li className={endCheck ? styles.checked : ""}><span>{endCheck ? "✓" : "3"}</span><div><strong>{copy.finishCheck}</strong><small>{copy.finishNote(info.end)}</small></div></li>
-          </ol>
-
-          <details className={styles.rules} open>
-            <summary>{copy.rules}</summary>
-            <ul>
-              <li>{copy.ruleStart}</li>
-              <li>{copy.ruleMove}</li>
-              <li>{copy.ruleOrder}</li>
-              <li><strong>{copy.ruleEnd}</strong></li>
-            </ul>
-          </details>
-
-          <p className={styles.inputNote}>{copy.inputNote}</p>
-        </aside>
-      </div>
+      <GameDialog open={panel === "restart"} title={copy.restartTitle} closeLabel={copy.close} onClose={() => setPanel(null)}>
+        <p>{copy.restartNote}</p><div className={styles.dialogActions}>
+          <button type="button" onClick={() => setPanel(null)}>{copy.cancelRestart}</button>
+          <button type="button" className={styles.dangerButton} onClick={resetCase}>{copy.confirmRestart}</button>
+        </div>
+      </GameDialog>
     </div>
   );
 }

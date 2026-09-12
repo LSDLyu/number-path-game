@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NumberPathGame } from "./NumberPathGame";
 import puzzles from "./number-path-puzzles.json";
+import "./dialogTestSupport";
 
 const storageKey = "zide-number-path-progress-v1";
 const sizes = [3, 4, 5, 6] as const;
@@ -13,7 +14,7 @@ function step([row, column]: number[]) {
 }
 
 function caseButton(number: number) {
-  return screen.getByRole("button", { name: new RegExp(`^第 ${number} 题(?:，| ·|$)`) }) as HTMLButtonElement;
+  return screen.getByRole("button", { name: new RegExp(`^第 ${number} 题(?:，| ·|$)`), hidden: true }) as HTMLButtonElement;
 }
 
 function nextButton() {
@@ -76,6 +77,7 @@ describe("sequential case progression", () => {
     const view = render(<NumberPathGame />);
     await screen.findByText(/这宗谜案已归档/);
     fireEvent.click(screen.getByRole("button", { name: "重新开始" }));
+    fireEvent.click(screen.getByRole("button", { name: "清空路线，重新开始" }));
     expect(screen.queryByText("破案成功！")).toBeNull();
     expect(caseButton(2).disabled).toBe(false);
     expect(nextButton().disabled).toBe(false);
@@ -132,7 +134,9 @@ describe("sequential case progression", () => {
   it("explains locked cases in English", async () => {
     render(<NumberPathGame locale="en" />);
     await screen.findByText(/Continue Case 1/);
-    expect((screen.getByRole("button", { name: "Case 2 · Locked" }) as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.getByText("Progress separately in each board size. Solve cases in order to unlock the next one.")).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Case 2 · Locked", hidden: true }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Choose a case" }));
+    const dialog = screen.getByRole("dialog", { name: "Choose a case · 3×3" });
+    expect(within(dialog).getByText("Progress separately in each board size. Solve cases in order to unlock the next one.")).toBeTruthy();
   });
 });

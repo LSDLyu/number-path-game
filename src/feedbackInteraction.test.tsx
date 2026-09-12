@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NumberPathGame } from "./NumberPathGame";
 import puzzles from "./number-path-puzzles.json";
 import { celebrationLevels, feedbackKey } from "./gameFeedback";
+import "./dialogTestSupport";
 
 const vibration = vi.fn();
 function step([r, c]: number[]) {
@@ -52,7 +53,9 @@ describe("game feedback", () => {
 
   it("persists all switches and completes silently when effects and vibration are off", async () => {
     let view = await start();
+    fireEvent.click(screen.getByRole("button", { name: "体验设置" }));
     ["通关动效", "震动反馈", "自动聚焦棋盘"].forEach((name) => fireEvent.click(screen.getByLabelText(name)));
+    fireEvent.click(screen.getByRole("button", { name: "关闭面板" }));
     expect(JSON.parse(localStorage.getItem(feedbackKey)!)).toEqual({ effects: false, haptics: false, focus: false });
     view.unmount();
     view = await start();
@@ -79,8 +82,10 @@ describe("game feedback", () => {
     Object.defineProperty(navigator, "vibrate", { configurable: true, value: undefined });
     vi.mocked(window.matchMedia).mockReturnValue({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() } as unknown as MediaQueryList);
     const view = await start();
+    fireEvent.click(screen.getByRole("button", { name: "体验设置" }));
     expect((screen.getByLabelText("震动反馈") as HTMLInputElement).disabled).toBe(true);
     expect(screen.getByText(/已跟随系统减少动态效果/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "关闭面板" }));
     puzzles["3"][0].route.slice(1).forEach(step);
     await waitFor(() => expect(screen.getByText("破案成功！")).toBeTruthy());
     expect(view.container.querySelector("[data-celebration]")).toBeNull();

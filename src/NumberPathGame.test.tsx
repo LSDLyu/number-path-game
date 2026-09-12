@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import rawPuzzles from "./number-path-puzzles.json";
 import { App } from "./App";
 import { NumberPathGame } from "./NumberPathGame";
+import "./dialogTestSupport";
 
 afterEach(cleanup);
 
@@ -20,7 +21,7 @@ describe("NumberPathGame progress persistence", () => {
       completed: Object.fromEntries(rawPuzzles["6"].slice(0, 16).map((puzzle) => [`6-${puzzle.number}`, 30])),
     }));
     const view = render(<NumberPathGame locale="zh" />);
-    await screen.findByRole("heading", { name: "第 1 题" });
+    await screen.findByText(/继续勘察第 1 题/);
 
     fireEvent.click(screen.getByRole("button", { name: /6×6/ }));
     fireEvent.change(screen.getByLabelText("快速选择题目"), { target: { value: "16" } });
@@ -47,9 +48,9 @@ describe("NumberPathGame progress persistence", () => {
     render(<NumberPathGame locale="en" />);
 
     await screen.findByRole("heading", { name: "Case 1" });
-    expect(screen.getAllByText("The largest number is the finish.")).toHaveLength(2);
+    expect(screen.getByRole("heading", { name: "Number Path Detectives" })).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Choose a board size" })).toBeTruthy();
-    expect(screen.getByText("Detective Rules")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "How to play" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Give me a clue" })).toBeTruthy();
   });
 
