@@ -819,7 +819,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   return (
     <div className={`${styles.page} ${focused ? styles.focused : ""} ${!feedback.effects || reducedMotion ? styles.quiet : ""}`}>
       <header className={styles.hero}>
-        <div><p className={styles.eyebrow}>{copy.eyebrow}</p><h1>{copy.gameTitle}</h1></div>
+        <h1>{copy.gameTitle}</h1>
         <button type="button" className={styles.helpButton} onClick={() => setPanel("help")}>{copy.help} <span aria-hidden="true">?</span></button>
       </header>
       <p className={styles.lede}>{copy.shortRules}</p>

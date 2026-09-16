@@ -4,9 +4,10 @@
   --game-teal-deep: #17685f;
   --game-paper: #fbf8f0;
   --game-line: #dce2d8;
+  --board-width: min(100%, 480px, max(268px, calc(100svh - 430px)));
   width: min(660px, calc(100% - 24px));
   margin: 0 auto;
-  padding: 22px 0 26px;
+  padding: 14px 0 26px;
   color: var(--game-ink);
 }
 .page button, .page select { font: inherit; }
@@ -16,29 +17,28 @@
 .page :is(button, select, input):focus-visible { outline: 3px solid #b87515; outline-offset: 3px; }
 .hero { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .hero h1 { margin: 0; font: 800 clamp(24px, 4vw, 32px)/1.2 var(--font-display); letter-spacing: -.035em; }
-.eyebrow { margin: 0 0 6px; color: var(--game-teal-deep); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
-.lede { margin: 9px 0 16px; color: #617069; font-size: 14px; line-height: 1.55; }
+.lede { margin: 7px 0 12px; color: #617069; font-size: 14px; line-height: 1.55; }
 .helpButton { display: flex; align-items: center; gap: 7px; flex-shrink: 0; min-height: 44px; padding: 8px; border: 0; background: none; color: #52665a; font-size: 13px !important; }
 .helpButton span { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; }
-.sizeTabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; margin-bottom: 14px; border: 1px solid var(--game-line); border-radius: 16px; background: #efefe6; }
-.sizeTabs button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 6px; border: 0; border-radius: 11px; background: none; color: #66766c; }
+.sizeTabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; margin-bottom: 10px; border: 1px solid var(--game-line); border-radius: 16px; background: #efefe6; }
+.sizeTabs button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 6px; border: 0; border-radius: 11px; background: none; color: #66766c; }
 .sizeTabs button span { font-size: 20px; font-weight: 700; }
 .sizeTabs button small { font-size: 12px; }
 .sizeTabs .activeSize { background: #fffef9; color: var(--game-teal-deep); box-shadow: 0 2px 6px #273c3512; }
 .sizeTabs button:hover:not(:disabled) { background: #ffffffa6; }
-.boardPanel { min-width: 0; padding: 20px 24px 8px; border: 1px solid #c9d5c9; border-radius: 22px; background: #fffef9; box-shadow: 0 8px 28px #344d3910; transition: box-shadow 180ms ease, border-color 180ms ease; }
+.boardPanel { min-width: 0; padding: 16px 24px 8px; border: 1px solid #c9d5c9; border-radius: 22px; background: #fffef9; box-shadow: 0 8px 28px #344d3910; transition: box-shadow 180ms ease, border-color 180ms ease; }
 .boardHeading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .caseIdentity h2 { margin: 0; font-size: 23px; line-height: 1.2; }
 .kicker { margin: 0 0 4px; color: #617568; font-size: 11px; font-weight: 600; }
 .boardTools { display: flex; gap: 8px; }
 .boardTools button { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; min-width: 44px; border: 1px solid var(--game-line); border-radius: 10px; padding: 8px 10px; background: #fafbf5; color: #52665a; font-size: 13px !important; }
 .boardTools svg, .playTime svg, .actions svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.boardMeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; margin-top: 8px; color: #5c6b62; font-size: 12px; font-variant-numeric: tabular-nums; }
+.boardMeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 30px; margin-top: 8px; color: #5c6b62; font-size: 12px; font-variant-numeric: tabular-nums; }
 .nextClue { display: flex; align-items: center; gap: 6px; color: var(--game-teal-deep); }
 .nextClue strong { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #e7eee4; font-size: 16px; }
 .playTime { display: flex; align-items: center; gap: 4px; }
 .playTime svg { width: 15px; height: 15px; }
-.board { position: relative; display: grid; width: min(100%, 520px); aspect-ratio: 1; margin: 10px auto 12px; border: 2px solid var(--game-ink); border-radius: 12px; background: #fffef9; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; isolation: isolate; }
+.board { position: relative; display: grid; width: var(--board-width); aspect-ratio: 1; margin: 8px auto 12px; border: 2px solid var(--game-ink); border-radius: 12px; background: #fffef9; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; isolation: isolate; }
 .board:focus-visible { outline: 3px solid #b87515; outline-offset: 4px; }
 .boardRow { display: contents; }
 .butter { --level-accent: #efcd71; --level-soft: #fbf1cf; }
@@ -48,7 +48,8 @@
 .cell { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 0; border: 0; border-right: 1px solid #d1d8ca; border-bottom: 1px solid #d1d8ca; color: var(--game-ink); background: transparent; }
 .boardRow:last-of-type .cell { border-bottom: 0; }
 .cell:last-child { border-right: 0; }
-.cell strong { position: relative; z-index: 3; display: grid; place-items: center; width: clamp(28px, 7.5vw, 48px); height: clamp(28px, 7.5vw, 48px); border: 2px solid var(--game-ink); border-radius: 50%; background: #fffef9; font-size: clamp(18px, 5vw, 28px); font-weight: 750; box-shadow: 0 2px 0 #273c3515; }
+.cell strong { position: relative; z-index: 3; display: grid; place-items: center; width: clamp(28px, 60%, 48px); aspect-ratio: 1; border: 2px solid var(--game-ink); border-radius: 50%; background: #fffef9; font-size: clamp(18px, 5vw, 28px); line-height: 1; font-weight: 750; box-shadow: 0 2px 0 #273c3515; }
+.lavender .cell strong { font-size: 20px; }
 .cell small { position: relative; z-index: 3; display: grid; place-items: center; width: 22px; height: 22px; background: var(--game-teal-deep); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; }
 .selectedCell { background: var(--level-soft); }
 .selectedCell strong { background: var(--level-accent); }
@@ -56,11 +57,11 @@
 .lastCell::after { content: ""; position: absolute; z-index: 2; inset: 5px; border: 2px solid var(--game-teal); border-radius: 8px; pointer-events: none; }
 .hintCell { box-shadow: inset 0 0 0 4px #dba348; }
 .hintCell::before { content: ""; position: absolute; inset: 8px; z-index: 2; border: 2px dashed #a86612; border-radius: 8px; animation: hintPulse 1.3s ease-in-out infinite alternate; pointer-events: none; }
-.finishTag { position: absolute; bottom: 6px; left: 0; right: 0; z-index: 3; color: #607064; font-size: 10px; font-weight: 700; letter-spacing: .1em; line-height: 1; }
-.cell:has(.finishTag) strong { transform: translateY(-3px); }
+.finishTag { position: absolute; bottom: 2px; left: 0; right: 0; z-index: 3; color: #607064; font-size: 10px; font-weight: 700; letter-spacing: .1em; line-height: 1; }
+.cell:has(.finishTag) strong { transform: translateY(-5px); }
 .pathLayer { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .pathLayer polyline { stroke: var(--game-teal-deep); stroke-width: 9px; stroke-linecap: round; stroke-linejoin: round; }
-.progressTrack { width: min(100%, 520px); height: 4px; margin: 0 auto; border-radius: 6px; background: #edf0e6; overflow: hidden; }
+.progressTrack { width: var(--board-width); height: 4px; margin: 0 auto; border-radius: 6px; background: #edf0e6; overflow: hidden; }
 .progressTrack i { display: block; height: 100%; background: var(--game-teal); transition: width 150ms ease; }
 .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
 .actions button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 8px 4px; border: 1px solid var(--game-line); border-radius: 12px; background: #fafbf5; color: var(--game-ink); font-size: 15px; font-weight: 650; }
@@ -136,7 +137,6 @@
 .quiet *, .quiet *::before, .quiet *::after { animation: none !important; transition: none !important; }
 @media (max-width: 540px) {
   .page { padding-top: 14px; }
-  .eyebrow { display: none; }
   .hero h1 { font-size: 25px; }
   .lede { font-size: 12px; margin-top: 5px; margin-bottom: 12px; }
   .sizeTabs { margin-bottom: 10px; }
