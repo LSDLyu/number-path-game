@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#74c8f4">
-  <meta name="lisa-version" content="2026-09-20-word-play">
+  <meta name="lisa-version" content="2026-09-20-site-navigation">
+  <link rel="canonical" href="https://edu.alading.org/games/lisa-letter-adventure/">
   <meta name="description" content="适合6岁儿童的绘本风字母启蒙横版闯关游戏">
   <title>Lisa的字母冒险</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2374c8f4'/%3E%3Cpath d='M15 49 28 14h8l13 35h-9l-3-9H25l-3 9Zm13-17h7l-3.5-11Z' fill='white'/%3E%3Ccircle cx='50' cy='14' r='7' fill='%23ffcf4a'/%3E%3C/svg%3E">
@@ -31,7 +32,7 @@
       margin: 0;
       overflow: hidden;
       overscroll-behavior: none;
-      touch-action: none;
+      touch-action: pinch-zoom;
       background: linear-gradient(180deg, #a8e2ff 0%, #e8f8ff 48%, #5ea68a 100%);
       color: var(--ink);
       font-family: "Arial Rounded MT Bold", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -57,7 +58,7 @@
       background: #8bd3f5;
       box-shadow: 0 18px 70px rgba(15, 52, 75, .35);
       isolation: isolate;
-      touch-action: none;
+      touch-action: pinch-zoom;
     }
 
     .playfield {
@@ -493,6 +494,33 @@
       pointer-events: none;
     }
 
+    .site-nav {
+      position: absolute;
+      left: 50%;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 31;
+      display: flex;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .site-nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 2px solid white;
+      border-radius: 999px;
+      color: #173a5a;
+      background: #fffaf0;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      touch-action: manipulation;
+    }
+    button:focus-visible, a:focus-visible { outline: 3px solid #173a5a; outline-offset: 3px; }
+    .panel .keyboard-hint { margin: 12px 0 0; font-size: 14px; line-height: 1.5; }
+
     @media (max-width: 760px) {
       .level-pill { display: none; }
       .top-hud { top: 7px; }
@@ -527,6 +555,7 @@
       .jump-btn { width: min(32vw, 150px); }
       .coach, .letter-card { top: 11%; }
       .rotate-tip { display: block; }
+      .site-nav { bottom: calc(220px + env(safe-area-inset-bottom)); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -592,6 +621,7 @@
         <p>陪 Lisa 玩 10 关，听单词、认图画，发现 A–Z！</p>
         <button class="start-btn" id="startBtn" type="button">开始游戏</button>
         <div class="how">短按小跳 · 长按大跳</div>
+        <p class="keyboard-hint">键盘：方向键 / WASD 移动，空格跳跃</p>
       </div>
     </section>
 
@@ -602,6 +632,10 @@
         <button class="start-btn" id="againBtn" type="button">再玩一次</button>
       </div>
     </section>
+    <nav class="site-nav" aria-label="返回网站">
+      <a href="https://edu.alading.org/games/">← 游戏大厅</a>
+      <a href="https://edu.alading.org/">自得学园首页</a>
+    </nav>
   </main>
 
   <script src="audio/manifest.js"></script>
