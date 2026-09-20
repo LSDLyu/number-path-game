@@ -569,7 +569,7 @@
       </div>
       <div class="doodle-frame">
         <span class="doodle-fallback" id="doodleFallback" hidden aria-hidden="true">🍎</span>
-        <img class="letter-doodle" id="letterDoodle" src="assets/apple-doodle.png" alt="苹果手绘图" decoding="async">
+        <img class="letter-doodle" id="letterDoodle" src="assets/apple-small.png" alt="苹果手绘图" decoding="async">
       </div>
       <button class="letter-replay" id="replayLessonBtn" type="button">🔊 再听一次</button>
     </div>
@@ -3613,7 +3613,7 @@
       setSound(soundEnabled);
       resetLevel(false);
       heroSprite.addEventListener("error", function () {
-        if (heroSprite.getAttribute("src").indexOf("lisa-hero.png") === -1) {
+        if (heroSprite.getAttribute("src").indexOf("lisa-hero-sprite.png") !== -1) {
           heroSprite.src = "assets/lisa-hero.webp?v=9";
         }
       });
