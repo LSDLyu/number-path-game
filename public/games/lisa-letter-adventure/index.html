@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#74c8f4">
+  <meta name="lisa-version" content="2026-09-20-word-play">
   <meta name="description" content="适合6岁儿童的绘本风字母启蒙横版闯关游戏">
   <title>Lisa的字母冒险</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2374c8f4'/%3E%3Cpath d='M15 49 28 14h8l13 35h-9l-3-9H25l-3 9Zm13-17h7l-3.5-11Z' fill='white'/%3E%3Ccircle cx='50' cy='14' r='7' fill='%23ffcf4a'/%3E%3C/svg%3E">
@@ -563,11 +564,12 @@
       <strong class="letter-big" id="letterBig">A</strong>
       <div class="letter-copy">
         <span class="letter-word" id="letterWord">apple</span>
-        <span class="letter-bonus" id="letterBonus">爱心满满</span>
+        <span class="letter-bonus" id="letterMeaning">苹果</span>
+        <span class="letter-bonus" id="letterBonus" style="font-size:12px"></span>
       </div>
       <div class="doodle-frame">
         <span class="doodle-fallback" id="doodleFallback" hidden aria-hidden="true">🍎</span>
-        <img class="letter-doodle" id="letterDoodle" src="assets/apple-small.png" alt="苹果手绘图" decoding="async">
+        <img class="letter-doodle" id="letterDoodle" src="assets/apple-doodle.png" alt="苹果手绘图" decoding="async">
       </div>
       <button class="letter-replay" id="replayLessonBtn" type="button">🔊 再听一次</button>
     </div>
@@ -587,7 +589,7 @@
     <section class="overlay" id="startOverlay">
       <div class="panel">
         <h1>Lisa的字母冒险</h1>
-        <p>陪 Lisa 玩 10 关，跳一跳、听字母，认识 A–Z！</p>
+        <p>陪 Lisa 玩 10 关，听单词、认图画，发现 A–Z！</p>
         <button class="start-btn" id="startBtn" type="button">开始游戏</button>
         <div class="how">短按小跳 · 长按大跳</div>
       </div>
@@ -602,6 +604,7 @@
     </section>
   </main>
 
+  <script src="audio/manifest.js"></script>
   <script>
     (function () {
       "use strict";
@@ -640,6 +643,11 @@
       var pendingResetTimer = null;
       var pendingFinishTimer = null;
       var confetti = [];
+      var finale = { active: false, time: 0, next: 0, sparks: [], opened: false };
+      var lessonAudioTimer = null;
+      var audioCache = {};
+      var narrationSource = null;
+      var previousWords = {};
       var particles = [];
 
       var bgImage = new Image();
@@ -671,22 +679,46 @@
         ["W", "whale", "鲸鱼", "🐳"], ["X", "xylophone", "木琴", "🎵"],
         ["Y", "yo-yo", "悠悠球", "🪀"], ["Z", "zebra", "斑马", "🦓"]
       ].map(function (item) {
-        return { char: item[0], word: item[1], speech: item[0] + ". " + item[1] + ".",
+        return { char: item[0], word: item[1], speech: item[1] + ".", meaning: item[2],
           art: "assets/" + item[1] + "-small.png", fallbackArt: "assets/" + item[1] + "-small.png",
           artAlt: item[2] + "手绘图", emoji: item[3] };
       });
+
+      var extraWords = [
+        ["ant", "蚂蚁", "🐜"], ["banana", "香蕉", "🍌"], ["cake", "蛋糕", "🍰"],
+        ["duck", "鸭子", "🦆"], ["elephant", "大象", "🐘"], ["frog", "青蛙", "🐸"],
+        ["grape", "葡萄", "🍇"], ["horse", "马", "🐴"], ["insect", "昆虫", "🐞"],
+        ["jelly", "果冻", "🍮"], ["koala", "考拉", "🐨"], ["lemon", "柠檬", "🍋"],
+        ["monkey", "猴子", "🐒"], ["nose", "鼻子", "👃"], ["orange", "橙子", "🍊"],
+        ["panda", "熊猫", "🐼"], ["quilt", "被子", "🛏️"], ["robot", "机器人", "🤖"],
+        ["star", "星星", "⭐"], ["tiger", "老虎", "🐯"], ["unicorn", "独角兽", "🦄"],
+        ["volcano", "火山", "🌋"], ["watermelon", "西瓜", "🍉"], ["x-ray", "X光照片", "🩻"],
+        ["yak", "牦牛", "🐂"], ["zoo", "动物园", "🦁🐼"]
+      ];
+      var wordPools = letterLessons.map(function (lesson, i) {
+        var extra = extraWords[i];
+        return [lesson, { char: lesson.char, word: extra[0], meaning: extra[1], speech: extra[0] + ".",
+          art: null, fallbackArt: null, artAlt: extra[1], emoji: extra[2] }];
+      });
+      function chooseWord(char) {
+        var pool = wordPools[char.charCodeAt(0) - 65];
+        var candidates = pool.filter(function (entry) { return entry.word !== previousWords[char]; });
+        var chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        previousWords[char] = chosen.word;
+        return chosen;
+      }
 
       var LEVELS = [
         { name: "字母森林", letters: "ABCDE", hint: "跳过火炉，从下面顶字母！碰到字母不会扣爱心。" },
         { name: "滚滚球谷", letters: "FGHIJ", hint: "站在球上按 ← →，跳起来收齐字母再去终点！" },
         { name: "字母陨石雨", letters: "KLMNO", hint: "按 ↑ ↓ 调整篮子。漏掉的字母还会回来！" },
-        { name: "彩虹泡泡海", letters: "PQRST", kind: "bubble", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "站上泡泡，按 ↑ ↓ 升降，按 ← → 漂移，跳起来顶字母！" },
-        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "小火车会慢慢向前走，跳上车顶找字母！地上也很安全。" },
-        { name: "云朵升降桥", letters: "ABCDE", kind: "cloud", sky: "#a3daf5", floor: "#92b2d9", accent: "#6b7abb", hint: "跳上云朵，按 ↑ ↓ 让它升降，再跳向下一朵！" },
+        { name: "彩虹泡泡海", letters: "PQRST", kind: "bubble", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "按住 ↑ 吹泡泡，把上方的字母泡泡碰破！也能坐泡泡升降。" },
+        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "跳上小火车，按住 ↓ 盖车票章！每节车厢带着一个字母。" },
+        { name: "云朵升降桥", letters: "ABCDE", kind: "cloud", sky: "#a3daf5", floor: "#92b2d9", accent: "#6b7abb", hint: "按 ↑ ↓ 呼叫最近的云朵，跳到云桥上！空中按住 ↑ 可以滑翔。" },
         { name: "蘑菇弹跳园", letters: "FGHIJ", kind: "mushroom", sky: "#caf0ce", floor: "#64b071", accent: "#d86672", hint: "踩上蘑菇会弹高！按住 ↓ 可以站稳，松开再弹！" },
-        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "站上小船按 ← → 划船，跳上小码头找字母。下方有安全栈道！" },
-        { name: "气球花园", letters: "PQRST", kind: "balloon", sky: "#f8cee0", floor: "#b2a2d3", accent: "#a5649d", hint: "站上气球篮，按 ↑ ↓ 控制高度，按 ← → 去找字母！" },
-        { name: "彩虹礼物城", letters: "UVWXYZ", kind: "rainbow", sky: "#ffe5a8", floor: "#7fbb9a", accent: "#cf7687", hint: "搭上彩虹升降台，收齐最后六个字母，打开礼物！" }
+        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "站上小船按 ← → 划船，按住 ↓ 放鱼线，钓起水里的字母！" },
+        { name: "气球花园", letters: "PQRST", kind: "balloon", sky: "#f8cee0", floor: "#b2a2d3", accent: "#a5649d", hint: "坐上气球用四个方向飞行！让小人穿过发光字母圈，不用跳。" },
+        { name: "彩虹礼物城", letters: "UVWXYZ", kind: "rainbow", sky: "#ffe5a8", floor: "#7fbb9a", accent: "#cf7687", hint: "站到每个字母按钮附近按 ↓ 点亮彩虹！集齐六把钥匙，到礼包前按 ↑。" }
       ];
       var LEVEL_LESSON_SETS = LEVELS.map(function (level) {
         return level.letters.split("").map(function (char) { return char.charCodeAt(0) - 65; });
@@ -707,6 +739,7 @@
 
       function preloadLevelLessonArt(levelNumber) {
         LEVEL_LESSON_SETS[levelNumber - 1].forEach(function (lessonIndex) {
+          wordPools[lessonIndex].forEach(function (entry) { preloadWordAudio(entry.word); });
           var lesson = letterLessons[lessonIndex];
           if (!lesson.preloadImage) {
             lesson.preloadImage = new Image();
@@ -884,6 +917,8 @@
 
       function resetLevel(showCoachMessage) {
         speechRunId += 1;
+        stopWordAudio();
+        finale = { active: false, time: 0, next: 0, sparks: [], opened: false };
         lastLesson = null;
         letterCardTimer = 0;
         try {
@@ -950,7 +985,8 @@
         lastLesson = lesson;
         document.getElementById("letterBig").textContent = lesson.char;
         document.getElementById("letterWord").textContent = lesson.word;
-        document.getElementById("letterBonus").textContent = healed ? "+1 颗爱心" : "爱心满满";
+        document.getElementById("letterMeaning").textContent = lesson.meaning;
+        document.getElementById("letterBonus").textContent = healed ? "♥ +1" : "";
         var doodle = document.getElementById("letterDoodle");
         var fallback = document.getElementById("doodleFallback");
         var triedFullSize = false;
@@ -964,12 +1000,14 @@
           if (lastLesson === lesson) letterCardTimer = Math.max(letterCardTimer, 4500);
         };
         doodle.onerror = function () {
+          if (lastLesson !== lesson || !lesson.art) return;
           if (!triedFullSize) { triedFullSize = true; doodle.src = lesson.fallbackArt; }
           else { doodle.hidden = true; fallback.hidden = false; }
         };
-        doodle.src = lesson.art;
+        doodle.onload = (function (handler) { return function () { if (lastLesson === lesson && lesson.art) handler(); }; })(doodle.onload);
+        if (lesson.art) doodle.src = lesson.art;
         doodle.alt = lesson.artAlt;
-        if (doodle.complete && doodle.naturalWidth > 0) doodle.onload();
+        if (lesson.art && doodle.complete && doodle.naturalWidth > 0) doodle.onload();
         document.getElementById("letterCard").classList.add("show");
         letterCardTimer = 4500;
       }
@@ -1096,7 +1134,7 @@
           characterText = "Ouch!";
         }
 
-        if (characterText && "speechSynthesis" in window && window.speechSynthesis &&
+        if (characterText && !narrationSource && "speechSynthesis" in window && window.speechSynthesis &&
             !window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
           try {
             if (typeof window.SpeechSynthesisUtterance !== "function" ||
@@ -1136,27 +1174,43 @@
         return ranked[0] || null;
       }
 
+      function stopWordAudio() {
+        clearTimeout(lessonAudioTimer);
+        if (narrationSource) {
+          try { narrationSource.stop(); } catch (error) { /* Already stopped. */ }
+          narrationSource = null;
+        }
+      }
+
+      function preloadWordAudio(word) {
+        var path = (window.LISA_WORD_AUDIO || {})[word];
+        if (!path || !window.fetch || audioCache[word]) return audioCache[word];
+        audioCache[word] = window.fetch(path).then(function (response) {
+          if (!response.ok) throw new Error("recording unavailable");
+          return response.arrayBuffer();
+        }).catch(function () { return null; });
+        return audioCache[word];
+      }
+
       function speakLesson(lesson) {
-        if (!soundEnabled || !("speechSynthesis" in window)) return;
+        if (!soundEnabled) return;
         initAudio();
         var synth = window.speechSynthesis;
-        if (!synth || typeof synth.speak !== "function" ||
-            typeof window.SpeechSynthesisUtterance !== "function") return;
+        stopWordAudio();
         var runId = ++speechRunId;
         try {
-          if (typeof synth.cancel === "function") synth.cancel();
-          if (typeof synth.resume === "function") synth.resume();
-        } catch (error) {
-          return;
-        }
+          if (synth && typeof synth.cancel === "function") synth.cancel();
+          if (synth && typeof synth.resume === "function") synth.resume();
+        } catch (error) { /* Recorded audio remains independent of system speech. */ }
 
         function speakNaturally() {
           if (!soundEnabled || runId !== speechRunId) return;
+          if (!synth || typeof synth.speak !== "function" || typeof window.SpeechSynthesisUtterance !== "function") return;
           try {
-            var utterance = new SpeechSynthesisUtterance(lesson.speech);
+            var utterance = new SpeechSynthesisUtterance(lesson.word + ".");
             utterance.lang = "en-US";
-            utterance.rate = .82;
-            utterance.pitch = 1.02;
+            utterance.rate = .95;
+            utterance.pitch = 1;
             utterance.volume = 1;
             var voice = preferredEnglishVoice();
             if (voice) utterance.voice = voice;
@@ -1166,11 +1220,39 @@
           }
         }
 
-        setTimeout(speakNaturally, 90);
+        var recording = preloadWordAudio(lesson.word);
+        if (!recording || !audioContext || !audioContext.decodeAudioData) {
+          lessonAudioTimer = setTimeout(speakNaturally, 90);
+          return;
+        }
+        var settled = false;
+        function fallback() {
+          if (settled || runId !== speechRunId) return;
+          settled = true;
+          clearTimeout(lessonAudioTimer);
+          speakNaturally();
+        }
+        lessonAudioTimer = setTimeout(fallback, 2500);
+        recording.then(function (bytes) {
+          if (!bytes) throw new Error("recording unavailable");
+          return audioContext.decodeAudioData(bytes.slice(0));
+        }).then(function (buffer) {
+          if (settled || runId !== speechRunId || !soundEnabled) return;
+          if (audioContext.state !== "running") { fallback(); return; }
+          var source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioContext.destination);
+          source.onended = function () { if (narrationSource === source) narrationSource = null; };
+          narrationSource = source;
+          source.start();
+          settled = true;
+          clearTimeout(lessonAudioTimer);
+        }).catch(fallback);
       }
 
       function setSound(enabled) {
         soundEnabled = enabled;
+        if (!enabled) { speechRunId += 1; stopWordAudio(); }
         try { localStorage.setItem("lisa-letter-sound-v2", enabled ? "on" : "off"); } catch (error) { /* Keep playing without saved preferences. */ }
         var btn = document.getElementById("soundBtn");
         btn.textContent = enabled ? "🔊" : "🔇";
@@ -1374,6 +1456,7 @@
 
       function rewardLesson(lesson, x, y) {
         if (learnedThisLevel[lesson.char]) return;
+        lesson = chooseWord(lesson.char);
         learnedThisLevel[lesson.char] = true;
         updateLevelLabel();
         var healed = hearts < MAX_HEARTS;
@@ -1418,6 +1501,11 @@
         }
         won = true;
         paused = true;
+        if (currentLevel === 10) {
+          cameraX = WORLD_W - W;
+          finale.active = true; finale.opened = true; finale.time = 0; finale.next = 0;
+          showCoach("礼包打开啦！A–Z 送你一场字母烟花！", 6000);
+        }
         for (var i = 0; i < 90; i += 1) {
           confetti.push({
             x: Math.random() * W,
@@ -1447,7 +1535,7 @@
             againBtn.textContent = "从第一关再玩一次";
           }
           document.getElementById("finishOverlay").classList.remove("hidden");
-        }, 650);
+        }, currentLevel === 10 ? 7000 : 1400);
       }
 
       function updateLetter(dt) {
@@ -1806,8 +1894,8 @@
         meteorState.catcherLift += (catcherTarget - meteorState.catcherLift) * Math.min(1, dt * 9);
         meteorState.basketBounce += (0 - meteorState.basketBounce) * Math.min(1, dt * 11);
 
-        var narrationActive = soundEnabled && "speechSynthesis" in window && window.speechSynthesis &&
-          (window.speechSynthesis.speaking || window.speechSynthesis.pending);
+        var narrationActive = soundEnabled && (narrationSource || ("speechSynthesis" in window && window.speechSynthesis &&
+          (window.speechSynthesis.speaking || window.speechSynthesis.pending)));
         var meteorDt = dt * (narrationActive ? .38 : 1);
         meteorState.spawnTimer -= meteorDt;
         if (meteorState.spawnTimer <= 0) {
@@ -1861,7 +1949,8 @@
       function resetAdventure() {
         var config = LEVELS[currentLevel - 1];
         var letters = LEVEL_LESSON_SETS[currentLevel - 1];
-        adventure = { kind: config.kind, platforms: [], badges: [], carrier: null, safeX: 78 };
+        adventure = { kind: config.kind, platforms: [], badges: [], carrier: null, safeX: 78,
+          shots: [], actionCooldown: 0, hook: null, bounces: 0 };
         var heights = [520, 455, 500, 430, 485, 465];
         var spacing = letters.length === 6 ? 300 : 365;
         letters.forEach(function (lessonIndex, index) {
@@ -1874,7 +1963,11 @@
           if (config.kind === "balloon") { platform.w = 105; platform.y = platform.baseY = 500 - index % 2 * 55; }
           adventure.platforms.push(platform);
           adventure.badges.push({ x: platform.x + platform.w / 2 - 31, y: platform.y - 162,
-            w: 62, h: 62, lessonIndex: lessonIndex, active: true, bob: index });
+            w: 62, h: 62, lessonIndex: lessonIndex, active: true, bob: index, platform: platform });
+          var badge = adventure.badges[adventure.badges.length - 1];
+          if (config.kind === "boat") badge.y = 635;
+          if (config.kind === "balloon") badge.y = 275 + index % 3 * 70;
+          if (config.kind === "rainbow") badge.y = 548;
         });
         // A controllable carrier starts near the entrance with an easy low step.
         if (["bubble", "boat", "balloon"].indexOf(config.kind) >= 0) {
@@ -1897,6 +1990,13 @@
         var move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (move) player.facing = move;
         var lift = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+        adventure.actionCooldown = Math.max(0, adventure.actionCooldown - dt);
+        var nearestCloud = null;
+        if (adventure.kind === "cloud") {
+          adventure.platforms.forEach(function (platform) {
+            if (!nearestCloud || Math.abs(platform.x - player.x) < Math.abs(nearestCloud.x - player.x)) nearestCloud = platform;
+          });
+        }
 
         adventure.platforms.forEach(function (platform) {
           var oldX = platform.x, oldY = platform.y;
@@ -1912,8 +2012,8 @@
           } else if (adventure.kind === "train") {
             platform.x = platform.baseX + Math.sin(worldTime * .48) * 64;
           } else if (adventure.kind === "cloud" || adventure.kind === "rainbow") {
-            if (wasRiding === platform && lift) platform.baseY = clamp(platform.baseY + lift * 130 * dt, 335, 555);
-            if (wasRiding !== platform) platform.baseY += (platform.homeY - platform.baseY) * Math.min(1, dt);
+            if ((wasRiding === platform || (adventure.kind === "cloud" && nearestCloud === platform)) && lift) platform.baseY = clamp(platform.baseY + lift * 130 * dt, 335, 555);
+            if (wasRiding !== platform && !(adventure.kind === "cloud" && nearestCloud === platform && lift)) platform.baseY += (platform.homeY - platform.baseY) * Math.min(1, dt);
             platform.y = platform.baseY + Math.sin(worldTime * .85 + platform.phase) * 24;
             if (adventure.kind === "rainbow") platform.x = platform.baseX + Math.sin(worldTime * .55 + platform.phase) * 45;
           } else if (adventure.kind === "bubble" || adventure.kind === "balloon") {
@@ -1932,6 +2032,7 @@
         player.vx += ((steeringCarrier ? 0 : move * speed) - player.vx) * Math.min(1, dt * 11);
         player.x = clamp(player.x + player.vx * dt, 0, WORLD_W - player.w);
         player.vy += GRAVITY * dt;
+        if (adventure.kind === "cloud" && input.up && player.vy > 90) player.vy = 90;
         player.y += player.vy * dt;
         player.onGround = false;
         player.riding = null;
@@ -1950,6 +2051,8 @@
           player.riding = landing;
           if (adventure.kind === "mushroom" && !input.down) {
             player.vy = -670; player.onGround = false; player.riding = null;
+            adventure.bounces += 1;
+            burst(player.x + player.w / 2, landing.y, "#ffe269", 8);
             landing.squash = 18;
             tone(490, .12, "sine", .04);
           }
@@ -1959,10 +2062,38 @@
         }
         if (player.onGround) adventure.safeX = player.x;
 
+        if (adventure.kind === "bubble" && input.up && adventure.actionCooldown <= 0) {
+          adventure.shots.push({ x: player.x + player.w / 2, y: player.y, life: 2.4 });
+          adventure.actionCooldown = .5;
+          tone(600, .06, "sine", .02);
+        }
+        adventure.shots.forEach(function (shot) { shot.y -= dt * 300; shot.life -= dt; });
+        adventure.shots = adventure.shots.filter(function (shot) { return shot.life > 0; });
+        adventure.hook = adventure.kind === "boat" && input.down && player.riding ?
+          { x: player.x + player.w / 2, y: 665, fromY: player.y + 38 } : null;
+
         adventure.badges.forEach(function (badge) {
           badge.bob += dt * 2.8;
           if (!badge.active) return;
+          if (adventure.kind === "train") badge.x = badge.platform.x + badge.platform.w / 2 - 31;
           var box = { x: badge.x, y: badge.y + Math.sin(badge.bob) * 8, w: badge.w, h: badge.h };
+          var special = false;
+          if (adventure.kind === "bubble") {
+            adventure.shots.forEach(function (shot) {
+              if (shot.life > 0 && rectOverlap({ x: shot.x - 22, y: shot.y - 22, w: 44, h: 44 }, box)) { special = true; shot.life = 0; }
+            });
+          }
+          if (adventure.kind === "train" && input.down && player.riding === badge.platform) special = true;
+          if (adventure.kind === "boat" && adventure.hook && Math.abs(adventure.hook.x - (badge.x + 31)) < 85) special = true;
+          if (adventure.kind === "balloon" && rectOverlap(player, box)) special = true;
+          if (adventure.kind === "rainbow" && input.down && Math.abs(player.x + player.w / 2 - (badge.x + 31)) < 85 && player.y + player.h > 490) special = true;
+          if (special) {
+            badge.active = false;
+            rewardLesson(letterLessons[badge.lessonIndex], box.x + 31, box.y);
+            if (adventure.kind === "rainbow") showCoach("彩虹钥匙 " + Object.keys(learnedThisLevel).length + "/6！", 1800);
+            return;
+          }
+          if (["boat", "rainbow"].indexOf(adventure.kind) >= 0) return;
           if (!rectOverlap(player, box)) return;
           var centerBelow = player.y + player.h / 2 > box.y + box.h / 2;
           if (player.vy < -30 && centerBelow) {
@@ -1976,7 +2107,10 @@
             rewardLesson(letterLessons[badge.lessonIndex], box.x + box.w / 2, box.y);
           } else bumpLetter(box);
         });
-        if (player.x + player.w > 2310) finishLevel();
+        if (player.x + player.w > 2310) {
+          if (currentLevel !== 10 || input.up) finishLevel();
+          else if (goalHintTimer <= 0) { showCoach("集齐六把钥匙后，按 ↑ 打开礼包！", 2500); goalHintTimer = 3; }
+        }
       }
 
       function drawPlatformSprite(platform) {
@@ -2038,15 +2172,68 @@
           }
         }
         adventure.platforms.forEach(drawPlatformSprite);
-        adventure.badges.forEach(function (badge) { if (badge.active) drawLetterBadge(badge, letterLessons[badge.lessonIndex]); });
+        adventure.badges.forEach(function (badge) {
+          if (adventure.kind === "rainbow" && !badge.active) {
+            ctx.fillStyle = "#ffcf39"; ctx.font = "bold 44px sans-serif"; ctx.textAlign = "center";
+            ctx.fillText("★", badge.x + 31, badge.y + 48);
+          }
+          if (!badge.active) return;
+          if (adventure.kind === "bubble" || adventure.kind === "balloon") {
+            ctx.strokeStyle = adventure.kind === "bubble" ? "#ffffff" : "#ffba28"; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.arc(badge.x + 31, badge.y + 31 + Math.sin(badge.bob) * 8, 47, 0, Math.PI * 2); ctx.stroke();
+          }
+          drawLetterBadge(badge, letterLessons[badge.lessonIndex]);
+          if (adventure.kind === "train" || adventure.kind === "rainbow") {
+            ctx.fillStyle = "#304c6d"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
+            ctx.fillText(adventure.kind === "train" ? "↓ 盖章" : "↓ 点亮", badge.x + 31, badge.y - 14);
+          }
+        });
+        adventure.shots.forEach(function (shot) {
+          ctx.fillStyle = "rgba(170,242,255,.5)"; ctx.strokeStyle = "white"; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.arc(shot.x, shot.y, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        });
+        if (adventure.hook) {
+          ctx.strokeStyle = "#ffe288"; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(adventure.hook.x, adventure.hook.fromY); ctx.lineTo(adventure.hook.x, adventure.hook.y);
+          ctx.arc(adventure.hook.x - 9, adventure.hook.y, 9, 0, Math.PI); ctx.stroke();
+        }
         var goalArt = platformArt[currentLevel === 10 ? "gift" : "rainbow"];
-        if (goalArt.complete && goalArt.naturalWidth) ctx.drawImage(goalArt, 2300, 475 + Math.sin(worldTime * 2) * 3, 155, 135);
+        if (goalArt.complete && goalArt.naturalWidth) {
+          if (finale.opened) {
+            ctx.save(); ctx.beginPath(); ctx.rect(2300, 535, 155, 90); ctx.clip();
+            ctx.drawImage(goalArt, 2300, 475, 155, 135); ctx.restore();
+            ctx.save(); ctx.translate(2300, 525); ctx.rotate(-Math.min(1.1, finale.time * 1.8));
+            ctx.beginPath(); ctx.rect(0, -55, 155, 65); ctx.clip(); ctx.drawImage(goalArt, 0, -50, 155, 135); ctx.restore();
+          } else ctx.drawImage(goalArt, 2300, 475 + Math.sin(worldTime * 2) * 3, 155, 135);
+        }
         ctx.fillStyle = config.accent; ctx.font = "bold 24px sans-serif"; ctx.textAlign = "center";
-        ctx.fillText(Object.keys(learnedThisLevel).length === config.letters.length ? "去下一站！" : "字母集合处", 2365, 453);
+        ctx.fillText(finale.opened ? "送给 Lisa！" : Object.keys(learnedThisLevel).length === config.letters.length ? (currentLevel === 10 ? "↑ 打开礼包" : "去下一站！") : "字母集合处", 2365, 453);
+        var missions = { bubble: "↑ 吹泡泡", train: "车顶 ↓ 盖车票章", cloud: "↑ ↓ 呼叫云朵 · ↑ 滑翔", mushroom: "踩蘑菇弹高 · ↓ 停住", boat: "← → 划船 · ↓ 钓字母", balloon: "↑ ↓ ← → 飞过字母圈", rainbow: "↓ 点亮六把钥匙 · ↑ 开礼包" };
+        ctx.save(); ctx.fillStyle = "rgba(255,255,255,.88)";
+        roundedRectPath(ctx, cameraX + 350, 76, 580, 43, 17); ctx.fill();
+        ctx.fillStyle = "#224667"; ctx.font = "bold 22px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText(missions[adventure.kind], cameraX + W / 2, 105); ctx.restore();
         drawParticles();
       }
 
       function updateParticles(dt) {
+        if (finale.active) {
+          finale.time += dt; finale.next -= dt;
+          if (finale.time < 6.2 && finale.next <= 0) {
+            finale.next = .7;
+            var cx = 220 + Math.random() * (W - 440), cy = 145 + Math.random() * 170;
+            for (var f = 0; f < 26; f++) {
+              var angle = f / 26 * Math.PI * 2;
+              finale.sparks.push({ x: cx, y: cy, vx: Math.cos(angle) * (110 + Math.random() * 110),
+                vy: Math.sin(angle) * 155 - 50, life: 2.1, char: String.fromCharCode(65 + f),
+                color: ["#ff6787", "#ffc629", "#39cce3", "#a785ff", "#6ed983"][f % 5] });
+            }
+            tone(700 + Math.random() * 350, .16, "sine", .04);
+          }
+          finale.sparks.forEach(function (spark) { spark.x += spark.vx * dt; spark.y += spark.vy * dt; spark.vy += dt * 110; spark.life -= dt; });
+          finale.sparks = finale.sparks.filter(function (spark) { return spark.life > 0; });
+          if (finale.time > 9) finale.active = false;
+        }
         particles.forEach(function (p) {
           p.vy += 500 * dt;
           p.x += p.vx * dt;
@@ -3192,6 +3379,12 @@
       }
 
       function drawConfetti() {
+        finale.sparks.forEach(function (spark) {
+          ctx.save(); ctx.globalAlpha = Math.min(1, spark.life); ctx.fillStyle = spark.color;
+          ctx.font = "bold 32px sans-serif"; ctx.textAlign = "center";
+          ctx.shadowColor = "#fff8d5"; ctx.shadowBlur = 12;
+          ctx.fillText(spark.char, spark.x, spark.y); ctx.restore();
+        });
         confetti.forEach(function (c) {
           ctx.save();
           ctx.translate(c.x, c.y);
@@ -3421,7 +3614,7 @@
       resetLevel(false);
       heroSprite.addEventListener("error", function () {
         if (heroSprite.getAttribute("src").indexOf("lisa-hero.png") === -1) {
-          heroSprite.src = "assets/lisa-hero.webp?v=13";
+          heroSprite.src = "assets/lisa-hero.webp?v=9";
         }
       });
       syncHeroSprite();
