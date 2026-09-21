@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#74c8f4">
-  <meta name="lisa-version" content="2026-09-20-site-navigation">
+  <meta name="lisa-version" content="2026-09-21-trampoline-sharks">
   <link rel="canonical" href="https://edu.alading.org/games/lisa-letter-adventure/">
   <meta name="description" content="适合6岁儿童的绘本风字母启蒙横版闯关游戏">
   <title>Lisa的字母冒险</title>
@@ -746,12 +746,12 @@
         { name: "字母森林", letters: "ABCDE", hint: "跳过火炉，从下面顶字母！碰到字母不会扣爱心。" },
         { name: "滚滚球谷", letters: "FGHIJ", hint: "站在球上按 ← →，跳起来收齐字母再去终点！" },
         { name: "字母陨石雨", letters: "KLMNO", hint: "按 ↑ ↓ 调整篮子。漏掉的字母还会回来！" },
-        { name: "彩虹泡泡海", letters: "PQRST", kind: "bubble", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "按住 ↑ 吹泡泡，把上方的字母泡泡碰破！也能坐泡泡升降。" },
-        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "跳上小火车，按住 ↓ 盖车票章！每节车厢带着一个字母。" },
+        { name: "彩虹蹦床岛", letters: "PQRST", kind: "trampoline", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "踩蹦床弹高，按 ← → 跳到下一张！按 ↓ 站稳；掉下去会扣一颗爱心。" },
+        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "跳上小火车，按住 ↓ 盖车票章！每节车厢带着一个字母，掉下车会扣一颗爱心。" },
         { name: "云朵升降桥", letters: "ABCDE", kind: "cloud", sky: "#a3daf5", floor: "#92b2d9", accent: "#6b7abb", hint: "按 ↑ ↓ 呼叫最近的云朵，跳到云桥上！空中按住 ↑ 可以滑翔。" },
         { name: "蘑菇弹跳园", letters: "FGHIJ", kind: "mushroom", sky: "#caf0ce", floor: "#64b071", accent: "#d86672", hint: "踩上蘑菇会弹高！按住 ↓ 可以站稳，松开再弹！" },
-        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "站上小船按 ← → 划船，按住 ↓ 放鱼线，钓起水里的字母！" },
-        { name: "气球花园", letters: "PQRST", kind: "balloon", sky: "#f8cee0", floor: "#b2a2d3", accent: "#a5649d", hint: "坐上气球用四个方向飞行！让小人穿过发光字母圈，不用跳。" },
+        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "落水不扣心！水中用方向键游泳，碰字母小鱼补心，躲开鲨鱼；按跳回船上。" },
+        { name: "气球花园", letters: "PQRST", kind: "balloon", sky: "#f8cee0", floor: "#b2a2d3", accent: "#a5649d", hint: "坐上气球用四个方向飞行！穿过发光字母圈；掉下气球会扣一颗爱心。" },
         { name: "彩虹礼物城", letters: "UVWXYZ", kind: "rainbow", sky: "#ffe5a8", floor: "#7fbb9a", accent: "#cf7687", hint: "站到每个字母按钮附近按 ↓ 点亮彩虹！集齐六把钥匙，到礼包前按 ↑。" }
       ];
       var LEVEL_LESSON_SETS = LEVELS.map(function (level) {
@@ -761,7 +761,7 @@
       var goalHintTimer = 0;
       var adventure = { platforms: [], badges: [], kind: "", carrier: null };
       var platformArt = {};
-      ["bubble", "train", "cloud", "mushroom", "boat", "balloon", "rainbow", "gift"].forEach(function (kind) {
+      ["trampoline", "train", "cloud", "mushroom", "boat", "balloon", "rainbow", "gift", "shark", "fish"].forEach(function (kind) {
         platformArt[kind] = new Image();
         platformArt[kind].src = "assets/platform-" + kind + ".png";
       });
@@ -1396,7 +1396,8 @@
 
       function startJump() {
         if (paused || won) return;
-        if (player.onGround || player.onLadder) {
+        if (player.onGround || player.onLadder || player.swimming) {
+          player.swimming = false;
           if (currentLevel === 1 && player.onLetter && letter.active) letter.collectOnLanding = true;
           player.onLetter = false;
           var jumpingFromBall = currentLevel === 2 && player.onBall;
@@ -1465,6 +1466,8 @@
             player.onGround = true;
             player.x = rollingBall.x - player.w / 2;
             player.y = rollingBall.y - rollingBall.r - player.h;
+          } else if (currentLevel >= 4) {
+            restoreAdventurePosition();
           } else {
             player.x = W / 2 - player.w / 2;
             player.y = LEVEL_THREE_GROUND - player.h;
@@ -1984,7 +1987,7 @@
         var config = LEVELS[currentLevel - 1];
         var letters = LEVEL_LESSON_SETS[currentLevel - 1];
         adventure = { kind: config.kind, platforms: [], badges: [], carrier: null, safeX: 78,
-          shots: [], actionCooldown: 0, hook: null, bounces: 0 };
+          checkpoint: null, sharks: [], bounces: 0 };
         var heights = [520, 455, 500, 430, 485, 465];
         var spacing = letters.length === 6 ? 300 : 365;
         letters.forEach(function (lessonIndex, index) {
@@ -1993,26 +1996,55 @@
             kind: config.kind, squash: 0 };
           if (config.kind === "train") { platform.y = platform.baseY = 510; platform.w = 235; }
           if (config.kind === "boat") { platform.y = platform.baseY = 555; platform.w = 185; }
-          if (config.kind === "bubble") { platform.w = 130; platform.y = platform.baseY = 510 - index % 2 * 50; }
+          if (config.kind === "trampoline") { platform.w = 205; platform.y = platform.baseY = 520 - index % 2 * 35; }
           if (config.kind === "balloon") { platform.w = 105; platform.y = platform.baseY = 500 - index % 2 * 55; }
           adventure.platforms.push(platform);
           adventure.badges.push({ x: platform.x + platform.w / 2 - 31, y: platform.y - 162,
             w: 62, h: 62, lessonIndex: lessonIndex, active: true, bob: index, platform: platform });
           var badge = adventure.badges[adventure.badges.length - 1];
-          if (config.kind === "boat") badge.y = 635;
+          if (config.kind === "boat") { badge.y = 625; badge.homeX = badge.x; }
           if (config.kind === "balloon") badge.y = 275 + index % 3 * 70;
           if (config.kind === "rainbow") badge.y = 548;
         });
         // A controllable carrier starts near the entrance with an easy low step.
-        if (["bubble", "boat", "balloon"].indexOf(config.kind) >= 0) {
+        if (["boat", "balloon"].indexOf(config.kind) >= 0) {
           adventure.carrier = { x: 170, y: config.kind === "balloon" ? 530 : 545,
             baseX: 170, baseY: 545, w: config.kind === "boat" ? 180 : 125,
             h: 22, dx: 0, dy: 0, phase: 0, kind: config.kind, squash: 0, controlled: true };
           adventure.platforms.unshift(adventure.carrier);
         }
+        if (config.kind === "trampoline") adventure.platforms.push({
+          x: 2075, baseX: 2075, y: 520, baseY: 520, w: 205, h: 22,
+          dx: 0, dy: 0, kind: "trampoline", squash: 0
+        });
+        if (config.kind === "boat") {
+          [650, 1150, 1660, 2070].forEach(function (x, i) {
+            adventure.sharks.push({ x: x, homeX: x, y: 635, w: 110, h: 55, phase: i * 1.8 });
+          });
+        }
+        player.swimming = false;
         player.x = 78;
         player.y = 610 - player.h;
         player.riding = null;
+      }
+
+      function adventureHasGaps() {
+        return ["trampoline", "train", "balloon", "boat"].indexOf(adventure.kind) >= 0;
+      }
+
+      function onAdventureDock() {
+        return player.x + player.w / 2 < 255 || player.x + player.w / 2 > 2225;
+      }
+
+      function restoreAdventurePosition() {
+        var platform = adventure.checkpoint;
+        player.h = player.baseH; player.crouching = false;
+        player.swimming = false; player.jumping = false;
+        player.vx = 0; player.vy = 0;
+        player.x = platform ? platform.x + (platform.w - player.w) / 2 : adventure.safeX;
+        player.y = (platform ? platform.y : 610) - player.h;
+        player.prevX = player.x; player.prevY = player.y;
+        player.riding = platform; player.onGround = true;
       }
 
       function updateAdventure(dt) {
@@ -2024,7 +2056,6 @@
         var move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (move) player.facing = move;
         var lift = (input.down ? 1 : 0) - (input.up ? 1 : 0);
-        adventure.actionCooldown = Math.max(0, adventure.actionCooldown - dt);
         var nearestCloud = null;
         if (adventure.kind === "cloud") {
           adventure.platforms.forEach(function (platform) {
@@ -2050,7 +2081,7 @@
             if (wasRiding !== platform && !(adventure.kind === "cloud" && nearestCloud === platform && lift)) platform.baseY += (platform.homeY - platform.baseY) * Math.min(1, dt);
             platform.y = platform.baseY + Math.sin(worldTime * .85 + platform.phase) * 24;
             if (adventure.kind === "rainbow") platform.x = platform.baseX + Math.sin(worldTime * .55 + platform.phase) * 45;
-          } else if (adventure.kind === "bubble" || adventure.kind === "balloon") {
+          } else if (adventure.kind === "balloon") {
             platform.y = platform.baseY + Math.sin(worldTime * 1.1 + platform.phase) * 13;
           } else if (adventure.kind === "boat") {
             platform.y = platform.baseY + Math.sin(worldTime * 1.5 + platform.phase) * 7;
@@ -2062,12 +2093,16 @@
         setCrouching(input.down && player.onGround && !(wasRiding && wasRiding.controlled));
         updateJumpHold(dt);
         var steeringCarrier = player.riding && player.riding.controlled;
-        var speed = player.crouching ? 150 : 255;
+        var speed = player.swimming ? 205 : player.crouching ? 150 : 255;
         player.vx += ((steeringCarrier ? 0 : move * speed) - player.vx) * Math.min(1, dt * 11);
         player.x = clamp(player.x + player.vx * dt, 0, WORLD_W - player.w);
-        player.vy += GRAVITY * dt;
+        if (player.swimming) {
+          player.vy = lift * 155;
+          if (input.jump) { player.swimming = false; player.vy = -560; player.jumping = true; }
+        } else player.vy += GRAVITY * dt;
         if (adventure.kind === "cloud" && input.up && player.vy > 90) player.vy = 90;
         player.y += player.vy * dt;
+        if (player.swimming) player.y = clamp(player.y, 615 - player.h, H - player.h - 8);
         player.onGround = false;
         player.riding = null;
         var foot = player.y + player.h;
@@ -2083,42 +2118,49 @@
           player.onGround = true;
           player.jumping = false;
           player.riding = landing;
-          if (adventure.kind === "mushroom" && !input.down) {
-            player.vy = -670; player.onGround = false; player.riding = null;
+          player.swimming = false;
+          adventure.checkpoint = landing;
+          if ((adventure.kind === "mushroom" || adventure.kind === "trampoline") && !input.down) {
+            player.vy = adventure.kind === "trampoline" ? -760 : -670; player.onGround = false; player.riding = null;
             adventure.bounces += 1;
             burst(player.x + player.w / 2, landing.y, "#ffe269", 8);
             landing.squash = 18;
             tone(490, .12, "sine", .04);
           }
-        } else if (player.y + player.h >= 610) {
+        } else if (player.y + player.h >= 610 && (!adventureHasGaps() || onAdventureDock())) {
           player.y = 610 - player.h; player.vy = 0; player.onGround = true; player.jumping = false;
-          // The low walkway is a safe recovery route in every new level.
+          player.swimming = false; adventure.checkpoint = null; adventure.safeX = player.x;
+        } else if (adventure.kind === "boat" && player.y + player.h >= 615 && !player.jumping) {
+          player.swimming = true;
+          player.y = clamp(player.y, 615 - player.h, H - player.h - 8);
+          player.vy = 0;
+        } else if (adventureHasGaps() && adventure.kind !== "boat" && player.y + player.h > 690) {
+          damage("掉下去啦！回到刚才的平台，再试一次。");
+          if (hearts > 0) restoreAdventurePosition();
+          return;
         }
-        if (player.onGround) adventure.safeX = player.x;
-
-        if (adventure.kind === "bubble" && input.up && adventure.actionCooldown <= 0) {
-          adventure.shots.push({ x: player.x + player.w / 2, y: player.y, life: 2.4 });
-          adventure.actionCooldown = .5;
-          tone(600, .06, "sine", .02);
+        // A jump that has reached the sea becomes swimming, never fall damage.
+        if (adventure.kind === "boat" && player.y > H - player.h - 8) {
+          player.y = H - player.h - 8; player.vy = 0; player.jumping = false; player.swimming = true;
         }
-        adventure.shots.forEach(function (shot) { shot.y -= dt * 300; shot.life -= dt; });
-        adventure.shots = adventure.shots.filter(function (shot) { return shot.life > 0; });
-        adventure.hook = adventure.kind === "boat" && input.down && player.riding ?
-          { x: player.x + player.w / 2, y: 665, fromY: player.y + 38 } : null;
+        adventure.sharks.forEach(function (shark) {
+          shark.x = shark.homeX + Math.sin(worldTime * .85 + shark.phase) * 100;
+          shark.y = 631 + Math.sin(worldTime * 1.3 + shark.phase) * 10;
+          // Slightly forgiving body hitbox excludes the decorative tail and nose.
+          var hit = { x: shark.x + 18, y: shark.y + 10, w: shark.w - 36, h: shark.h - 18 };
+          if (rectOverlap(player, hit)) damage("鲨鱼游过来啦！躲开它，再去找字母小鱼。");
+        });
+        if (paused) return;
 
         adventure.badges.forEach(function (badge) {
           badge.bob += dt * 2.8;
           if (!badge.active) return;
+          if (adventure.kind === "boat") badge.x = badge.homeX + Math.sin(worldTime * 1.2 + badge.lessonIndex) * 28;
           if (adventure.kind === "train") badge.x = badge.platform.x + badge.platform.w / 2 - 31;
           var box = { x: badge.x, y: badge.y + Math.sin(badge.bob) * 8, w: badge.w, h: badge.h };
           var special = false;
-          if (adventure.kind === "bubble") {
-            adventure.shots.forEach(function (shot) {
-              if (shot.life > 0 && rectOverlap({ x: shot.x - 22, y: shot.y - 22, w: 44, h: 44 }, box)) { special = true; shot.life = 0; }
-            });
-          }
           if (adventure.kind === "train" && input.down && player.riding === badge.platform) special = true;
-          if (adventure.kind === "boat" && adventure.hook && Math.abs(adventure.hook.x - (badge.x + 31)) < 85) special = true;
+          if (adventure.kind === "boat" && rectOverlap(player, box)) special = true;
           if (adventure.kind === "balloon" && rectOverlap(player, box)) special = true;
           if (adventure.kind === "rainbow" && input.down && Math.abs(player.x + player.w / 2 - (badge.x + 31)) < 85 && player.y + player.h > 490) special = true;
           if (special) {
@@ -2155,6 +2197,7 @@
         if (platform.kind === "cloud") height = 68;
         if (platform.kind === "rainbow") height = 90;
         if (platform.kind === "balloon") { y -= 164; height = 202; }
+        if (platform.kind === "trampoline") { height = 78 - platform.squash; y += platform.squash; }
         if (platform.kind === "mushroom") { y += platform.squash; height = 100 - platform.squash; }
         if (image && image.complete && image.naturalWidth) ctx.drawImage(image, x, y, width, height);
         // A simple landing guide remains functional even while art loads.
@@ -2188,13 +2231,16 @@
           ctx.restore();
         }
         ctx.fillStyle = config.floor; ctx.fillRect(0, 622, WORLD_W, H - 622);
-        // All new themes retain a broad, non-damaging walkway under the platforms.
-        ctx.fillStyle = "#f4d7a8"; roundedRectPath(ctx, 0, 610, WORLD_W, 24, 9); ctx.fill();
-        ctx.strokeStyle = config.accent; ctx.lineWidth = 3;
-        for (var mark = 0; mark < WORLD_W; mark += 48) {
-          ctx.beginPath(); ctx.moveTo(mark, 613); ctx.lineTo(mark + 4, 631); ctx.stroke();
-        }
-        if (adventure.kind === "boat" || adventure.kind === "bubble") {
+        ctx.fillStyle = "#f4d7a8";
+        if (adventureHasGaps()) {
+          roundedRectPath(ctx, 0, 610, 255, 110, 9); ctx.fill();
+          roundedRectPath(ctx, 2225, 610, WORLD_W - 2225, 110, 9); ctx.fill();
+          if (adventure.kind !== "boat") {
+            ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "bold 21px sans-serif"; ctx.textAlign = "center";
+            ctx.fillText("小心掉落 · 踩稳平台再出发", cameraX + W / 2, 688);
+          }
+        } else { roundedRectPath(ctx, 0, 610, WORLD_W, 24, 9); ctx.fill(); }
+        if (adventure.kind === "boat") {
           ctx.strokeStyle = "rgba(255,255,255,.5)";
           for (var wave = 0; wave < 3; wave++) {
             ctx.beginPath();
@@ -2205,6 +2251,11 @@
             ctx.stroke();
           }
         }
+        adventure.sharks.forEach(function (shark) {
+          var image = platformArt.shark;
+          if (image.complete && image.naturalWidth) ctx.drawImage(image, shark.x, shark.y, shark.w, shark.h);
+          else { ctx.font = "54px sans-serif"; ctx.textAlign = "left"; ctx.fillText("🦈", shark.x, shark.y + 48); }
+        });
         adventure.platforms.forEach(drawPlatformSprite);
         adventure.badges.forEach(function (badge) {
           if (adventure.kind === "rainbow" && !badge.active) {
@@ -2212,25 +2263,25 @@
             ctx.fillText("★", badge.x + 31, badge.y + 48);
           }
           if (!badge.active) return;
-          if (adventure.kind === "bubble" || adventure.kind === "balloon") {
-            ctx.strokeStyle = adventure.kind === "bubble" ? "#ffffff" : "#ffba28"; ctx.lineWidth = 7;
+          if (adventure.kind === "balloon") {
+            ctx.strokeStyle = "#ffba28"; ctx.lineWidth = 7;
             ctx.beginPath(); ctx.arc(badge.x + 31, badge.y + 31 + Math.sin(badge.bob) * 8, 47, 0, Math.PI * 2); ctx.stroke();
           }
-          drawLetterBadge(badge, letterLessons[badge.lessonIndex]);
+          if (adventure.kind === "boat") {
+            var fishY = badge.y + Math.sin(badge.bob) * 8;
+            var fishImage = platformArt.fish;
+            if (fishImage.complete && fishImage.naturalWidth) ctx.drawImage(fishImage, badge.x - 25, fishY - 3, 112, 68);
+            else { ctx.font = "60px sans-serif"; ctx.fillText("🐟", badge.x + 31, fishY + 52); }
+            ctx.font = "900 32px sans-serif"; ctx.textAlign = "center";
+            ctx.strokeStyle = "white"; ctx.lineWidth = 5;
+            ctx.strokeText(letterLessons[badge.lessonIndex].char, badge.x + 31, fishY + 42);
+            ctx.fillStyle = "#174568"; ctx.fillText(letterLessons[badge.lessonIndex].char, badge.x + 31, fishY + 42);
+          } else drawLetterBadge(badge, letterLessons[badge.lessonIndex]);
           if (adventure.kind === "train" || adventure.kind === "rainbow") {
             ctx.fillStyle = "#304c6d"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
             ctx.fillText(adventure.kind === "train" ? "↓ 盖章" : "↓ 点亮", badge.x + 31, badge.y - 14);
           }
         });
-        adventure.shots.forEach(function (shot) {
-          ctx.fillStyle = "rgba(170,242,255,.5)"; ctx.strokeStyle = "white"; ctx.lineWidth = 4;
-          ctx.beginPath(); ctx.arc(shot.x, shot.y, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        });
-        if (adventure.hook) {
-          ctx.strokeStyle = "#ffe288"; ctx.lineWidth = 4;
-          ctx.beginPath(); ctx.moveTo(adventure.hook.x, adventure.hook.fromY); ctx.lineTo(adventure.hook.x, adventure.hook.y);
-          ctx.arc(adventure.hook.x - 9, adventure.hook.y, 9, 0, Math.PI); ctx.stroke();
-        }
         var goalArt = platformArt[currentLevel === 10 ? "gift" : "rainbow"];
         if (goalArt.complete && goalArt.naturalWidth) {
           if (finale.opened) {
@@ -2242,7 +2293,7 @@
         }
         ctx.fillStyle = config.accent; ctx.font = "bold 24px sans-serif"; ctx.textAlign = "center";
         ctx.fillText(finale.opened ? "送给 Lisa！" : Object.keys(learnedThisLevel).length === config.letters.length ? (currentLevel === 10 ? "↑ 打开礼包" : "去下一站！") : "字母集合处", 2365, 453);
-        var missions = { bubble: "↑ 吹泡泡", train: "车顶 ↓ 盖车票章", cloud: "↑ ↓ 呼叫云朵 · ↑ 滑翔", mushroom: "踩蘑菇弹高 · ↓ 停住", boat: "← → 划船 · ↓ 钓字母", balloon: "↑ ↓ ← → 飞过字母圈", rainbow: "↓ 点亮六把钥匙 · ↑ 开礼包" };
+        var missions = { trampoline: "踩蹦床弹跳 · ↓ 站稳 · 掉落扣心", train: "车顶 ↓ 盖车票章", cloud: "↑ ↓ 呼叫云朵 · ↑ 滑翔", mushroom: "踩蘑菇弹高 · ↓ 停住", boat: "方向键游泳 · 碰字母鱼补心 · 躲鲨鱼", balloon: "↑ ↓ ← → 飞过字母圈", rainbow: "↓ 点亮六把钥匙 · ↑ 开礼包" };
         ctx.save(); ctx.fillStyle = "rgba(255,255,255,.88)";
         roundedRectPath(ctx, cameraX + 350, 76, 580, 43, 17); ctx.fill();
         ctx.fillStyle = "#224667"; ctx.font = "bold 22px sans-serif"; ctx.textAlign = "center";
