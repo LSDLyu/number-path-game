@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#74c8f4">
-  <meta name="lisa-version" content="2026-09-21-trampoline-sharks">
+  <meta name="lisa-version" content="2026-09-22-spikes-easier-trampolines">
   <link rel="canonical" href="https://edu.alading.org/games/lisa-letter-adventure/">
   <meta name="description" content="适合6岁儿童的绘本风字母启蒙横版闯关游戏">
   <title>Lisa的字母冒险</title>
@@ -828,7 +828,9 @@
       var landingSurfaces = surfaces.concat([
         { x: blueBlock.x, y: blueBlock.y, w: blueBlock.w, h: blueBlock.h, kind: "blue-top" }
       ]);
-      var spring = { x: 1188, y: GROUND - 30, w: 72, h: 30 };
+      var spikeHill = { x: 1188, y: GROUND - 42, w: 72, h: 42 };
+      var spikeHillArt = new Image();
+      spikeHillArt.src = "assets/spike-hill.png";
       var lava = { x: 1400, y: GROUND + 2, w: 360, h: H - GROUND + 18 };
       var ladder = { x: 1292, y: 292, w: 44, h: GROUND - 292 };
       var triangleRock = { x: 1830, y: GROUND - 62, w: 76, h: 62 };
@@ -1749,13 +1751,8 @@
           showCoach("蓝色方块是实体，要跳过去，也可以站上去！", 2600);
         }
 
-        if (rectOverlap(player, spring) && player.vy >= 0 && player.prevY + player.h <= spring.y + 18) {
-          player.y = spring.y - player.h;
-          player.vy = -900;
-          player.onGround = false;
-          player.jumping = false;
-          tone(320, .18, "square", .05);
-          showCoach("弹簧把 Lisa 弹高啦！", 1500);
+        if (rectOverlap(player, spikeHill)) {
+          damage("小心尖刺小山！跳过去，别落在尖刺上。", "rock");
         }
 
         if (player.x + player.w > lava.x && player.x < lava.x + lava.w && player.y + player.h > lava.y - 2) {
@@ -1996,7 +1993,7 @@
             kind: config.kind, squash: 0 };
           if (config.kind === "train") { platform.y = platform.baseY = 510; platform.w = 235; }
           if (config.kind === "boat") { platform.y = platform.baseY = 555; platform.w = 185; }
-          if (config.kind === "trampoline") { platform.w = 205; platform.y = platform.baseY = 520 - index % 2 * 35; }
+          if (config.kind === "trampoline") { platform.x = platform.baseX = 295 + index * 300; platform.w = 205; platform.y = platform.baseY = 520 - index % 2 * 35; }
           if (config.kind === "balloon") { platform.w = 105; platform.y = platform.baseY = 500 - index % 2 * 55; }
           adventure.platforms.push(platform);
           adventure.badges.push({ x: platform.x + platform.w / 2 - 31, y: platform.y - 162,
@@ -2013,9 +2010,9 @@
             h: 22, dx: 0, dy: 0, phase: 0, kind: config.kind, squash: 0, controlled: true };
           adventure.platforms.unshift(adventure.carrier);
         }
-        if (config.kind === "trampoline") adventure.platforms.push({
-          x: 2075, baseX: 2075, y: 520, baseY: 520, w: 205, h: 22,
-          dx: 0, dy: 0, kind: "trampoline", squash: 0
+        if (config.kind === "trampoline") [1795, 2095].forEach(function (x) {
+          adventure.platforms.push({ x: x, baseX: x, y: 520, baseY: 520, w: 205, h: 22,
+            dx: 0, dy: 0, kind: "trampoline", squash: 0 });
         });
         if (config.kind === "boat") {
           [650, 1150, 1660, 2070].forEach(function (x, i) {
@@ -2820,22 +2817,13 @@
         ctx.restore();
       }
 
-      function drawSpring() {
-        ctx.save();
-        ctx.strokeStyle = "#df3d51";
-        ctx.lineWidth = 7;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(spring.x + 8, spring.y + spring.h);
-        for (var i = 0; i < 6; i += 1) {
-          ctx.lineTo(spring.x + 12 + i * 10, spring.y + (i % 2 ? 2 : 24));
+      function drawSpikeHill() {
+        if (spikeHillArt.complete && spikeHillArt.naturalWidth) {
+          ctx.drawImage(spikeHillArt, spikeHill.x, spikeHill.y, spikeHill.w, spikeHill.h);
+        } else {
+          ctx.save(); ctx.fillStyle = "#a13a32"; ctx.font = "bold 32px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText("⚠", spikeHill.x + spikeHill.w / 2, spikeHill.y + spikeHill.h); ctx.restore();
         }
-        ctx.lineTo(spring.x + spring.w - 7, spring.y + spring.h);
-        ctx.stroke();
-        ctx.fillStyle = "#7554a5";
-        roundedRectPath(ctx, spring.x, spring.y + spring.h - 7, spring.w, 12, 6);
-        ctx.fill();
-        ctx.restore();
       }
 
       function drawLadder() {
@@ -3495,7 +3483,7 @@
           drawLadder();
           drawFurnace();
           drawBlueBlock();
-          drawSpring();
+          drawSpikeHill();
           drawMachineSpring();
           drawLetter();
           drawTunnel();
