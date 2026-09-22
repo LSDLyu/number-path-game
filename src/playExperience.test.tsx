@@ -117,8 +117,15 @@ describe("focused play experience", () => {
     });
     await start();
     fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
+    expect(screen.getByText(/① 先想方法/)).toBeTruthy();
+    expect(screen.queryByText(/下一步可走第/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
+    expect(screen.getByText(/② 看看路线末端/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     expect(screen.getByText(/下一步可走第 1 行、第 2 列/)).toBeTruthy();
     [[0, 1], [0, 2], [1, 2], [1, 1], [2, 1]].forEach(step);
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     expect(instances).toHaveLength(1);
     expect(screen.getByRole("button", { name: "给我一条线索" }).getAttribute("aria-busy")).toBe("true");
@@ -164,6 +171,8 @@ describe("focused play experience", () => {
     await start();
     vi.useFakeTimers();
     [[0, 1], [0, 2], [1, 2], [1, 1], [2, 1]].forEach(step);
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
+    fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     await act(() => vi.advanceTimersByTimeAsync(1500));
     expect(terminate).toHaveBeenCalledOnce();

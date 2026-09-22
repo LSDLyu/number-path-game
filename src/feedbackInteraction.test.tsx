@@ -56,7 +56,7 @@ describe("game feedback", () => {
     fireEvent.click(screen.getByRole("button", { name: "体验设置" }));
     ["通关动效", "震动反馈", "自动聚焦棋盘"].forEach((name) => fireEvent.click(screen.getByLabelText(name)));
     fireEvent.click(screen.getByRole("button", { name: "关闭面板" }));
-    expect(JSON.parse(localStorage.getItem(feedbackKey)!)).toEqual({ effects: false, haptics: false, focus: false });
+    expect(JSON.parse(localStorage.getItem(feedbackKey)!)).toEqual({ effects: false, haptics: false, focus: false, timer: true, steps: false });
     view.unmount();
     view = await start();
     vibration.mockClear();

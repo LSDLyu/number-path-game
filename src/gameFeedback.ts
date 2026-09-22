@@ -1,5 +1,5 @@
 export type Point = [number, number];
-export type FeedbackSettings = { effects: boolean; haptics: boolean; focus: boolean };
+export type FeedbackSettings = { effects: boolean; haptics: boolean; focus: boolean; timer: boolean; steps: boolean };
 export const feedbackKey = "zide-number-path-feedback-v1";
 export const celebrationLevels = {
   3: { particles: 16, bursts: 1, duration: 1200, vibration: [35, 60, 55] },
@@ -9,7 +9,7 @@ export const celebrationLevels = {
 };
 
 export function loadFeedback(): FeedbackSettings {
-  const defaults = { effects: true, haptics: true, focus: true };
+  const defaults = { effects: true, haptics: true, focus: true, timer: true, steps: false };
   try {
     const saved = JSON.parse(window.localStorage.getItem(feedbackKey) || "null");
     for (const key of Object.keys(defaults) as (keyof FeedbackSettings)[]) {

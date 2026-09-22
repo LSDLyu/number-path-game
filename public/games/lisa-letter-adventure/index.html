@@ -564,6 +564,29 @@
         transition-duration: .01ms !important;
       }
     }
+
+    .site-nav { display:none; }
+    .level-pill { display:block!important; max-width:62vw; font-size:clamp(12px,2vw,15px); }
+    @media(max-width:760px) { .level-pill { top:66px; max-width:90vw; padding:4px 10px; } }
+    .letter-card.show { top:50%; left:50%; transform:translate(-50%,-50%); z-index:25; width:min(90%,620px); max-height:90dvh; overflow:auto; box-shadow:0 0 0 100vmax #172b426b; }
+    .letter-card .letter-continue { grid-column:1/-1; }
+    .letter-replay { min-height:44px; }
+    .letter-continue { border:0; border-radius:18px; padding:12px 20px; background:#176d62; color:white; font-weight:800; cursor:pointer; }
+    .control-btn[data-action="down"] { font-size:clamp(12px,2vw,18px); }
+    .learning-dialog { color:#21465b; border:3px solid #ebc978; border-radius:26px; padding:24px; width:min(620px,90vw); max-height:85dvh; overflow:auto; background:#fffbeb; }
+    .learning-dialog::backdrop { background:#17304799; }
+    .learning-dialog h2 { margin-top:0; }
+    .learning-dialog button,.learning-dialog a { display:inline-block; border:2px solid #bad9d3; border-radius:14px; padding:12px 16px; margin:5px; color:#21465b; background:white; font:inherit; cursor:pointer; min-height:44px; }
+    .learning-dialog button:focus-visible,.letter-continue:focus-visible { outline:4px solid #d88b2e; outline-offset:3px; }
+    .learning-dialog button:disabled { opacity:.45; cursor:default; }
+    .learning-dialog .primary { background:#176d62; color:white; }
+    .learning-dialog .choices { display:flex; flex-wrap:wrap; gap:8px; }
+    .learning-dialog .choices button { font-size:32px; min-width:88px; }
+    .learning-dialog .record-row { border-bottom:1px solid #dce6db; padding:9px 0; }
+    .action-status { position:absolute; top:15%; left:50%; transform:translateX(-50%); padding:8px 14px; border-radius:20px; background:#e6fff1ed; color:#17594c; font-weight:700; pointer-events:none; }
+    .demo-motion { display:block; text-align:center; font-size:44px; padding:12px; animation:demo-hop 1.6s ease-in-out infinite; }
+    @keyframes demo-hop { 50% { transform:translateY(-16px); } }
+    @media(max-height:500px) { .learning-dialog { padding:14px; } .letter-card.show { padding:12px; } .demo-motion { font-size:30px; padding:4px; } }
   </style>
 </head>
 <body>
@@ -583,13 +606,13 @@
       </div>
       <div class="hud-actions">
         <button class="icon-btn" id="soundBtn" type="button" aria-label="关闭声音">🔊</button>
-        <button class="icon-btn" id="restartBtn" type="button" aria-label="重新开始本关">↻</button>
+        <button class="icon-btn" id="restartBtn" type="button" aria-label="暂停与菜单">☰</button>
       </div>
     </div>
 
     <div class="level-pill" id="levelPill">第一关 · 字母森林 · A–E</div>
     <div class="coach" id="coach" aria-live="polite"></div>
-    <div class="letter-card" id="letterCard" aria-live="polite">
+    <div class="letter-card" id="letterCard" role="dialog" aria-modal="true" aria-label="安全学习时刻" aria-live="polite" inert>
       <strong class="letter-big" id="letterBig">A</strong>
       <div class="letter-copy">
         <span class="letter-word" id="letterWord">apple</span>
@@ -601,6 +624,7 @@
         <img class="letter-doodle" id="letterDoodle" src="assets/apple-small.png" alt="苹果手绘图" decoding="async">
       </div>
       <button class="letter-replay" id="replayLessonBtn" type="button">🔊 再听一次</button>
+      <button class="letter-continue" id="continueLessonBtn" type="button">我准备好了，继续 →</button>
     </div>
 
     <div class="controls" aria-label="游戏控制按钮">
@@ -613,6 +637,8 @@
       <button class="jump-btn" id="jumpBtn" type="button" aria-label="跳跃，长按跳得更高">↑</button>
     </div>
 
+    <div class="action-status" id="actionStatus" hidden></div>
+    <dialog class="learning-dialog" id="learningDialog" aria-labelledby="dialogTitle"></dialog>
     <div class="rotate-tip">横过来，画面会更大哦 ↻</div>
 
     <section class="overlay" id="startOverlay">
@@ -620,6 +646,8 @@
         <h1>Lisa的字母冒险</h1>
         <p>陪 Lisa 玩 10 关，听单词、认图画，发现 A–Z！</p>
         <button class="start-btn" id="startBtn" type="button">开始游戏</button>
+        <button class="letter-continue" id="startMenuBtn" type="button">选关 · 学习记录</button>
+        <p id="saveStatus" style="font-size:13px">进度仅保存在这台设备</p>
         <div class="how">短按小跳 · 长按大跳</div>
         <p class="keyboard-hint">键盘：方向键 / WASD 移动，空格跳跃</p>
       </div>
@@ -746,7 +774,7 @@
       }
 
       var LEVELS = [
-        { name: "字母森林", letters: "ABCDE", hint: "跳过火炉，从下面顶字母！碰到字母不会扣爱心。" },
+        { name: "字母森林", letters: "ABCDE", hint: "先在安全的草地顶到 A，再跳过火炉！碰字母不扣爱心。" },
         { name: "滚滚球谷", letters: "FGHIJ", hint: "按跳带球越过尖刺！上坡前按 ↓ 下球，再按方向键推球上坡。" },
         { name: "字母陨石雨", letters: "KLMNO", hint: "按 ↑ ↓ 调整篮子。漏掉的字母还会回来！" },
         { name: "彩虹蹦床岛", letters: "PQRST", kind: "trampoline", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "踩蹦床弹高，按 ← → 跳到下一张！按 ↓ 站稳；掉下去会扣一颗爱心。" },
@@ -799,6 +827,8 @@
         basketBounce: 0
       };
       var hearts = MAX_HEARTS;
+      var learningMode = "", levelWords = {}, saveClock = 0, learningProgress = null, reviewState = null;
+      var slopeBlockedTime = 0, slopeDemoShown = false;
       var checkpointX = 78;
 
       var furnace = { x: 305, y: GROUND - 96, w: 78, h: 96 };
@@ -812,7 +842,7 @@
         velocity: 0
       };
       var levelOneLetterSpots = [
-        { x: 540, y: 292 },
+        { x: 168, y: 292 },
         { x: 780, y: 285 },
         { x: 1110, y: 278 },
         { x: 1515, y: 292 },
@@ -1010,6 +1040,211 @@
         }
       }
 
+
+      var SAVE_KEY = "lisa-learning-progress-v1";
+      function emptyLearningProgress() { return { version:1, current:1, unlocked:1, levels:{}, words:{}, completed:{}, tutorials:{} }; }
+      function allWords() { return [].concat.apply([],wordPools); }
+      function wordByName(name) { return allWords().filter(function (word) { return word.word === name; })[0]; }
+      function initializeLearning() {
+        learningProgress = emptyLearningProgress();
+        try {
+          var saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+          if (saved && saved.version === 1 && saved.levels && saved.words) {
+            learningProgress.unlocked = clamp(Math.floor(Number(saved.unlocked)) || 1,1,10);
+            learningProgress.current = clamp(Math.floor(Number(saved.current)) || 1,1,learningProgress.unlocked);
+            ["levels","completed","tutorials"].forEach(function (key) {
+              if (saved[key] && typeof saved[key] === "object") learningProgress[key] = saved[key];
+            });
+            allWords().forEach(function (word) {
+              var record = saved.words[word.word];
+              if (record && Number.isFinite(record.seen)) learningProgress.words[word.word] = {
+                seen:Math.max(0,record.seen), correct:Math.max(0,Number(record.correct)||0), attempts:Math.max(0,Number(record.attempts)||0)
+              };
+            });
+            document.getElementById("startBtn").textContent = "继续第 " + learningProgress.current + " 关";
+          }
+        } catch (error) { document.getElementById("saveStatus").textContent = "当前无法读取存档，仍可正常游玩"; }
+        document.getElementById("continueLessonBtn").addEventListener("click", function () {
+          hideLetterLesson(); learningMode = ""; clearControls(); unlockAudio(); paused = false;
+          player.invincible = Math.max(player.invincible || 0,.8);
+          saveLearning();
+          if (currentLevel === 3 && Object.keys(learnedThisLevel).length === LEVELS[2].letters.length) finishLevel();
+        });
+        document.getElementById("startMenuBtn").addEventListener("click",function () { openLearningMenu("pause"); });
+        var dialog = document.getElementById("learningDialog");
+        dialog.addEventListener("cancel",function (event) { event.preventDefault(); if (learningMode === "pause") resumeLearning(); });
+        dialog.addEventListener("click",function (event) {
+          var button = event.target.closest("[data-learning]");
+          if (!button || button.disabled) return;
+          var action = button.getAttribute("data-learning");
+          unlockAudio();
+          if (action === "resume") resumeLearning();
+          else if (action === "level") enterLearningLevel(Number(button.getAttribute("data-level")),true);
+          else if (action === "restart") enterLearningLevel(currentLevel,false);
+          else if (action === "retry") { saveLearning(); enterLearningLevel(currentLevel,true,true); }
+          else if (action === "records") showLearningRecords();
+          else if (action === "menu") openLearningMenu("pause");
+          else if (action === "tutorial") showLevelTutorial();
+          else if (action === "go") { learningProgress.tutorials[currentLevel]=true; resumeLearning(); }
+          else if (action === "listen") speakLesson(reviewState.lesson);
+          else if (action === "slope-go") resumeLearning();
+          else if (action === "answer") answerReview(button.getAttribute("data-answer"));
+          else if (action === "review-next") { reviewState.index++; renderReview(); }
+          else if (action === "next-level") enterLearningLevel(currentLevel === 10 ? 1 : currentLevel + 1,true);
+        });
+        window.addEventListener("pagehide",saveLearning);
+      }
+      function saveLearning() {
+        if (!learningProgress || !started) return;
+        learningProgress.current = currentLevel;
+        learningProgress.levels[currentLevel] = {
+          learned:Object.keys(learnedThisLevel), words:levelWords, hearts:hearts, checkpointX:checkpointX,
+          ballX:rollingBall.safeX || 310, platform:adventure.platforms.indexOf(adventure.checkpoint),
+          safeX:adventure.safeX || 78, finished:won
+        };
+        try { localStorage.setItem(SAVE_KEY,JSON.stringify(learningProgress)); }
+        catch (error) { document.getElementById("saveStatus").textContent = "存档不可用，请不要关闭页面"; }
+      }
+      function restoreLearning(snapshot, refill) {
+        if (!snapshot || snapshot.finished) return;
+        (Array.isArray(snapshot.learned) ? snapshot.learned : []).forEach(function (char) {
+            if (typeof char === "string" && char.length === 1 && LEVELS[currentLevel-1].letters.indexOf(char) >= 0) learnedThisLevel[char] = true;
+        });
+        levelWords = {};
+        Object.keys(learnedThisLevel).forEach(function (char) {
+          var word = wordByName(snapshot.words && snapshot.words[char]);
+          if (word && word.char === char) levelWords[char] = word.word;
+        });
+        hearts = refill ? MAX_HEARTS : clamp(Number(snapshot.hearts) || MAX_HEARTS,1,MAX_HEARTS);
+        checkpointX = [78,940,1768].indexOf(snapshot.checkpointX)>=0 ? snapshot.checkpointX : 78;
+        if (currentLevel === 1) {
+          player.x = checkpointX; player.prevX = player.x;
+          letter.index = 0;
+          while (learnedThisLevel[LEVELS[0].letters[letter.index]]) letter.index++;
+          prepareNextLevelOneLetter();
+        } else if (currentLevel === 2) {
+          rollingLetters.forEach(function (item) { item.active = !learnedThisLevel[letterLessons[item.lessonIndex].char]; });
+          rollingBall.safeX = clamp(Number(snapshot.ballX)||310,310,2300);
+          rollingBall.x = rollingBall.safeX; rollingBall.y = levelTwoGroundY(rollingBall.x)-rollingBall.r;
+          player.x = rollingBall.x-player.w/2; player.y = rollingBall.y-rollingBall.r-player.h;
+        } else if (currentLevel === 3) {
+          meteorState.caught = Object.keys(learnedThisLevel).length;
+        } else {
+          adventure.badges.forEach(function (badge) {
+            badge.active = !learnedThisLevel[letterLessons[badge.lessonIndex].char];
+            if (adventure.kind === "train" && !badge.active) badge.platform.stamped = true;
+          });
+          adventure.checkpoint = adventure.platforms[snapshot.platform] || (adventure.kind === "boat" ? adventure.carrier : null);
+          adventure.safeX = clamp(Number(snapshot.safeX)||78,24,WORLD_W-100);
+          restoreAdventurePosition();
+        }
+        cameraX = currentLevel===3 ? 0 : clamp(player.x-350,0,WORLD_W-W);
+        player.invincible = 1.5; updateHearts(); updateLevelLabel();
+      }
+      function showLearningDialog(mode, content) {
+        learningMode = mode; paused = true; clearControls();
+        var dialog = document.getElementById("learningDialog");
+        dialog.innerHTML = content;
+        if (!dialog.open) dialog.showModal();
+      }
+      function closeLearningDialog() {
+        var dialog = document.getElementById("learningDialog");
+        if (dialog.open) dialog.close();
+      }
+      function resumeLearning() {
+        closeLearningDialog(); learningMode = ""; clearControls(); unlockAudio();
+        if (!started) { paused=true; return; }
+        if (won) { paused=true; return; }
+        if (hearts <= 0) { openLearningMenu("defeat"); return; }
+        paused = false; lastTime = 0; saveLearning();
+      }
+      function enterLearningLevel(number, resume, refill) {
+        if (!Number.isInteger(number) || number < 1 || number > learningProgress.unlocked) return;
+        var snapshot = resume ? learningProgress.levels[number] : null;
+        closeLearningDialog(); hideLetterLesson(); learningMode = "";
+        currentLevel = number; resetLevel(false); levelWords = {}; slopeBlockedTime = 0; slopeDemoShown = false;
+        restoreLearning(snapshot,refill);
+        unlockAudio(); started = true; paused = false;
+        tone(520, .12, "sine", .045);
+        document.getElementById("startOverlay").classList.add("hidden");
+        saveLearning();
+        if (!learningProgress.tutorials[number]) showLevelTutorial();
+        else showCoach(LEVELS[number-1].hint,5500);
+      }
+      function openLearningMenu(kind) {
+        if (learningMode === "lesson") return;
+        saveLearning();
+        var choices = LEVELS.map(function (level,index) { return '<button data-learning="level" data-level="'+(index+1)+'" '+(index+1>learningProgress.unlocked?'disabled':'')+'>'+(index+1)+'. '+level.name+(learningProgress.completed[index+1]?' ✓':'')+'</button>'; }).join("");
+        showLearningDialog(kind, '<h2 id="dialogTitle">'+(kind==="defeat"?'歇一歇，再出发':'冒险菜单')+'</h2><p>'+(kind==="defeat"?'找到的字母已经留下了。补满爱心，从安全点继续吧！':'进度自动保存在这台设备，已解锁的关卡可以重玩。')+'</p>'+
+          (kind==="defeat"?'<button class="primary" data-learning="retry">补满爱心，继续本关</button>':'<button class="primary" data-learning="resume">'+(started?'继续冒险':'返回开始画面')+'</button>')+
+          '<button data-learning="restart">重新开始本关</button><button data-learning="tutorial">玩法演示</button><button data-learning="records">学习记录 · 家长查看</button><details><summary>选关</summary>'+choices+'</details><p><a href="https://edu.alading.org/games/">← 游戏大厅</a></p>');
+      }
+      function showLevelTutorial() {
+        var demos = ["← 👧 ↑ A →","👧⚽ ↑ 🔺 · 👧 → ⚽ ⛰️","🧺 ↑ ↓ · K L M","👧 ↑ 🟣 → 🟣","👧 ↓ U → Lisa","☁️ ↑ ↓ · 👧 ↑","🍄 ↑ 👧 · ↓ 停","🦈 · 🫧 👧 · 🐟 K","🎈 ← ↑ ↓ →","U ↓ 🌈 · 🎁 ↑"];
+        showLearningDialog("tutorial",'<h2 id="dialogTitle">'+currentLevel+' / 10 · '+LEVELS[currentLevel-1].name+'</h2><span class="demo-motion" aria-hidden="true">'+demos[currentLevel-1]+'</span><p>'+LEVELS[currentLevel-1].hint+'</p><p>短按跳跃是小跳，长按跳得更高。收集字母后会暂停，听完单词再继续。</p><button class="primary" data-learning="go">明白了，出发！</button>');
+      }
+      function showLearningRecords() {
+        var words = allWords().filter(function (word) { return learningProgress.words[word.word]; });
+        var practiced = words.filter(function (word) { return learningProgress.words[word.word].attempts>0; }).length;
+        var rows = words.map(function (word) {
+          var record = learningProgress.words[word.word];
+          return '<div class="record-row"><strong>'+word.char+' '+word.word+'</strong> · '+word.meaning+' · 收集 '+record.seen+' 次 · '+(record.attempts?'首次答对 '+record.correct+'/'+record.attempts+(record.correct<record.attempts?' · 建议再练':' · 可继续复习'):'尚未复习')+'</div>';
+        }).join("");
+        showLearningDialog("records",'<h2 id="dialogTitle">学习记录</h2><p>已收集 '+words.length+' / 52 个词，复习过 '+practiced+' 个。收集表示遇见过，不代表已经掌握。</p><p>孩子不扣爱心地练习；家长可关注反复答错的词。记录仅在本设备保存。</p>'+(rows||'<p>开始冒险后，这里会出现单词记录。</p>')+'<button data-learning="menu">返回菜单</button>');
+      }
+      function beginReview() {
+        document.getElementById("finishOverlay").classList.add("hidden");
+        var words = Object.keys(levelWords).map(function (char) { return wordByName(levelWords[char]); }).filter(Boolean);
+        if (!words.length) words = LEVELS[currentLevel-1].letters.split("").map(function (char) { return letterLessons[char.charCodeAt(0)-65]; });
+        words.sort(function(a,b) {
+          var ra=learningProgress.words[a.word]||{}, rb=learningProgress.words[b.word]||{};
+          return ((rb.attempts||0)-(rb.correct||0))-((ra.attempts||0)-(ra.correct||0));
+        });
+        reviewState = { index:0, words:words.slice(0,3), lesson:null, answered:false };
+        renderReview();
+      }
+      function renderReview() {
+        if (reviewState.index >= reviewState.words.length) {
+          saveLearning();
+          showLearningDialog("review",'<h2 id="dialogTitle">今天又认识了一些新朋友！</h2><p>复习完成。错了也没关系，下次再听一听。</p><button class="primary" data-learning="next-level">'+(currentLevel===10?'从第一关再玩':'去下一关')+'</button><button data-learning="records">查看学习记录</button>');
+          return;
+        }
+        var lesson = reviewState.words[reviewState.index]; reviewState.lesson=lesson; reviewState.answered=false;
+        var matching = reviewState.index===2;
+        var alternatives = allWords().filter(function (word) { return word.char!==lesson.char; });
+        var choices = [lesson,alternatives[(currentLevel*3)%alternatives.length],alternatives[(currentLevel*3+9)%alternatives.length]];
+        choices.sort(function(a,b) { return a.word.localeCompare(b.word); });
+        reviewState.tried = false;
+        showLearningDialog("review",'<h2 id="dialogTitle">轻松复习 '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'找到大写 '+lesson.char+' 的小写伙伴':'听一听，选择对应的图片')+'</p>'+(matching?'':'<button data-learning="listen">🔊 再听一次</button>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">不扣爱心，慢慢想。</p>');
+        if (!matching) speakLesson(lesson);
+      }
+      function answerReview(answer) {
+        if (reviewState.answered) return;
+        var lesson=reviewState.lesson;
+        var record=learningProgress.words[lesson.word] || {seen:0,attempts:0,correct:0};
+        if (!reviewState.tried) { record.attempts++; if (answer===lesson.word) record.correct++; }
+        reviewState.tried = true;
+        learningProgress.words[lesson.word]=record; saveLearning();
+        if (answer !== lesson.word) {
+          document.getElementById("reviewFeedback").textContent="没关系，再听一次，然后再选一选。不扣爱心。";
+          speakLesson(lesson); return;
+        }
+        reviewState.answered=true;
+        document.getElementById("reviewFeedback").textContent=(answer===lesson.word?'答对啦！':'再认识一下：')+' '+lesson.char+' '+lesson.char.toLowerCase()+' · '+lesson.emoji+' '+lesson.word+' · '+lesson.meaning;
+        var next=document.createElement("button"); next.setAttribute("data-learning","review-next"); next.textContent="继续 →"; next.className="primary";
+        document.getElementById("learningDialog").appendChild(next); next.focus(); speakLesson(lesson);
+      }
+      function updateActionLabels() {
+        var label=currentLevel===2?(player.onBall?'↓ 下球':'↓ 蹲下'):currentLevel===5?'↓ 盖章':currentLevel===8?'↓ 潜水':currentLevel===9?'↓ 下降':currentLevel===10?'↓ 点亮':currentLevel===4||currentLevel===7?'↓ 站稳':currentLevel===6?'↓ 降云':currentLevel===3?'↓ 篮子':'↓ 蹲下';
+        document.querySelectorAll('.control-btn').forEach(function (button) {
+          if (button.getAttribute("data-action")==="down" && button.textContent!==label) { button.textContent=label; button.setAttribute("aria-label",label.slice(2)); }
+        });
+        var status=document.getElementById("actionStatus");
+        var nearSlope=currentLevel===2 && ballHills.some(function(hill){return rollingBall.x>hill.start-100 && rollingBall.x<hill.peak;});
+        status.hidden=!(started && !won && !paused && ((currentLevel===8 && player.inBubble)||nearSlope));
+        status.textContent=nearSlope?(player.onBall?"到坡脚啦 · ↓ 下球，再 → 推球":"站在球后面 · → 推球上坡"):"🫧 泡泡保护中 · 出去才能收集小鱼";
+      }
+
       function updateHearts(changedIndex, changeKind) {
         var nodes = document.querySelectorAll(".heart");
         nodes.forEach(function (node, index) {
@@ -1047,7 +1282,7 @@
           doodle.hidden = false;
           fallback.hidden = true;
           // Slow image loading must not consume the whole time allowed to see it.
-          if (lastLesson === lesson) letterCardTimer = Math.max(letterCardTimer, 4500);
+          if (lastLesson === lesson) letterCardTimer = 0;
         };
         doodle.onerror = function () {
           if (lastLesson !== lesson || !lesson.art) return;
@@ -1059,10 +1294,14 @@
         doodle.alt = lesson.artAlt;
         if (lesson.art && doodle.complete && doodle.naturalWidth > 0) doodle.onload();
         document.getElementById("letterCard").classList.add("show");
-        letterCardTimer = 4500;
+        document.getElementById("letterCard").inert = false;
+        letterCardTimer = 0;
+        paused = true; learningMode = "lesson"; clearControls();
+        document.getElementById("continueLessonBtn").focus();
       }
 
       function hideLetterLesson() {
+        document.getElementById("letterCard").inert = true;
         document.getElementById("letterCard").classList.remove("show");
       }
 
@@ -1474,7 +1713,7 @@
       }
 
       function damage(reason, hazardKind) {
-        if (player.invincible > 0 || won) return;
+        if (player.invincible > 0 || won || paused) return;
         player.invincible = 1.35;
         player.jumping = false;
         hearts -= 1;
@@ -1486,11 +1725,7 @@
 
         if (hearts <= 0) {
           paused = true;
-          showCoach("爱心用完啦，马上再试一次！", 1800);
-          pendingResetTimer = setTimeout(function () {
-            resetLevel(true);
-            paused = false;
-          }, 1500);
+          openLearningMenu("defeat");
         } else {
           showCoach(reason || "小心障碍！", 1500);
           player.h = player.baseH;
@@ -1537,6 +1772,9 @@
         if (learnedThisLevel[lesson.char]) return;
         lesson = chooseWord(lesson.char);
         learnedThisLevel[lesson.char] = true;
+        var record = learningProgress.words[lesson.word] || { seen:0, correct:0, attempts:0 };
+        record.seen += 1; learningProgress.words[lesson.word] = record;
+        levelWords[lesson.char] = lesson.word;
         updateLevelLabel();
         var healed = hearts < MAX_HEARTS;
         if (healed) {
@@ -1548,6 +1786,7 @@
         tone(660, .18, "sine", .07);
         setTimeout(function () { tone(880, .24, "sine", .06); }, 100);
         burst(x, y, healed ? "#ff6177" : "#ffd43f", 20);
+        saveLearning();
       }
 
       function bumpLetter(box) {
@@ -1572,7 +1811,7 @@
       }
 
       function finishLevel() {
-        if (won) return;
+        if (won || learningMode === "lesson") return;
         var remaining = LEVELS[currentLevel - 1].letters.split("").filter(function (char) { return !learnedThisLevel[char]; });
         if (remaining.length) {
           if (goalHintTimer <= 0) { showCoach("还有 " + remaining.join("、") + "，找齐它们再去下一关！", 3200); goalHintTimer = 4; }
@@ -1580,6 +1819,9 @@
         }
         won = true;
         paused = true;
+        learningProgress.unlocked = Math.max(learningProgress.unlocked, Math.min(10,currentLevel + 1));
+        learningProgress.completed[currentLevel] = true;
+        saveLearning();
         if (currentLevel === 10) {
           cameraX = WORLD_W - W;
           finale.active = true; finale.opened = true; finale.time = 0; finale.next = 0;
@@ -1607,11 +1849,11 @@
           if (currentLevel < LEVELS.length) {
             finishTitle.textContent = LEVELS[currentLevel - 1].name + "完成！";
             finishText.textContent = "这关的字母都找齐啦！下一站：" + LEVELS[currentLevel].name;
-            againBtn.textContent = "进入第 " + (currentLevel + 1) + " 关";
+            againBtn.textContent = "听一听、认一认，再去下一关";
           } else {
             finishTitle.textContent = "十关都完成啦！";
             finishText.textContent = "Lisa和 A–Z 都见过两次面啦！再来一次新的冒险吧。";
-            againBtn.textContent = "从第一关再玩一次";
+            againBtn.textContent = "复习今天的字母和单词";
           }
           document.getElementById("finishOverlay").classList.remove("hidden");
         }, currentLevel === 10 ? 7000 : 1400);
@@ -1862,7 +2104,13 @@
         if (player.onBall && levelTwoGroundY(nextBallX) < levelTwoGroundY(rollingBall.x) - .05) {
           nextBallX = rollingBall.x; rollingBall.vx = 0;
           if (goalHintTimer <= 0) { showCoach("上坡啦！按 ↓ 下球，站在球后面推它上去。", 2800); goalHintTimer = 3; }
-        }
+          slopeBlockedTime += dt;
+          if (slopeBlockedTime > 5 && !slopeDemoShown) {
+            slopeDemoShown = true;
+            showLearningDialog("slope",'<h2 id="dialogTitle">一起把球推上坡</h2><p>① 松开方向键，按 ↓ 下球。</p><p>② Lisa 会站到球后面。</p><p>③ 按住 →，慢慢把球推上坡。坡顶再跳回球上。</p><button class="primary" data-learning="slope-go">我来试一试</button>');
+            return;
+          }
+        } else slopeBlockedTime = 0;
         rollingBall.x = nextBallX;
         if (rollingBall.onGround) rollingBall.y = levelTwoGroundY(rollingBall.x) - rollingBall.r;
         else {
@@ -2285,6 +2533,7 @@
             badge.active = false;
             if (adventure.kind === "train") {
               badge.platform.stamped = true;
+              badge.platform.stampTime = worldTime;
               player.onTrainLetter = null; player.onGround = false; player.riding = null;
               burst(box.x + 31, badge.platform.y + 60, "#e84b70", 18);
             }
@@ -2325,6 +2574,7 @@
         if (image && image.complete && image.naturalWidth) ctx.drawImage(image, x, y, width, height);
         if (platform.kind === "train" && platform.stamped) {
           ctx.save(); ctx.translate(x + width / 2, y + 66); ctx.rotate(-.16);
+          var stampScale = 1 + .45 * Math.max(0,1 - (worldTime - (platform.stampTime || -10)) / .8); ctx.scale(stampScale,stampScale);
           ctx.strokeStyle = "#c92658"; ctx.fillStyle = "rgba(255,248,240,.92)"; ctx.lineWidth = 4;
           ctx.beginPath(); ctx.ellipse(0, 0, 45, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
           ctx.font = "900 29px Georgia, serif"; ctx.textAlign = "center"; ctx.fillStyle = "#c92658";
@@ -2474,7 +2724,10 @@
       }
 
       function update(dt) {
-        worldTime += dt;
+        if (!paused) worldTime += dt;
+        saveClock += dt;
+        if (started && saveClock > 3) { saveClock = 0; saveLearning(); }
+        updateActionLabels();
         goalHintTimer = Math.max(0, goalHintTimer - dt);
         player.letterBumpCooldown = Math.max(0, (player.letterBumpCooldown || 0) - dt);
         if (!paused) {
@@ -3704,6 +3957,7 @@
 
         function press(event) {
           event.preventDefault();
+          if (paused || !started || won) return;
           var pointerId = eventPointerId(event);
           if (activePointerId !== null && activePointerId !== pointerId) return;
           activePointerId = pointerId;
@@ -3776,6 +4030,13 @@
       }
 
       window.addEventListener("keydown", function (event) {
+        if (learningMode === "lesson" && event.code === "Tab") {
+          event.preventDefault();
+          var replay=document.getElementById("replayLessonBtn"), next=document.getElementById("continueLessonBtn");
+          (document.activeElement===next?replay:next).focus(); return;
+        }
+        if (event.code === "Escape" && started && !paused) { event.preventDefault(); openLearningMenu("pause"); return; }
+        if (paused) return;
         var action = actionFromKeyEvent(event);
         if (!action) return;
         event.preventDefault();
@@ -3790,36 +4051,24 @@
         setControl(action, "key:" + (event.code || String(event.key).toLowerCase()), false);
       }, { passive: false });
 
-      window.addEventListener("blur", clearControls);
+      window.addEventListener("blur", function () { clearControls(); if (started && !paused) openLearningMenu("pause"); });
       document.addEventListener("visibilitychange", function () {
         clearControls();
         lastTime = 0;
-        if (document.hidden) { audioNeedsGesture = true; speechPrimed = false; }
+        if (document.hidden) { audioNeedsGesture = true; speechPrimed = false; if (started && !paused) openLearningMenu("pause"); saveLearning(); }
         else if (soundEnabled) initAudio();
       });
 
       document.getElementById("startBtn").addEventListener("click", function () {
-        currentLevel = 1;
-        resetLevel(false);
-        unlockAudio();
-        tone(520, .12, "sine", .045);
-        started = true;
-        paused = false;
-        document.getElementById("startOverlay").classList.add("hidden");
-        showCoach("先试试 ← →，再短按或长按跳跃！", 3300);
+        enterLearningLevel(learningProgress.current || 1, true);
       });
 
       document.getElementById("againBtn").addEventListener("click", function () {
-        currentLevel = currentLevel === LEVELS.length ? 1 : currentLevel + 1;
-        resetLevel(true);
-        unlockAudio();
-        paused = false;
+        beginReview();
       });
 
       document.getElementById("restartBtn").addEventListener("click", function () {
-        resetLevel(true);
-        unlockAudio();
-        paused = !started;
+        if (learningMode !== "lesson") openLearningMenu("pause");
       });
 
       document.getElementById("soundBtn").addEventListener("click", function () {
@@ -3835,6 +4084,7 @@
         if (lastLesson) speakLesson(lastLesson);
       });
 
+      initializeLearning();
       setSound(soundEnabled);
       resetLevel(false);
       heroSprite.addEventListener("error", function () {

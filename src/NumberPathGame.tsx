@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Celebration } from "./Celebration";
+import { PathTutorial, newLearningRecord, readLearningRecords, skillGroup, strategyName, strategyTip, type LearningRecord } from "./PathLearning";
 import { GameDialog } from "./GameDialog";
 import { createPlayClock } from "./playClock";
 import { solveFromPath, type HintResult } from "./hintSolver";
@@ -24,6 +25,7 @@ type Clue = [number, number, number];
 type Puzzle = { number: number; clues: Clue[]; route: Point[] };
 type Tone = "guide" | "good" | "warn";
 type SavedProgress = {
+  learning?: Record<string, LearningRecord>;
   paths: Record<string, Point[]>;
   completed: Record<string, number>;
   elapsedMs?: Record<string, number>;
@@ -353,10 +355,12 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const supportsVibration = typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
   const progressRef = useRef<SavedProgress>(emptyProgress);
   const boardRef = useRef<HTMLDivElement>(null);
-  const [panel, setPanel] = useState<"cases" | "settings" | "help" | "restart" | null>(null);
+  const [panel, setPanel] = useState<"cases" | "settings" | "help" | "restart" | "tutorial" | "records" | null>(null);
   const [visible, setVisible] = useState(() => typeof document === "undefined" || !document.hidden);
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [hinting, setHinting] = useState(false);
+  const [hintStage, setHintStage] = useState(0);
+  const hintSequence = useRef({ signature:"", stage:0 });
   const hintJob = useRef<{ worker: Worker; timer: number } | null>(null);
   const hintRequestId = useRef(0);
   const cancelHint = useCallback(() => {
@@ -404,7 +408,10 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const clock = useMemo(() => createPlayClock(progressRef.current.elapsedMs?.[progressKey] ?? 0), [progressKey, hydrated]);
 
   const deadEnd = !isComplete && !hasForwardMove(path, size, clueMap, info.end);
-  const focused = feedback.focus && path.length > 1 && !isComplete;
+  const focused = feedback.focus;
+  const chapter = skillGroup(puzzleIndex,puzzleList.length);
+  useEffect(() => { document.body.classList.toggle("number-path-focus",feedback.focus); return () => document.body.classList.remove("number-path-focus"); },[feedback.focus]);
+  useEffect(() => { setHintStage(0); hintSequence.current = { signature:"",stage:0 }; },[path,progressKey]);
 
   const vibrate = useCallback((pattern: number[]) => {
     if (!feedback.haptics || !supportsVibration || document.hidden) return;
@@ -466,6 +473,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             lastCase: parsed.lastCase,
             lastCases: parsed.lastCases,
             elapsedMs: parsed.elapsedMs,
+            learning: readLearningRecords(parsed.learning),
           };
         }
       } catch {
@@ -537,12 +545,14 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const completeCase = useCallback((nextPath: Point[]) => {
     const milliseconds = clock.pause();
     const seconds = Math.max(1, Math.floor(milliseconds / 1000));
+    const record = progressRef.current.learning?.[progressKey] || newLearningRecord();
     const previous = progress.completed[progressKey];
     const best = previous ? Math.min(previous, seconds) : seconds;
     persist({
       ...progressRef.current,
       paths: { ...progressRef.current.paths, [progressKey]: nextPath },
       completed: { ...progressRef.current.completed, [progressKey]: best },
+      learning: { ...progressRef.current.learning, [progressKey]: { ...record, solves:record.solves+1, independent:record.independent+(record.hints===0?1:0), lastHints:record.hints, strategy:chapter } },
       elapsedMs: { ...progressRef.current.elapsedMs, [progressKey]: milliseconds },
       lastCase: { size, number: puzzle.number },
     });
@@ -552,7 +562,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     setElapsed(seconds);
     setMessage(copy.success(total, info.end));
     setTone("good");
-  }, [clock, copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
+  }, [chapter, clock, copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
 
   const moveTo = useCallback((point: Point) => {
     if (!hydrated || isComplete || panel || pathRef.current.length === total) return;
@@ -561,6 +571,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     const currentPath = pathRef.current;
     const last = currentPath.at(-1);
     if (!last || samePoint(last, point)) return;
+    hintSequence.current = { signature: "", stage: 0 }; setHintStage(0);
 
     const existingIndex = currentPath.findIndex((step) => samePoint(step, point));
     if (existingIndex >= 0) {
@@ -695,6 +706,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       ...progress,
       paths: { ...progress.paths, [progressKey]: initial },
       elapsedMs: { ...progressRef.current.elapsedMs, [progressKey]: 0 },
+      learning: { ...progressRef.current.learning, [progressKey]: { ...(progressRef.current.learning?.[progressKey]||newLearningRecord()), hints:0, restarts:(progressRef.current.learning?.[progressKey]?.restarts||0)+1 } },
       lastCase: { size, number: puzzle.number },
     });
     pathRef.current = initial;
@@ -708,6 +720,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
   const undo = () => {
     cancelHint();
+    hintSequence.current = { signature: "", stage: 0 }; setHintStage(0);
     const currentPath = pathRef.current;
     if (currentPath.length <= 1 || isComplete) {
       setMessage(currentPath.length <= 1 ? copy.atStart : copy.closedUndo);
@@ -728,6 +741,20 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     if (!hydrated || isComplete || hinting) return;
     cancelHint();
     const snapshot = pathRef.current;
+    const signature = progressKey+":"+snapshot.map(point=>point.join(",")).join(";");
+    const stage = hintSequence.current.signature===signature ? Math.min(3,hintSequence.current.stage+1) : 1;
+    hintSequence.current = {signature,stage}; setHintStage(stage);
+    const record = progressRef.current.learning?.[progressKey] || newLearningRecord();
+    persist({...progressRef.current,learning:{...progressRef.current.learning,[progressKey]:{...record,hints:record.hints+1}}});
+    setTone("guide"); setHintCell(null);
+    if (stage===1) {
+      setMessage(locale==="zh" ? "① 先想方法："+strategyTip(locale,chapter)+" 再点提示，可以观察附近区域。" : "① Think first: "+strategyTip(locale,chapter)+" Tap hint again to inspect the nearby area.");
+      return;
+    }
+    if (stage===2) {
+      setMessage(locale==="zh" ? "② 看看路线末端周围标出的空格：哪些会堵住出口或把空格隔开？这些是观察区域，不保证每一格都能走通。再点可检查下一步。" : "② Inspect the marked unvisited neighbors. Could a move block an exit or isolate squares? These are areas to inspect, not guaranteed moves. Tap again to check a next step.");
+      return;
+    }
     const requestId = hintRequestId.current;
     const apply = (result: HintResult) => {
       if (hintRequestId.current !== requestId || pathRef.current !== snapshot) return;
@@ -770,6 +797,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       return;
     }
     cancelHint();
+    hintSequence.current = { signature: "", stage: 0 }; setHintStage(0);
     clock.pause();
     setPanel(null);
     setCelebrating(false);
@@ -823,6 +851,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
         <button type="button" className={styles.helpButton} onClick={() => setPanel("help")}>{copy.help} <span aria-hidden="true">?</span></button>
       </header>
       <p className={styles.lede}>{copy.shortRules}</p>
+      <div className={styles.learningLinks}><button type="button" onClick={() => setPanel("tutorial")}>{locale==="zh"?"跟我练一题":"Try a guided puzzle"}</button><button type="button" onClick={() => setPanel("records")}>{locale==="zh"?"学习记录 · 家长查看":"Learning record"}</button><a href="https://edu.alading.org/games/">{locale==="zh"?"游戏大厅":"Games"}</a></div>
 
       <nav className={styles.sizeTabs} aria-label={copy.sizeNav}>
         {sizes.map((value) => <button type="button" key={value} className={size === value ? styles.activeSize : ""}
@@ -833,7 +862,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
       <section className={styles.boardPanel} aria-labelledby="board-title">
         <div className={styles.boardHeading}>
-          <div className={styles.caseIdentity}><p className={styles.kicker}>{level} · {size}×{size}</p><h2 id="board-title">{copy.question(puzzle.number)}</h2></div>
+          <div className={styles.caseIdentity}><p className={styles.kicker}>{level} · {size}×{size} · {strategyName(locale,chapter)}</p><h2 id="board-title">{copy.question(puzzle.number)}</h2></div>
           <div className={styles.boardTools}>
             <button type="button" aria-label={copy.chooseCase} onClick={() => setPanel("cases")} disabled={!hydrated}>
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h5v5H3Zm9 0h5v5h-5ZM3 12h5v5H3Zm9 0h5v5h-5Z" /></svg>{copy.chooseShort}
@@ -846,7 +875,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
         <div className={styles.boardMeta}>
           <span className={styles.nextClue}>{isComplete ? copy.closed : <>{copy.nextNumber} <strong>{nextClue}</strong></>}</span>
-          <span className={styles.playTime} aria-label={`${copy.currentTime} ${formatTime(elapsed)}`}><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M10 5v5l3 2" /></svg>{formatTime(elapsed)}</span>
+          {feedback.timer && <span className={styles.playTime} aria-label={`${copy.currentTime} ${formatTime(elapsed)}`}><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M10 5v5l3 2" /></svg>{formatTime(elapsed)}</span>}
           <span>{copy.explored} <strong>{path.length}</strong> / {total} {copy.squares}</span>
         </div>
 
@@ -864,13 +893,14 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
               const selected = pathIndex >= 0;
               const last = pathIndex === path.length - 1;
               const hinted = samePoint(hintCell ?? undefined, [row, column]);
+              const region = hintStage===2 && !selected && distance(path.at(-1)!,[row,column])===1;
               return <button type="button" role="gridcell" key={`${row}-${column}`} id={`cell-${size}-${row}-${column}`} tabIndex={-1}
                 data-cell="true" data-row={row} data-column={column} aria-rowindex={row + 1} aria-colindex={column + 1} aria-selected={selected}
-                className={`${styles.cell} ${selected ? styles.selectedCell : ""} ${last ? styles.lastCell : ""} ${hinted ? styles.hintCell : ""} ${clue === nextClue && !isComplete ? styles.nextNumber : ""}`}
+                className={`${styles.cell} ${selected ? styles.selectedCell : ""} ${last ? styles.lastCell : ""} ${hinted ? styles.hintCell : ""} ${region ? styles.hintRegion : ""} ${clue === nextClue && !isComplete ? styles.nextNumber : ""}`}
                 aria-label={copy.cellAria(row + 1, column + 1, clue, info.end, selected, pathIndex)}
                 onClick={(event) => { if (event.detail === 0) moveTo([row, column]); }}>
                 {clue && <strong>{clue}</strong>}
-                {selected && !clue && <small>{pathIndex + 1}</small>}
+                {selected && !clue && <small aria-hidden="true">{feedback.steps && isComplete ? pathIndex + 1 : "●"}</small>}
                 {clue === info.end && <span className={styles.finishTag} aria-hidden="true">{copy.finishTag}</span>}
               </button>;
             })}
@@ -879,7 +909,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
         <div className={styles.progressTrack} role="progressbar" aria-label={copy.explored} aria-valuenow={path.length} aria-valuemin={0} aria-valuemax={total}><i style={{ width: `${percent}%` }} /></div>
         {isComplete && <div className={styles.successCard} role="status">
-          <div><strong>{copy.solved}</strong><span>{copy.bestTime(formatTime(completedSeconds))}</span></div>
+          <div><strong>{copy.solved}</strong><span>{progress.learning?.[progressKey]?.lastHints===undefined ? (locale==="zh"?"已完成 · 旧记录":"Completed · previous record") : progress.learning[progressKey].lastHints===0 ? (locale==="zh"?"本次独立完成":"Solved independently") : (locale==="zh"?`提示辅助完成 · 提示 ${progress.learning[progressKey].lastHints} 次`:`Solved with ${progress.learning[progressKey].lastHints} hints`)}</span>{feedback.timer && <span>{copy.bestTime(formatTime(completedSeconds))}</span>}<p>{strategyTip(locale,chapter)}</p></div>
           {canOpenNext && <button type="button" onClick={() => selectPuzzle(puzzleIndex + 1)}>{copy.continueCase}<span aria-hidden="true"> →</span></button>}
           {categoryComplete && puzzleIndex === puzzleList.length - 1 && <p>{copy.categoryComplete}</p>}
         </div>}
@@ -889,7 +919,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5-5 5 5 5M4 10h10a6 6 0 0 1 0 12" /></svg>{copy.undoShort}
           </button>
           <button type="button" className={styles.hintAction} onClick={showHint} disabled={!hydrated || isComplete || hinting} aria-label={copy.giveHint} aria-busy={hinting}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M8 14a7 7 0 1 1 8 0l-1 4H9Z" /></svg>{hinting ? copy.hintBusy : copy.hintShort}
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M8 14a7 7 0 1 1 8 0l-1 4H9Z" /></svg>{hinting ? copy.hintBusy : `${copy.hintShort} ${Math.min(hintStage+1,3)}/3`}
           </button>
           <button type="button" onClick={() => { if (path.length > 1) setPanel("restart"); else resetCase(); }} disabled={!hydrated} aria-label={copy.restart}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9a8 8 0 1 1-1 7M4 3v6h6" /></svg>{copy.restartShort}
@@ -898,7 +928,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
         <div className={`${styles.message} ${styles[deadEnd ? "warn" : tone]}`} role="status" aria-live="polite">
           <DetectiveCat label={copy.catLabel} />
-          <p>{deadEnd ? copy.deadEnd : message}</p>
+          <p>{message}</p>
         </div>
         <div className={styles.pager}>
           <button type="button" disabled={!hydrated || puzzleIndex === 0} onClick={() => selectPuzzle(puzzleIndex - 1)} aria-label={copy.previous}>← {copy.previous}</button>
@@ -916,16 +946,17 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
             {copy.option(item.number, hasCompletedCase(progress.completed, size, item.number))}{index > unlockedIndex ? ` · ${copy.locked}` : ""}
           </option>)}
         </select></label>
+        <p>{locale==="zh"?"三个练习阶段：沿边观察 → 给终点留出口 → 避免孤岛。阶段名称提示思考重点，题目仍按原顺序解锁。":"Three practice focuses: edges → finish access → isolated squares. Cases retain their original unlock order."}</p>
         <div className={styles.caseGrid}>
           {puzzleList.map((item, index) => {
             const complete = hasCompletedCase(progress.completed, size, item.number), locked = index > unlockedIndex;
-            return <button type="button" key={item.number} disabled={locked || !hydrated}
+            return <span key={item.number} className={styles.caseGroupItem}>{(index===0 || skillGroup(index,puzzleList.length)!==skillGroup(index-1,puzzleList.length)) && <strong className={styles.chapterLabel}>{strategyName(locale,skillGroup(index,puzzleList.length))}</strong>}<button type="button" disabled={locked || !hydrated}
               className={`${index === puzzleIndex ? styles.activeCase : ""} ${complete ? styles.completeCase : ""}`}
               aria-label={`${copy.caseAria(item.number, complete)}${locked ? ` · ${copy.locked}` : ""}`} aria-current={index === puzzleIndex ? "true" : undefined}
               title={locked ? copy.unlockRequired(puzzleList[unlockedIndex].number) : undefined} onClick={() => selectPuzzle(index)}>
               {String(item.number).padStart(2, "0")}
               {locked ? <svg className={styles.lockIcon} viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v7H4Z" /></svg> : complete && <span aria-hidden="true">✓</span>}
-            </button>;
+            </button></span>;
           })}
         </div>
       </GameDialog>
@@ -937,6 +968,8 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
           <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
           {supportsVibration && <button type="button" disabled={!feedback.haptics} onClick={() => vibrate([30, 65, 30])}>{copy.testVibration}</button>}
           <label><span>{copy.focus}</span><input type="checkbox" checked={feedback.focus} onChange={(event) => updateFeedback("focus", event.target.checked)} /></label>
+          <label><span>{locale==="zh"?"显示计时（关闭后安心思考）":"Show timer"}</span><input type="checkbox" checked={feedback.timer} onChange={event=>updateFeedback("timer",event.target.checked)} /></label>
+          <label><span>{locale==="zh"?"完成后显示路线步数":"Show route step numbers after solving"}</span><input type="checkbox" checked={feedback.steps} onChange={event=>updateFeedback("steps",event.target.checked)} /></label>
           {reducedMotion && <p>{copy.reducedMotion}</p>}
         </div>
       </GameDialog>
@@ -948,6 +981,16 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
         <div className={styles.helpFooter}><DetectiveCat label={copy.catLabel} /><span>319 {copy.cases} · {copy.verified}</span></div>
       </GameDialog>
 
+
+      <GameDialog open={panel === "tutorial"} title={locale==="zh"?"跟我练一题":"Guided practice"} closeLabel={copy.close} onClose={()=>setPanel(null)}>
+        {panel==="tutorial" && <PathTutorial locale={locale} onDone={()=>setPanel(null)} />}
+      </GameDialog>
+      <GameDialog open={panel === "records"} title={locale==="zh"?"学习记录":"Learning record"} closeLabel={copy.close} onClose={()=>setPanel(null)}>
+        <p>{locale==="zh"?"记录保存在本设备。独立完成表示该次未使用提示，不等同于能力测评。旧记录不推断是否使用过提示。":"Saved on this device. Independent means no hints in that attempt, not an ability assessment. Old records have no hint history."}</p>
+        {sizes.map(value => <div className={styles.recordRow} key={value}><strong>{value}×{value}</strong><span>{puzzles[String(value) as `${Size}`].filter(item=>hasCompletedCase(progress.completed,value,item.number)).length} / {puzzles[String(value) as `${Size}`].length} {locale==="zh"?"题完成":"cases completed"}</span></div>)}
+        {Object.entries(progress.learning||{}).map(([key,record])=><div className={styles.recordRow} key={key}><strong>{key.replace("-"," · #")}</strong><span>{locale==="zh"?`独立完成 ${record.independent} 次 · 辅助完成 ${record.solves-record.independent} 次 · 本轮提示 ${record.hints} 次`:`${record.independent} independent · ${record.solves-record.independent} assisted · ${record.hints} hints this attempt`}</span>{record.strategy!==undefined && <small>{locale==="zh"?"已练习的思路：":"Practice focus: "}{strategyName(locale,record.strategy)}</small>}</div>)}
+        <p>{locale==="zh"?"练习建议：用过提示的题可以隔天重试，并说一说为什么要给终点留出口。":"Try hinted cases again another day. Explain how you kept a way to the finish."}</p>
+      </GameDialog>
       <GameDialog open={panel === "restart"} title={copy.restartTitle} closeLabel={copy.close} onClose={() => setPanel(null)}>
         <p>{copy.restartNote}</p><div className={styles.dialogActions}>
           <button type="button" onClick={() => setPanel(null)}>{copy.cancelRestart}</button>
