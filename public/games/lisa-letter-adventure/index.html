@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#74c8f4">
-  <meta name="lisa-version" content="2026-09-22-spikes-easier-trampolines">
+  <meta name="lisa-version" content="2026-09-22-audio-stamps-ball-sea">
   <link rel="canonical" href="https://edu.alading.org/games/lisa-letter-adventure/">
   <meta name="description" content="适合6岁儿童的绘本风字母启蒙横版闯关游戏">
   <title>Lisa的字母冒险</title>
@@ -665,6 +665,9 @@
       var audioContext = null;
       var audioReadyPromise = null;
       var speechPrimed = false;
+      var activeUtterance = null;
+      var pendingSpeechLesson = null;
+      var audioNeedsGesture = false;
       var coachTimer = 0;
       var letterCardTimer = 0;
       var speechRunId = 0;
@@ -744,13 +747,13 @@
 
       var LEVELS = [
         { name: "字母森林", letters: "ABCDE", hint: "跳过火炉，从下面顶字母！碰到字母不会扣爱心。" },
-        { name: "滚滚球谷", letters: "FGHIJ", hint: "站在球上按 ← →，跳起来收齐字母再去终点！" },
+        { name: "滚滚球谷", letters: "FGHIJ", hint: "按跳带球越过尖刺！上坡前按 ↓ 下球，再按方向键推球上坡。" },
         { name: "字母陨石雨", letters: "KLMNO", hint: "按 ↑ ↓ 调整篮子。漏掉的字母还会回来！" },
         { name: "彩虹蹦床岛", letters: "PQRST", kind: "trampoline", sky: "#82dcf3", floor: "#258dc4", accent: "#6c56bd", hint: "踩蹦床弹高，按 ← → 跳到下一张！按 ↓ 站稳；掉下去会扣一颗爱心。" },
-        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "跳上小火车，按住 ↓ 盖车票章！每节车厢带着一个字母，掉下车会扣一颗爱心。" },
+        { name: "星光字母列车", letters: "UVWXYZ", kind: "train", sky: "#424479", floor: "#7779b3", accent: "#e98d35", hint: "跳到字母上按 ↓ 蹲下，收字母、补爱心，给火车盖 Lisa 印章！" },
         { name: "云朵升降桥", letters: "ABCDE", kind: "cloud", sky: "#a3daf5", floor: "#92b2d9", accent: "#6b7abb", hint: "按 ↑ ↓ 呼叫最近的云朵，跳到云桥上！空中按住 ↑ 可以滑翔。" },
         { name: "蘑菇弹跳园", letters: "FGHIJ", kind: "mushroom", sky: "#caf0ce", floor: "#64b071", accent: "#d86672", hint: "踩上蘑菇会弹高！按住 ↓ 可以站稳，松开再弹！" },
-        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "落水不扣心！水中用方向键游泳，碰字母小鱼补心，躲开鲨鱼；按跳回船上。" },
+        { name: "小船漂流记", letters: "KLMNO", kind: "boat", sky: "#a3e7df", floor: "#43aebe", accent: "#328b67", hint: "全程水域！方向键游泳，按跳回船；泡泡里不怕鲨鱼，但也不能收小鱼。" },
         { name: "气球花园", letters: "PQRST", kind: "balloon", sky: "#f8cee0", floor: "#b2a2d3", accent: "#a5649d", hint: "坐上气球用四个方向飞行！穿过发光字母圈；掉下气球会扣一颗爱心。" },
         { name: "彩虹礼物城", letters: "UVWXYZ", kind: "rainbow", sky: "#ffe5a8", floor: "#7fbb9a", accent: "#cf7687", hint: "站到每个字母按钮附近按 ↓ 点亮彩虹！集齐六把钥匙，到礼包前按 ↑。" }
       ];
@@ -761,7 +764,7 @@
       var goalHintTimer = 0;
       var adventure = { platforms: [], badges: [], kind: "", carrier: null };
       var platformArt = {};
-      ["trampoline", "train", "cloud", "mushroom", "boat", "balloon", "rainbow", "gift", "shark", "fish"].forEach(function (kind) {
+      ["trampoline", "train", "cloud", "mushroom", "boat", "balloon", "rainbow", "gift", "shark", "fish", "bubble"].forEach(function (kind) {
         platformArt[kind] = new Image();
         platformArt[kind].src = "assets/platform-" + kind + ".png";
       });
@@ -900,8 +903,15 @@
         letter.active = true;
       }
 
+      var ballHills = [{start:850, peak:1100, end:1300, height:105}, {start:1650, peak:1830, end:1980, height:95}];
+      var ballSpikes = [{x:620,w:66,h:38}, {x:1415,w:66,h:38}, {x:2100,w:66,h:38}];
       function levelTwoGroundY(x) {
-        return 594 - Math.sin((x - 160) / 245) * 24 - Math.sin((x + 80) / 112) * 9;
+        var y = 594;
+        ballHills.forEach(function (hill) {
+          if (x > hill.start && x < hill.end) y -= hill.height * (x < hill.peak ?
+            (x - hill.start) / (hill.peak - hill.start) : (hill.end - x) / (hill.end - hill.peak));
+        });
+        return y;
       }
 
       function resetLevelTwo() {
@@ -910,6 +920,7 @@
           y: 0,
           r: 78,
           vx: 0,
+          vy: 0, onGround: true, jumpHold: 0, popped: 0, safeX: 310,
           rotation: 0,
           squash: 0
         };
@@ -953,6 +964,9 @@
 
       function resetLevel(showCoachMessage) {
         speechRunId += 1;
+        pendingSpeechLesson = null;
+        activeUtterance = null;
+        speechPrimed = false;
         stopWordAudio();
         finale = { active: false, time: 0, next: 0, sparks: [], opened: false };
         lastLesson = null;
@@ -1060,11 +1074,14 @@
           speechPrimed = true;
           if (typeof synth.resume === "function") synth.resume();
           if (typeof synth.getVoices === "function") synth.getVoices();
-          var primer = new SpeechSynthesisUtterance("");
+          var primer = new SpeechSynthesisUtterance("Ready!");
           primer.lang = "en-US";
           primer.rate = 2;
           primer.pitch = 1;
-          primer.volume = .001;
+          primer.volume = .6;
+          activeUtterance = primer;
+          primer.onerror = function () { if (activeUtterance === primer) { speechPrimed = false; activeUtterance = null; } };
+          primer.onend = function () { if (activeUtterance === primer) activeUtterance = null; };
           synth.speak(primer);
         } catch (error) {
           speechPrimed = false;
@@ -1074,7 +1091,7 @@
       function initAudio() {
         if (!soundEnabled) return Promise.resolve(false);
         try {
-          if (!audioContext) {
+          if (!audioContext || audioContext.state === "closed") {
             var AudioContextClass = window.AudioContext || window.webkitAudioContext;
             if (AudioContextClass) audioContext = new AudioContextClass();
           }
@@ -1086,12 +1103,33 @@
           } else {
             audioReadyPromise = Promise.resolve(false);
           }
-          primeSpeechSynthesis();
           return audioReadyPromise;
         } catch (error) {
           audioReadyPromise = Promise.resolve(false);
           return audioReadyPromise;
         }
+      }
+
+      function unlockAudio() {
+        if (!soundEnabled) return;
+        // Run synchronously inside the real touch/key/click event, before game actions.
+        if (audioNeedsGesture && audioContext && audioContext.state !== "running") {
+          try { var closing = audioContext.close(); if (closing && closing.catch) closing.catch(function () {}); } catch (error) { /* Optional cleanup. */ }
+          audioContext = null;
+        }
+        audioNeedsGesture = false;
+        initAudio();
+        if (audioContext && audioContext.createBuffer && audioContext.createBufferSource) {
+          try {
+            var silent = audioContext.createBufferSource();
+            silent.buffer = audioContext.createBuffer(1, 1, 22050);
+            silent.connect(audioContext.destination); silent.start(0);
+          } catch (error) { /* Resume can complete asynchronously. */ }
+        }
+        if (pendingSpeechLesson) {
+          var pending = pendingSpeechLesson; pendingSpeechLesson = null;
+          speakLesson(pending);
+        } else primeSpeechSynthesis();
       }
 
       function runWhenAudioReady(callback) {
@@ -1156,37 +1194,17 @@
 
       function cuteVoice(kind) {
         if (!soundEnabled) return;
-        var characterText = "";
         if (kind === "short") {
           voiceGlide(560, 900, .18, 0, .048);
-          characterText = "Hop!";
         } else if (kind === "long") {
           voiceGlide(440, 720, .2, 0, .05);
           voiceGlide(710, 1040, .25, .14, .046);
-          characterText = "Whee!";
         } else if (kind === "hurt") {
           voiceGlide(680, 310, .3, 0, .055);
           voiceGlide(430, 240, .18, .14, .035);
-          characterText = "Ouch!";
         }
 
-        if (characterText && !narrationSource && "speechSynthesis" in window && window.speechSynthesis &&
-            !window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
-          try {
-            if (typeof window.SpeechSynthesisUtterance !== "function" ||
-                typeof window.speechSynthesis.speak !== "function") return;
-            var utterance = new SpeechSynthesisUtterance(characterText);
-            utterance.lang = "en-US";
-            utterance.rate = 1.25;
-            utterance.pitch = 1.65;
-            utterance.volume = .72;
-            var voice = preferredEnglishVoice();
-            if (voice) utterance.voice = voice;
-            window.speechSynthesis.speak(utterance);
-          } catch (error) {
-            // Character sounds are optional; controls must remain responsive.
-          }
-        }
+        // Character glides never compete with the word narration queue.
       }
 
       function preferredEnglishVoice() {
@@ -1244,6 +1262,16 @@
           if (!synth || typeof synth.speak !== "function" || typeof window.SpeechSynthesisUtterance !== "function") return;
           try {
             var utterance = new SpeechSynthesisUtterance(lesson.word + ".");
+            activeUtterance = utterance;
+            utterance.onstart = function () { pendingSpeechLesson = null; speechPrimed = true; };
+            utterance.onend = function () { if (activeUtterance === utterance) activeUtterance = null; };
+            utterance.onerror = function (event) {
+              if (runId !== speechRunId || !soundEnabled) return;
+              if (event.error !== "canceled" && event.error !== "interrupted") {
+                pendingSpeechLesson = lesson; speechPrimed = false;
+                showCoach("声音还没启动，轻点右上角的喇叭或“再听一次”。", 3500);
+              }
+            };
             utterance.lang = "en-US";
             utterance.rate = .95;
             utterance.pitch = 1;
@@ -1258,7 +1286,7 @@
 
         var recording = preloadWordAudio(lesson.word);
         if (!recording || !audioContext || !audioContext.decodeAudioData) {
-          lessonAudioTimer = setTimeout(speakNaturally, 90);
+          speakNaturally();
           return;
         }
         var settled = false;
@@ -1288,7 +1316,7 @@
 
       function setSound(enabled) {
         soundEnabled = enabled;
-        if (!enabled) { speechRunId += 1; stopWordAudio(); }
+        if (!enabled) { speechRunId += 1; stopWordAudio(); pendingSpeechLesson = null; activeUtterance = null; }
         try { localStorage.setItem("lisa-letter-sound-v2", enabled ? "on" : "off"); } catch (error) { /* Keep playing without saved preferences. */ }
         var btn = document.getElementById("soundBtn");
         btn.textContent = enabled ? "🔊" : "🔇";
@@ -1398,6 +1426,14 @@
 
       function startJump() {
         if (paused || won) return;
+        if (currentLevel === 2 && player.onBall) {
+          if (rollingBall.onGround && !rollingBall.popped) {
+            rollingBall.vy = -850; rollingBall.onGround = false; rollingBall.jumpHold = 0;
+            player.onGround = false; player.jumping = true; player.longJumpVoicePlayed = false;
+            tone(430, .13, "sine", .07);
+          }
+          return;
+        }
         if (player.onGround || player.onLadder || player.swimming) {
           player.swimming = false;
           if (currentLevel === 1 && player.onLetter && letter.active) letter.collectOnLanding = true;
@@ -1417,6 +1453,7 @@
       }
 
       function releaseJump() {
+        // Keep the ball's full bounce on release so a quick tap can clear spikes.
         var playShortVoice = player.jumping && !player.longJumpVoicePlayed;
         if (player.jumping && player.vy < -235) player.vy = -235;
         player.jumping = false;
@@ -1464,6 +1501,9 @@
             player.x = checkpointX;
             player.y = GROUND - player.baseH;
           } else if (currentLevel === 2) {
+            rollingBall.x = rollingBall.safeX;
+            rollingBall.y = levelTwoGroundY(rollingBall.x) - rollingBall.r;
+            rollingBall.vx = 0; rollingBall.vy = 0; rollingBall.onGround = true;
             player.onBall = true;
             player.onGround = true;
             player.x = rollingBall.x - player.w / 2;
@@ -1795,13 +1835,43 @@
         var move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (move) player.facing = move;
         setCrouching(false);
-        updateJumpHold(dt);
+        if (player.onBall && rollingBall.onGround && input.down) {
+          player.onBall = false; player.jumping = false;
+          player.x = rollingBall.x - rollingBall.r - player.w - 4;
+          player.y = levelTwoGroundY(player.x + player.w / 2) - player.h;
+          player.onGround = true; player.vx = 0;
+        }
+        if (!player.onBall) updateJumpHold(dt);
+        else {
+          if (input.jumpPressed) startJump();
+          input.jumpPressed = false;
+          if (input.jump && rollingBall.vy < 0 && rollingBall.jumpHold < .24) {
+            rollingBall.vy -= 700 * dt; rollingBall.jumpHold += dt;
+          }
+        }
+        if (rollingBall.popped > 0) { rollingBall.popped = Math.max(0, rollingBall.popped - dt); return; }
 
         var targetBallSpeed = player.onBall ? move * 245 : 0;
         var ballResponse = player.onBall ? 3.8 : .7;
+        var pushing = !player.onBall && player.onGround && move &&
+          (move > 0 ? player.x + player.w > rollingBall.x - rollingBall.r - 14 && player.x < rollingBall.x :
+            player.x < rollingBall.x + rollingBall.r + 14 && player.x > rollingBall.x);
+        if (pushing) { targetBallSpeed = move * 145; ballResponse = 12; }
         rollingBall.vx += (targetBallSpeed - rollingBall.vx) * Math.min(1, dt * ballResponse);
-        rollingBall.x = clamp(rollingBall.x + rollingBall.vx * dt, 125, WORLD_W - 145);
-        rollingBall.y = levelTwoGroundY(rollingBall.x) - rollingBall.r;
+        var nextBallX = clamp(rollingBall.x + rollingBall.vx * dt, 125, WORLD_W - 145);
+        if (player.onBall && levelTwoGroundY(nextBallX) < levelTwoGroundY(rollingBall.x) - .05) {
+          nextBallX = rollingBall.x; rollingBall.vx = 0;
+          if (goalHintTimer <= 0) { showCoach("上坡啦！按 ↓ 下球，站在球后面推它上去。", 2800); goalHintTimer = 3; }
+        }
+        rollingBall.x = nextBallX;
+        if (rollingBall.onGround) rollingBall.y = levelTwoGroundY(rollingBall.x) - rollingBall.r;
+        else {
+          rollingBall.vy += GRAVITY * dt; rollingBall.y += rollingBall.vy * dt;
+          if (rollingBall.y + rollingBall.r >= levelTwoGroundY(rollingBall.x) && rollingBall.vy >= 0) {
+            rollingBall.y = levelTwoGroundY(rollingBall.x) - rollingBall.r;
+            rollingBall.vy = 0; rollingBall.onGround = true; rollingBall.squash = .12;
+          }
+        }
         rollingBall.rotation += rollingBall.vx * dt / rollingBall.r;
         rollingBall.squash += (Math.min(.055, Math.abs(rollingBall.vx) / 5200) - rollingBall.squash) * Math.min(1, dt * 7);
 
@@ -1809,13 +1879,14 @@
           player.x = rollingBall.x - player.w / 2;
           player.y = rollingBall.y - rollingBall.r - player.h;
           player.vx = rollingBall.vx;
-          player.vy = 0;
-          player.onGround = true;
-          player.jumping = false;
+          player.vy = rollingBall.vy;
+          player.onGround = rollingBall.onGround;
+          player.jumping = !rollingBall.onGround;
         } else {
           var targetPlayerSpeed = move * 265;
           player.vx += (targetPlayerSpeed - player.vx) * Math.min(1, dt * 9);
           player.x += player.vx * dt;
+          if (pushing) player.x = move > 0 ? rollingBall.x - rollingBall.r - player.w - 2 : rollingBall.x + rollingBall.r + 2;
           player.vy += GRAVITY * dt;
           player.y += player.vy * dt;
           player.onGround = false;
@@ -1827,7 +1898,7 @@
             var ballTop = rollingBall.y - Math.sqrt(ballReach * ballReach - distanceX * distanceX);
             var previousBottom = player.prevY + player.h;
             var currentBottom = player.y + player.h;
-            if (player.vy >= 0 && previousBottom <= ballTop + 14 && currentBottom >= ballTop) {
+            if (!input.down && player.vy >= 0 && previousBottom <= ballTop + 14 && currentBottom >= ballTop) {
               player.onBall = true;
               player.onGround = true;
               player.jumping = false;
@@ -1852,6 +1923,25 @@
         }
 
         player.x = clamp(player.x, 0, WORLD_W - player.w);
+        var nearSpikes = false;
+        for (var spikeIndex = 0; spikeIndex < ballSpikes.length; spikeIndex += 1) {
+          var spike = ballSpikes[spikeIndex];
+          var spikeY = levelTwoGroundY(spike.x) - spike.h;
+          if (Math.abs(rollingBall.x - (spike.x + spike.w / 2)) < 180) nearSpikes = true;
+          var closestX = clamp(rollingBall.x, spike.x + 7, spike.x + spike.w - 7);
+          var closestY = clamp(rollingBall.y, spikeY + 6, spikeY + spike.h);
+          var dx = rollingBall.x - closestX, dy = rollingBall.y - closestY;
+          if (dx * dx + dy * dy < (rollingBall.r - 6) * (rollingBall.r - 6) && player.invincible <= 0) {
+            burst(rollingBall.x, rollingBall.y, "#ffd85a", 26);
+            damage("球球被尖刺扎破了！按跳，让 Lisa 和球一起越过去。", "rock");
+            rollingBall.popped = .75;
+            return;
+          }
+          if (!player.onBall && rectOverlap(player, {x:spike.x+7,y:spikeY+6,w:spike.w-14,h:spike.h-6})) {
+            damage("小心尖刺！先跳回球上，再带着球一起跳。", "rock"); return;
+          }
+        }
+        if (!nearSpikes && rollingBall.onGround) rollingBall.safeX = rollingBall.x;
         rollingLetters.forEach(function (badge) {
           badge.bob += dt * 3.4;
           if (!badge.active) return;
@@ -1984,7 +2074,7 @@
         var config = LEVELS[currentLevel - 1];
         var letters = LEVEL_LESSON_SETS[currentLevel - 1];
         adventure = { kind: config.kind, platforms: [], badges: [], carrier: null, safeX: 78,
-          checkpoint: null, sharks: [], bounces: 0 };
+          checkpoint: null, sharks: [], shelters: [], bounces: 0 };
         var heights = [520, 455, 500, 430, 485, 465];
         var spacing = letters.length === 6 ? 300 : 365;
         letters.forEach(function (lessonIndex, index) {
@@ -1999,6 +2089,7 @@
           adventure.badges.push({ x: platform.x + platform.w / 2 - 31, y: platform.y - 162,
             w: 62, h: 62, lessonIndex: lessonIndex, active: true, bob: index, platform: platform });
           var badge = adventure.badges[adventure.badges.length - 1];
+          if (config.kind === "train") badge.y = platform.y - 92;
           if (config.kind === "boat") { badge.y = 625; badge.homeX = badge.x; }
           if (config.kind === "balloon") badge.y = 275 + index % 3 * 70;
           if (config.kind === "rainbow") badge.y = 548;
@@ -2015,6 +2106,9 @@
             dx: 0, dy: 0, kind: "trampoline", squash: 0 });
         });
         if (config.kind === "boat") {
+          [500, 950, 1430, 1910, 2270].forEach(function (x) {
+            adventure.shelters.push({ x: x, y: 643, r: 66 });
+          });
           [650, 1150, 1660, 2070].forEach(function (x, i) {
             adventure.sharks.push({ x: x, homeX: x, y: 635, w: 110, h: 55, phase: i * 1.8 });
           });
@@ -2023,6 +2117,12 @@
         player.x = 78;
         player.y = 610 - player.h;
         player.riding = null;
+        player.onTrainLetter = null;
+        player.inBubble = false;
+        if (config.kind === "boat") {
+          adventure.checkpoint = adventure.carrier;
+          restoreAdventurePosition();
+        }
       }
 
       function adventureHasGaps() {
@@ -2030,7 +2130,8 @@
       }
 
       function onAdventureDock() {
-        return player.x + player.w / 2 < 255 || player.x + player.w / 2 > 2225;
+        var dockStart = adventure.kind === "train" ? 2140 : 2225;
+        return adventure.kind !== "boat" && (player.x + player.w / 2 < 255 || player.x + player.w / 2 > dockStart);
       }
 
       function restoreAdventurePosition() {
@@ -2042,6 +2143,7 @@
         player.y = (platform ? platform.y : 610) - player.h;
         player.prevX = player.x; player.prevY = player.y;
         player.riding = platform; player.onGround = true;
+        player.onTrainLetter = null; player.inBubble = false;
       }
 
       function updateAdventure(dt) {
@@ -2086,6 +2188,9 @@
           platform.dx = platform.x - oldX; platform.dy = platform.y - oldY;
         });
 
+        adventure.badges.forEach(function (badge) {
+          if (adventure.kind === "train") badge.x = badge.platform.x + badge.platform.w / 2 - 31;
+        });
         if (wasRiding && player.onGround) { player.x += wasRiding.dx; player.y += wasRiding.dy; oldFoot += wasRiding.dy; }
         setCrouching(input.down && player.onGround && !(wasRiding && wasRiding.controlled));
         updateJumpHold(dt);
@@ -2104,12 +2209,23 @@
         player.riding = null;
         var foot = player.y + player.h;
         var landing = null;
+        var letterLanding = null;
+        if (adventure.kind === "train") adventure.badges.forEach(function (badge) {
+          if (badge.active && player.x + player.w > badge.x + 5 && player.x < badge.x + badge.w - 5 &&
+              player.vy >= 0 && oldFoot <= badge.y + 10 && foot >= badge.y) letterLanding = badge;
+        });
+        player.onTrainLetter = null;
         adventure.platforms.forEach(function (platform) {
           if (player.x + player.w > platform.x + 5 && player.x < platform.x + platform.w - 5 &&
               player.vy >= 0 && oldFoot <= platform.y + 10 && foot >= platform.y &&
               (!landing || platform.y < landing.y)) landing = platform;
         });
-        if (landing) {
+        if (letterLanding && (!landing || letterLanding.y < landing.y)) {
+          player.y = letterLanding.y - player.h; player.vy = 0;
+          player.onGround = true; player.jumping = false;
+          player.onTrainLetter = letterLanding; player.riding = letterLanding.platform;
+          adventure.checkpoint = letterLanding.platform;
+        } else if (landing) {
           player.y = landing.y - player.h;
           player.vy = 0;
           player.onGround = true;
@@ -2140,33 +2256,43 @@
         if (adventure.kind === "boat" && player.y > H - player.h - 8) {
           player.y = H - player.h - 8; player.vy = 0; player.jumping = false; player.swimming = true;
         }
+        player.inBubble = adventure.kind === "boat" && adventure.shelters.some(function (bubble) {
+          var dx = player.x + player.w / 2 - bubble.x;
+          var dy = player.y + player.h / 2 - bubble.y;
+          return dx * dx + dy * dy < (bubble.r - 18) * (bubble.r - 18);
+        });
         adventure.sharks.forEach(function (shark) {
           shark.x = shark.homeX + Math.sin(worldTime * .85 + shark.phase) * 100;
           shark.y = 631 + Math.sin(worldTime * 1.3 + shark.phase) * 10;
           // Slightly forgiving body hitbox excludes the decorative tail and nose.
           var hit = { x: shark.x + 18, y: shark.y + 10, w: shark.w - 36, h: shark.h - 18 };
-          if (rectOverlap(player, hit)) damage("鲨鱼游过来啦！躲开它，再去找字母小鱼。");
+          if (!player.inBubble && rectOverlap(player, hit)) damage("鲨鱼游过来啦！躲进泡泡，等它游走再找字母鱼。");
         });
         if (paused) return;
 
         adventure.badges.forEach(function (badge) {
-          badge.bob += dt * 2.8;
+          if (adventure.kind !== "train") badge.bob += dt * 2.8;
           if (!badge.active) return;
           if (adventure.kind === "boat") badge.x = badge.homeX + Math.sin(worldTime * 1.2 + badge.lessonIndex) * 28;
           if (adventure.kind === "train") badge.x = badge.platform.x + badge.platform.w / 2 - 31;
-          var box = { x: badge.x, y: badge.y + Math.sin(badge.bob) * 8, w: badge.w, h: badge.h };
+          var box = { x: badge.x, y: badge.y + (adventure.kind === "train" ? 0 : Math.sin(badge.bob) * 8), w: badge.w, h: badge.h };
           var special = false;
-          if (adventure.kind === "train" && input.down && player.riding === badge.platform) special = true;
-          if (adventure.kind === "boat" && rectOverlap(player, box)) special = true;
+          if (adventure.kind === "train" && input.down && player.onTrainLetter === badge) special = true;
+          if (adventure.kind === "boat" && !player.inBubble && rectOverlap(player, box)) special = true;
           if (adventure.kind === "balloon" && rectOverlap(player, box)) special = true;
           if (adventure.kind === "rainbow" && input.down && Math.abs(player.x + player.w / 2 - (badge.x + 31)) < 85 && player.y + player.h > 490) special = true;
           if (special) {
             badge.active = false;
+            if (adventure.kind === "train") {
+              badge.platform.stamped = true;
+              player.onTrainLetter = null; player.onGround = false; player.riding = null;
+              burst(box.x + 31, badge.platform.y + 60, "#e84b70", 18);
+            }
             rewardLesson(letterLessons[badge.lessonIndex], box.x + 31, box.y);
             if (adventure.kind === "rainbow") showCoach("彩虹钥匙 " + Object.keys(learnedThisLevel).length + "/6！", 1800);
             return;
           }
-          if (["boat", "rainbow"].indexOf(adventure.kind) >= 0) return;
+          if (["boat", "rainbow", "train"].indexOf(adventure.kind) >= 0) return;
           if (!rectOverlap(player, box)) return;
           var centerBelow = player.y + player.h / 2 > box.y + box.h / 2;
           if (player.vy < -30 && centerBelow) {
@@ -2197,6 +2323,13 @@
         if (platform.kind === "trampoline") { height = 78 - platform.squash; y += platform.squash; }
         if (platform.kind === "mushroom") { y += platform.squash; height = 100 - platform.squash; }
         if (image && image.complete && image.naturalWidth) ctx.drawImage(image, x, y, width, height);
+        if (platform.kind === "train" && platform.stamped) {
+          ctx.save(); ctx.translate(x + width / 2, y + 66); ctx.rotate(-.16);
+          ctx.strokeStyle = "#c92658"; ctx.fillStyle = "rgba(255,248,240,.92)"; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.ellipse(0, 0, 45, 28, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.font = "900 29px Georgia, serif"; ctx.textAlign = "center"; ctx.fillStyle = "#c92658";
+          ctx.fillText("Lisa", 0, 10); ctx.restore();
+        }
         // A simple landing guide remains functional even while art loads.
         ctx.strokeStyle = platform.controlled ? "#ffdf70" : "rgba(255,255,255,.92)";
         ctx.lineWidth = 5;
@@ -2214,7 +2347,7 @@
         sky.addColorStop(0, config.sky); sky.addColorStop(1, "#fff5de");
         ctx.fillStyle = sky; ctx.fillRect(cameraX, 0, W, H);
         // Reuse the generated storybook scenery as a light paper landscape.
-        if (bgImage.complete && bgImage.naturalWidth) {
+        if (adventure.kind !== "boat" && bgImage.complete && bgImage.naturalWidth) {
           ctx.save(); ctx.globalAlpha = .16;
           ctx.drawImage(bgImage, cameraX, 0, W, 600); ctx.restore();
         }
@@ -2227,16 +2360,18 @@
           }
           ctx.restore();
         }
-        ctx.fillStyle = config.floor; ctx.fillRect(0, 622, WORLD_W, H - 622);
+        var floorY = adventure.kind === "boat" ? 565 : 622;
+        ctx.fillStyle = config.floor; ctx.fillRect(0, floorY, WORLD_W, H - floorY);
         ctx.fillStyle = "#f4d7a8";
-        if (adventureHasGaps()) {
+        if (adventureHasGaps() && adventure.kind !== "boat") {
           roundedRectPath(ctx, 0, 610, 255, 110, 9); ctx.fill();
-          roundedRectPath(ctx, 2225, 610, WORLD_W - 2225, 110, 9); ctx.fill();
+          var dockStart = adventure.kind === "train" ? 2140 : 2225;
+          roundedRectPath(ctx, dockStart, 610, WORLD_W - dockStart, 110, 9); ctx.fill();
           if (adventure.kind !== "boat") {
             ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "bold 21px sans-serif"; ctx.textAlign = "center";
             ctx.fillText("小心掉落 · 踩稳平台再出发", cameraX + W / 2, 688);
           }
-        } else { roundedRectPath(ctx, 0, 610, WORLD_W, 24, 9); ctx.fill(); }
+        } else if (adventure.kind !== "boat") { roundedRectPath(ctx, 0, 610, WORLD_W, 24, 9); ctx.fill(); }
         if (adventure.kind === "boat") {
           ctx.strokeStyle = "rgba(255,255,255,.5)";
           for (var wave = 0; wave < 3; wave++) {
@@ -2248,6 +2383,14 @@
             ctx.stroke();
           }
         }
+        adventure.shelters.forEach(function (bubble) {
+          var image = platformArt.bubble;
+          if (image.complete && image.naturalWidth) ctx.drawImage(image, bubble.x - bubble.r, bubble.y - bubble.r, bubble.r * 2, bubble.r * 2);
+          ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(bubble.x, bubble.y, bubble.r - 5, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = "#164b77"; ctx.font = "bold 16px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText("安全泡泡", bubble.x, bubble.y - bubble.r - 8);
+        });
         adventure.sharks.forEach(function (shark) {
           var image = platformArt.shark;
           if (image.complete && image.naturalWidth) ctx.drawImage(image, shark.x, shark.y, shark.w, shark.h);
@@ -2273,7 +2416,7 @@
             ctx.strokeStyle = "white"; ctx.lineWidth = 5;
             ctx.strokeText(letterLessons[badge.lessonIndex].char, badge.x + 31, fishY + 42);
             ctx.fillStyle = "#174568"; ctx.fillText(letterLessons[badge.lessonIndex].char, badge.x + 31, fishY + 42);
-          } else drawLetterBadge(badge, letterLessons[badge.lessonIndex]);
+          } else drawLetterBadge(adventure.kind === "train" ? Object.assign({}, badge, { bob: 0 }) : badge, letterLessons[badge.lessonIndex]);
           if (adventure.kind === "train" || adventure.kind === "rainbow") {
             ctx.fillStyle = "#304c6d"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
             ctx.fillText(adventure.kind === "train" ? "↓ 盖章" : "↓ 点亮", badge.x + 31, badge.y - 14);
@@ -2290,7 +2433,7 @@
         }
         ctx.fillStyle = config.accent; ctx.font = "bold 24px sans-serif"; ctx.textAlign = "center";
         ctx.fillText(finale.opened ? "送给 Lisa！" : Object.keys(learnedThisLevel).length === config.letters.length ? (currentLevel === 10 ? "↑ 打开礼包" : "去下一站！") : "字母集合处", 2365, 453);
-        var missions = { trampoline: "踩蹦床弹跳 · ↓ 站稳 · 掉落扣心", train: "车顶 ↓ 盖车票章", cloud: "↑ ↓ 呼叫云朵 · ↑ 滑翔", mushroom: "踩蘑菇弹高 · ↓ 停住", boat: "方向键游泳 · 碰字母鱼补心 · 躲鲨鱼", balloon: "↑ ↓ ← → 飞过字母圈", rainbow: "↓ 点亮六把钥匙 · ↑ 开礼包" };
+        var missions = { trampoline: "踩蹦床弹跳 · ↓ 站稳 · 掉落扣心", train: "跳上字母 · ↓ 收集补心 + 盖 Lisa 章", cloud: "↑ ↓ 呼叫云朵 · ↑ 滑翔", mushroom: "踩蘑菇弹高 · ↓ 停住", boat: player.inBubble ? "泡泡保护中 · 不会受伤 · 暂不能收集鱼" : "游泳找字母鱼 · 泡泡里避鲨鱼但不能补心", balloon: "↑ ↓ ← → 飞过字母圈", rainbow: "↓ 点亮六把钥匙 · ↑ 开礼包" };
         ctx.save(); ctx.fillStyle = "rgba(255,255,255,.88)";
         roundedRectPath(ctx, cameraX + 350, 76, 580, 43, 17); ctx.fill();
         ctx.fillStyle = "#224667"; ctx.font = "bold 22px sans-serif"; ctx.textAlign = "center";
@@ -3139,6 +3282,7 @@
       }
 
       function drawRollingBall() {
+        if (rollingBall.popped > 0) return;
         var squash = rollingBall.squash + Math.sin(worldTime * 7) * Math.min(.012, Math.abs(rollingBall.vx) / 18000);
         var scaleX = 1 + squash;
         var scaleY = 1 - squash;
@@ -3242,6 +3386,12 @@
         }
         ctx.restore();
         drawLevelTwoGround();
+        ballSpikes.forEach(function (spike) {
+          if (spikeHillArt.complete && spikeHillArt.naturalWidth) ctx.drawImage(spikeHillArt, spike.x, levelTwoGroundY(spike.x) - spike.h, spike.w, spike.h);
+        });
+        ctx.save(); ctx.font = "bold 23px sans-serif"; ctx.fillStyle = "#754b32"; ctx.textAlign = "center";
+        ballHills.forEach(function (hill) { ctx.fillText("↓ 下球 · → 推球上坡", hill.start + 90, levelTwoGroundY(hill.start + 90) + 42); });
+        ctx.restore();
         drawLevelTwoFinish();
         rollingLetters.forEach(function (badge) {
           if (badge.active) drawLetterBadge(badge, letterLessons[badge.lessonIndex]);
@@ -3558,8 +3708,8 @@
           if (activePointerId !== null && activePointerId !== pointerId) return;
           activePointerId = pointerId;
           button.classList.add("active");
+          unlockAudio();
           setControl(action, "button", true);
-          initAudio();
           if (button.setPointerCapture && event.pointerId !== undefined) {
             try { button.setPointerCapture(event.pointerId); } catch (error) { /* iPad can reject capture; input still works. */ }
           }
@@ -3574,6 +3724,7 @@
             if (!matchingTouch) return;
           } else if (event && eventPointerId(event) !== activePointerId) return;
           if (event) event.preventDefault();
+          unlockAudio();
           button.classList.remove("active");
           activePointerId = null;
           setControl(action, "button", false);
@@ -3602,7 +3753,8 @@
         bindHoldButton(button, button.getAttribute("data-action"));
       });
       bindHoldButton(document.getElementById("jumpBtn"), "jump");
-      document.addEventListener("pointerdown", function () { initAudio(); }, { capture: true, once: true });
+      document.addEventListener("pointerup", unlockAudio, { capture: true });
+      document.addEventListener("touchend", unlockAudio, { capture: true, passive: true });
 
       var keyMap = {
         ArrowLeft: "left",
@@ -3627,8 +3779,8 @@
         var action = actionFromKeyEvent(event);
         if (!action) return;
         event.preventDefault();
+        unlockAudio();
         setControl(action, "key:" + (event.code || String(event.key).toLowerCase()), true);
-        initAudio();
       }, { passive: false });
 
       window.addEventListener("keyup", function (event) {
@@ -3642,15 +3794,15 @@
       document.addEventListener("visibilitychange", function () {
         clearControls();
         lastTime = 0;
+        if (document.hidden) { audioNeedsGesture = true; speechPrimed = false; }
+        else if (soundEnabled) initAudio();
       });
 
       document.getElementById("startBtn").addEventListener("click", function () {
-        initAudio().then(function () {
-          tone(520, .12, "sine", .045);
-          setTimeout(function () { tone(720, .18, "sine", .04); }, 90);
-        });
         currentLevel = 1;
         resetLevel(false);
+        unlockAudio();
+        tone(520, .12, "sine", .045);
         started = true;
         paused = false;
         document.getElementById("startOverlay").classList.add("hidden");
@@ -3658,15 +3810,15 @@
       });
 
       document.getElementById("againBtn").addEventListener("click", function () {
-        initAudio();
         currentLevel = currentLevel === LEVELS.length ? 1 : currentLevel + 1;
         resetLevel(true);
+        unlockAudio();
         paused = false;
       });
 
       document.getElementById("restartBtn").addEventListener("click", function () {
-        initAudio();
         resetLevel(true);
+        unlockAudio();
         paused = !started;
       });
 
@@ -3674,12 +3826,12 @@
         var enabling = !soundEnabled;
         setSound(enabling);
         if (enabling) {
-          initAudio().then(function () { tone(660, .18, "sine", .07); });
+          unlockAudio(); tone(660, .18, "sine", .07);
         }
       });
 
       document.getElementById("replayLessonBtn").addEventListener("click", function () {
-        initAudio();
+        unlockAudio();
         if (lastLesson) speakLesson(lastLesson);
       });
 
