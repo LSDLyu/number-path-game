@@ -5,7 +5,8 @@ import re
 import subprocess
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parents[1] / "dist"
+SITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
+ROOT = SITE_ROOT / "dist" if (SITE_ROOT / "dist").is_dir() else SITE_ROOT.parent / "public/games/lisa-letter-adventure"
 WORDS = set("apple ant ball banana cat cake dog duck egg elephant fish frog goat grape hat horse igloo insect jam jelly kite koala lion lemon moon monkey nest nose octopus orange penguin panda queen quilt rabbit robot sun star turtle tiger umbrella unicorn violin volcano whale watermelon xylophone x-ray yo-yo yak zebra zoo".split())
 
 
