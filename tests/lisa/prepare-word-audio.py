@@ -26,7 +26,7 @@ def word_audio(word):
     except Exception: return word, None
     if not isinstance(data, list): return word, None
     choices = [p for d in data for p in d.get('phonetics', []) if
-               p.get('audio', '').endswith('.mp3') and p.get('sourceUrl', '').startswith('https://commons.wikimedia.org/')
+               (p.get('audio') or '').endswith('.mp3') and (p.get('sourceUrl') or '').startswith('https://commons.wikimedia.org/')
                and isinstance(p.get('license'), dict) and p['license'].get('name', '').startswith('CC BY')
                and p['license'].get('url', '').startswith('https://creativecommons.org/')]
     choices.sort(key=lambda p: (not p['audio'].endswith('-us.mp3'), not p['audio'].endswith('-uk.mp3')))
