@@ -1,0 +1,123 @@
+{
+  "apple": {
+    "file": "audio/apple.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/9/9a/En-us-apple.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-apple.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "ant": {
+    "file": "audio/ant.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/a0/En-us-ant.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-ant.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "ball": {
+    "file": "audio/ball.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/a8/En-us-ball.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-ball.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "banana": {
+    "file": "audio/banana.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/6/61/En-us-banana.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-banana.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "cat": {
+    "file": "audio/cat.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/4/46/En-us-cat.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-cat.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "cake": {
+    "file": "audio/cake.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/89/En-us-cake.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-cake.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "dog": {
+    "file": "audio/dog.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/06/En-us-dog.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-dog.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "duck": {
+    "file": "audio/duck.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/5/5b/En-us-duck.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-duck.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "egg": {
+    "file": "audio/egg.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/88/En-us-egg.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-egg.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "frog": {
+    "file": "audio/frog.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/0e/En-us-frog.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-frog.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  },
+  "goat": {
+    "file": "audio/goat.mp3",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/01/En-us-goat.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-goat.ogg",
+    "author": "Dvortygirl",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+  }
+}

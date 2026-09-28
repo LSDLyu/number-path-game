@@ -1,3 +1,1 @@
-// Only list bundled, licensed recordings here. Empty means use the device voice.
-// No API credentials or external audio requests are needed to play.
-window.LISA_WORD_AUDIO = {};
+window.LISA_WORD_AUDIO = {"apple": "audio/apple.mp3", "ant": "audio/ant.mp3", "ball": "audio/ball.mp3", "banana": "audio/banana.mp3", "cat": "audio/cat.mp3", "cake": "audio/cake.mp3", "dog": "audio/dog.mp3", "duck": "audio/duck.mp3", "egg": "audio/egg.mp3", "frog": "audio/frog.mp3", "goat": "audio/goat.mp3"};

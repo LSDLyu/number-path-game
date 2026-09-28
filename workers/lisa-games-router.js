@@ -1,6 +1,30 @@
 const LISA_PATH = "/games/lisa-letter-adventure";
 const LISA_ORIGIN = "https://lsdlyu.github.io";
 const LISA_ORIGIN_PREFIX = "/number-path-game/games/lisa-letter-adventure";
+const NUMBER_PATH = "/games/number-path";
+
+async function proxyNumberPath(request, url) {
+  if (!["GET", "HEAD"].includes(request.method)) {
+    return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
+  }
+  const suffix = url.pathname.slice(NUMBER_PATH.length) || "/";
+  const upstreamUrl = new URL("https://lsdlyu.github.io/number-path-game" + suffix);
+  upstreamUrl.search = url.search;
+  const upstream = await fetch(upstreamUrl, { method: request.method, redirect: "manual" });
+  const headers = new Headers(upstream.headers);
+  headers.delete("set-cookie");
+  headers.set("X-Learning-Game-Source", "github-pages");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  let body = upstream.body;
+  if (request.method === "GET" && (headers.get("content-type") || "").includes("text/html")) {
+    body = (await upstream.text()).replaceAll('"/number-path-game/', '"/games/number-path/');
+    headers.delete("content-length");
+    headers.delete("content-encoding");
+    headers.delete("etag");
+  }
+  return new Response(body, { status: upstream.status, headers });
+}
 
 function redirect(location) {
   return new Response(null, {
@@ -132,9 +156,9 @@ export default {
     if (url.pathname === "/games/") return gamesDirectory();
     if (url.pathname === LISA_PATH) return redirect(`${LISA_PATH}/`);
     if (url.pathname.startsWith(`${LISA_PATH}/`)) return proxyLisa(request, url);
+    if (url.pathname === NUMBER_PATH || url.pathname.startsWith(`${NUMBER_PATH}/`)) return proxyNumberPath(request, url);
 
-    // A Worker Route can fetch the Custom Domain behind it. This preserves
-    // the existing Number Path game and any future /games routes.
+    // Preserve all other existing routes through the original Custom Domain Worker.
     return fetch(request);
   },
 };

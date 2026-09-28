@@ -1,4 +1,4 @@
-# Learning-game upgrade checkpoint — not released
+# Learning-game upgrade — release preparation 2026-09-28
 
 Implemented in this branch:
 - Lisa: versioned device-local save/continue and unlocked replay; pause/defeat choices retaining collected letters; safe learning card with explicit continue and repeat audio; contextual button/tutorial labels; first letter before hazards; three-question sound-picture/case review without heart penalties; first-response learning records/parent view; train stamp emphasis, slope help and bubble status; mobile progress and menu navigation.
@@ -11,10 +11,11 @@ Validation:
 - For the mirrored Lisa regression, install `@napi-rs/canvas` in the test environment and run `LISA_DIST=public/games/lisa-letter-adventure node tests/lisa/game-regression.cjs` and the equivalent command for `learning-regression.cjs`.
 - Real iPad multi-touch/audio and static Lisa browser layout checks have not been certified.
 
-Remaining release gates:
-1. Bundle and verify the 52 licensed word recordings. The audio manifest is still empty; working system speech remains the fallback. No claim of bundled recording completion is made.
-2. Restore authorized Cloudflare publication access. Dashboard security verification blocked the available session; no safeguard was bypassed.
-3. Publish the games router and Number Path routes through their existing Cloudflare services. Updating GitHub alone does not update those two official routes.
-4. Verify the official pages and Lisa Sites publication, then merge/release this checkpoint. Preserve any newer changes on main.
-
-No production deployment was performed for this checkpoint.
+Release scope:
+- Publish the validated learning features with device speech as fallback; fixed recordings are an explicitly partial delivery.
+- Eleven licensed Commons recordings are bundled: apple, ant, ball, banana, cat, cake, dog, duck, egg, frog, goat. Each MP3 has source, author, CC BY-SA 3.0 license and conversion credit in audio/credits.json and audio/credits.html.
+- Forty-one words still use device speech. The strict check-word-audio.py gate intentionally reports these missing recordings. Commons media downloads returned HTTP 429; import-commons-audio.py stops new requests on rate limiting and resumes from existing attributed files.
+- Number Path: all 45 tests and production build passed on 2026-09-28. Lisa: ten-level game and learning regressions passed. Bundled audio codec, duration and attribution checked.
+- workers/lisa-games-router.js now includes a scoped Number Path proxy and asset rewriting, so both games can later follow GitHub Pages without replacing the main website. Exact routes, methods, directory response and unrelated-route pass-through are checked.
+- Cloudflare dashboard is still blocked by human-verification in the available browser. The router has NOT been deployed. The official Number Path route and games directory therefore remain unchanged until this update is deployed.
+- Real iPad audio and multi-touch testing remains outstanding. No claim of complete device certification is made.
