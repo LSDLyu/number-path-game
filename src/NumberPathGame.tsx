@@ -851,7 +851,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
         <button type="button" className={styles.helpButton} onClick={() => setPanel("help")}>{copy.help} <span aria-hidden="true">?</span></button>
       </header>
       <p className={styles.lede}>{copy.shortRules}</p>
-      <div className={styles.learningLinks}><button type="button" onClick={() => setPanel("tutorial")}>{locale==="zh"?"跟我练一题":"Try a guided puzzle"}</button><button type="button" onClick={() => setPanel("records")}>{locale==="zh"?"学习记录 · 家长查看":"Learning record"}</button><a href="https://edu.alading.org/games/">{locale==="zh"?"游戏大厅":"Games"}</a></div>
+      <div className={styles.learningLinks}><button type="button" onClick={() => setPanel("tutorial")}>{locale==="zh"?"跟我练一题":"Try a guided puzzle"}</button><button type="button" onClick={() => setPanel("records")}>{locale==="zh"?"学习记录 · 家长查看":"Learning record"}</button><a href={locale==="zh" ? "https://edu.alading.org/games/" : "https://edu.alading.org/en/games/"}>{locale==="zh"?"游戏大厅":"Games"}</a></div>
 
       <nav className={styles.sizeTabs} aria-label={copy.sizeNav}>
         {sizes.map((value) => <button type="button" key={value} className={size === value ? styles.activeSize : ""}
