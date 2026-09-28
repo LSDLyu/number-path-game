@@ -2,6 +2,9 @@ const LISA_PATH = "/games/lisa-letter-adventure";
 const LISA_ORIGIN = "https://lsdlyu.github.io";
 const LISA_ORIGIN_PREFIX = "/number-path-game/games/lisa-letter-adventure";
 const NUMBER_PATH = "/games/number-path";
+const EN_GAMES = "/en/games";
+const EN_NUMBER_PATH = "/en/games/number-path";
+const EN_LISA_PATH = "/en/games/lisa-letter-adventure";
 
 // If a route intercepts the homepage, fetch the Custom Domain Worker first
 // and change only the learning-games navigation link in its HTML response.
@@ -18,11 +21,11 @@ async function homepage(request) {
   });
 }
 
-async function proxyNumberPath(request, url) {
+async function proxyNumberPath(request, url, path = NUMBER_PATH) {
   if (!["GET", "HEAD"].includes(request.method)) {
     return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
   }
-  const suffix = url.pathname.slice(NUMBER_PATH.length) || "/";
+  const suffix = url.pathname.slice(path.length) || "/";
   const upstreamUrl = new URL("https://lsdlyu.github.io/number-path-game" + suffix);
   upstreamUrl.search = url.search;
   const upstream = await fetch(upstreamUrl, { method: request.method, redirect: "manual" });
@@ -33,7 +36,7 @@ async function proxyNumberPath(request, url) {
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   let body = upstream.body;
   if (request.method === "GET" && (headers.get("content-type") || "").includes("text/html")) {
-    body = (await upstream.text()).replaceAll('"/number-path-game/', '"/games/number-path/');
+    body = (await upstream.text()).replaceAll('"/number-path-game/', `"${path}/`);
     headers.delete("content-length");
     headers.delete("content-encoding");
     headers.delete("etag");
@@ -51,8 +54,8 @@ function redirect(location) {
   });
 }
 
-function gamesDirectory() {
-  const html = `<!doctype html>
+function gamesDirectory(locale = "zh") {
+  let html = `<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
@@ -117,7 +120,7 @@ function gamesDirectory() {
   <header class="header"><div class="shell header-inner">
     <a class="brand" href="/" aria-label="自得学园首页"><span class="brand-mark" aria-hidden="true">学</span><span><strong>自得学园</strong><small>ZIDE LEARNING</small></span></a>
     <nav class="nav" aria-label="主要导航"><a href="/#method">方法</a><a href="/#guides">六册手册</a><a href="/games/" aria-current="page">学习游戏</a><a href="/#review">如何审核</a><a href="/#faq">常见问题</a></nav>
-    <div class="actions"><a class="language" href="/en" lang="en">English</a><a class="button button-small" href="/apply">申请试读</a></div>
+    <div class="actions"><a class="language" href="/en/games/" lang="en">English</a><a class="button button-small" href="/apply">申请试读</a></div>
   </div></header>
   <main class="shell" id="main">
     <a class="crumb" href="/">← 返回首页</a>
@@ -134,9 +137,56 @@ function gamesDirectory() {
 </body>
 </html>`;
 
+  if (locale === "en") {
+    const translations = [
+      ['lang="zh-CN"', 'lang="en"'],
+      ['跳到主要内容', 'Skip to main content'],
+      ['主要导航', 'Main navigation'],
+      ['学习游戏｜自得学园', 'Learning Games | Zide Learning'],
+      ['数学路径怪探与 Lisa 的字母冒险：在游戏中练习推理、认识英语单词。', 'Number Path Detectives and Lisa’s Letter Adventure: explore maths, letters, and words through play.'],
+      ['href="/" aria-label="自得学园首页"', 'href="/en" aria-label="Zide Learning home"'],
+      ['href="/">← 返回首页', 'href="/en">← Back home'],
+      ['href="/#method"', 'href="/en#method"'],
+      ['href="/#guides"', 'href="/en#guides"'],
+      ['href="/#review"', 'href="/en#review"'],
+      ['href="/#faq"', 'href="/en#faq"'],
+      ['href="/games/" aria-current="page"', 'href="/en/games/" aria-current="page"'],
+      ['href="/games/number-path/"', 'href="/en/games/number-path/"'],
+      ['href="/games/lisa-letter-adventure/"', 'href="/en/games/lisa-letter-adventure/"'],
+      ['href="/en/games/" lang="en">English', 'href="/games/" lang="zh-CN">中文'],
+      ['href="/apply"', 'href="/en/apply"'],
+      ['自得学园', 'Zide Learning'],
+      ['方法</a>', 'Method</a>'],
+      ['六册手册</a>', 'Six guides</a>'],
+      ['学习游戏', 'Learning games'],
+      ['如何审核</a>', 'How we review</a>'],
+      ['常见问题</a>', 'FAQ</a>'],
+      ['申请试读', 'Request a sample'],
+      ['边玩边探索 · 数学与英语', 'Explore through play · maths and English'],
+      ['选一个游戏开始。想一想数字路线，或者和 Lisa 一起认识字母与单词；完成的进度会保存在当前浏览器。', 'Choose a game to begin. Solve a number path or join Lisa to discover letters and words. Your progress stays in this browser.'],
+      ['游戏列表', 'Game list'],
+      ['数学 · 路线推理', 'Maths · route reasoning'],
+      ['3×3 到 6×6 · 顺序解锁', '3×3 to 6×6 · unlock in order'],
+      ['数学路径怪探', 'Number Path Detectives'],
+      ['按顺序连接数字，铺满每一个格子。先想方法，再逐步看线索。', 'Connect the numbers in order and fill every square. Plan your route, then reveal clues when you need them.'],
+      ['开始闯关 →', 'Play Number Path →'],
+      ['英语 · 字母与单词', 'English · letters and words'],
+      ['十个绘本关卡 · 建议横屏', '10 illustrated levels · landscape recommended'],
+      ['Lisa的字母冒险', 'Lisa’s Letter Adventure'],
+      ['跳跃、听词、认图，在不同的关卡里收集字母。可以随时暂停，下次继续。', 'Jump, listen to words, and match pictures as you collect letters. Pause anytime and pick up where you left off.'],
+      ['进入冒险 →', 'Join Lisa →'],
+      ['游戏进度和学习记录仅保存在当前浏览器。清除浏览器数据后，记录也会清除。', 'Game progress stays in this browser. Clearing browser data also removes your saved progress.'],
+      ['自驱成长，自得其乐', 'Self-driven growth, joyfully discovered'],
+      ['ChatGPT 协力 · 人工复核', 'ChatGPT collaboration · human review'],
+      ['返回 alading.org', 'Back to alading.org'],
+    ];
+    for (const [source, target] of translations) html = html.replaceAll(source, target);
+  }
+
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
+      "Content-Language": locale === "en" ? "en" : "zh-CN",
       "Cache-Control": "public, max-age=300",
       "Content-Security-Policy": "default-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'self'",
       "X-Content-Type-Options": "nosniff",
@@ -145,12 +195,12 @@ function gamesDirectory() {
   });
 }
 
-async function proxyLisa(request, url) {
+async function proxyLisa(request, url, path = LISA_PATH) {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
   }
 
-  const suffix = url.pathname.slice(LISA_PATH.length) || "/";
+  const suffix = url.pathname.slice(path.length) || "/";
   const upstreamUrl = new URL(LISA_ORIGIN);
   upstreamUrl.pathname = `${LISA_ORIGIN_PREFIX}${suffix}`;
   upstreamUrl.search = url.search;
@@ -174,7 +224,7 @@ async function proxyLisa(request, url) {
 
   const location = headers.get("location");
   if (location && location.startsWith(`${LISA_ORIGIN}${LISA_ORIGIN_PREFIX}`)) {
-    headers.set("location", location.replace(`${LISA_ORIGIN}${LISA_ORIGIN_PREFIX}`, LISA_PATH));
+    headers.set("location", location.replace(`${LISA_ORIGIN}${LISA_ORIGIN_PREFIX}`, path));
   }
 
   return new Response(upstream.body, {
@@ -189,6 +239,30 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/") return homepage(request);
+
+    if (url.pathname === EN_GAMES) return redirect(`${EN_GAMES}/`);
+    if (url.pathname === `${EN_GAMES}/`) return gamesDirectory("en");
+    if (url.pathname === EN_LISA_PATH) return redirect(`${EN_LISA_PATH}/`);
+    if (url.pathname.startsWith(`${EN_LISA_PATH}/`)) return proxyLisa(request, url, EN_LISA_PATH);
+    if (request.method === "GET" && url.pathname === EN_NUMBER_PATH) {
+      const referrer = request.headers.get("referer");
+      if (referrer) {
+        try {
+          const source = new URL(referrer);
+          if (source.origin === url.origin && source.pathname.startsWith("/en") && !source.pathname.startsWith(`${EN_GAMES}/`)) {
+            return new Response(null, { status: 302, headers: { Location: `${EN_GAMES}/`, "Cache-Control": "private, no-store" } });
+          }
+        } catch { /* Ignore malformed referrers. */ }
+      }
+    }
+    if (url.pathname === EN_NUMBER_PATH || url.pathname.startsWith(`${EN_NUMBER_PATH}/`)) {
+      if ((url.pathname === EN_NUMBER_PATH || url.pathname === `${EN_NUMBER_PATH}/`) && !url.searchParams.has("lang")) {
+        const localized = new URL(url);
+        localized.searchParams.set("lang", "en");
+        return new Response(null, { status: 302, headers: { Location: localized.pathname + localized.search, "Cache-Control": "private, no-store" } });
+      }
+      return proxyNumberPath(request, url, EN_NUMBER_PATH);
+    }
 
     if (url.pathname === "/games") return redirect("/games/");
     if (url.pathname === "/games/") return gamesDirectory();
