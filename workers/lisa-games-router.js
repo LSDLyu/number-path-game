@@ -3,6 +3,21 @@ const LISA_ORIGIN = "https://lsdlyu.github.io";
 const LISA_ORIGIN_PREFIX = "/number-path-game/games/lisa-letter-adventure";
 const NUMBER_PATH = "/games/number-path";
 
+// Also bind this Worker to the exact root route `edu.alading.org`.
+// Fetching the original Custom Domain Worker preserves the full homepage.
+async function homepage(request) {
+  const upstream = await fetch(request);
+  if (request.method !== "GET" || upstream.status !== 200 ||
+      !(upstream.headers.get("content-type") || "").includes("text/html")) return upstream;
+  const original = await upstream.text();
+  if (!original.includes('/games/number-path')) return new Response(original, upstream);
+  const headers = new Headers(upstream.headers);
+  headers.delete("content-length"); headers.delete("content-encoding"); headers.delete("etag");
+  return new Response(original.replaceAll('/games/number-path', '/games/').replaceAll('数学游戏', '学习游戏'), {
+    status: upstream.status, statusText: upstream.statusText, headers,
+  });
+}
+
 async function proxyNumberPath(request, url) {
   if (!["GET", "HEAD"].includes(request.method)) {
     return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
@@ -172,6 +187,8 @@ async function proxyLisa(request, url) {
 export default {
   async fetch(request) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/") return homepage(request);
 
     if (url.pathname === "/games") return redirect("/games/");
     if (url.pathname === "/games/") return gamesDirectory();
