@@ -3,8 +3,8 @@ const LISA_ORIGIN = "https://lsdlyu.github.io";
 const LISA_ORIGIN_PREFIX = "/number-path-game/games/lisa-letter-adventure";
 const NUMBER_PATH = "/games/number-path";
 
-// Also bind this Worker to the exact root route `edu.alading.org`.
-// Fetching the original Custom Domain Worker preserves the full homepage.
+// If a route intercepts the homepage, fetch the Custom Domain Worker first
+// and change only the learning-games navigation link in its HTML response.
 async function homepage(request) {
   const upstream = await fetch(request);
   if (request.method !== "GET" || upstream.status !== 200 ||
