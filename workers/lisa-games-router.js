@@ -125,7 +125,7 @@ function gamesDirectory() {
     <h1>学习游戏</h1>
     <p class="intro">选一个游戏开始。想一想数字路线，或者和 Lisa 一起认识字母与单词；完成的进度会保存在当前浏览器。</p>
     <section class="grid" aria-label="游戏列表">
-      <a class="card number" href="/games/number-path"><div class="card-top"><span aria-hidden="true">01</span><span>数学 · 路线推理</span></div><div class="card-body"><p class="tag">3×3 到 6×6 · 顺序解锁</p><h2>数学路径怪探</h2><p class="desc">按顺序连接数字，铺满每一个格子。先想方法，再逐步看线索。</p><span class="button play">开始闯关 →</span></div></a>
+      <a class="card number" href="/games/number-path/"><div class="card-top"><span aria-hidden="true">01</span><span>数学 · 路线推理</span></div><div class="card-body"><p class="tag">3×3 到 6×6 · 顺序解锁</p><h2>数学路径怪探</h2><p class="desc">按顺序连接数字，铺满每一个格子。先想方法，再逐步看线索。</p><span class="button play">开始闯关 →</span></div></a>
       <a class="card letter" href="/games/lisa-letter-adventure/"><div class="card-top"><span aria-hidden="true">02</span><span>英语 · 字母与单词</span></div><div class="card-body"><p class="tag">十个绘本关卡 · 建议横屏</p><h2>Lisa的字母冒险</h2><p class="desc">跳跃、听词、认图，在不同的关卡里收集字母。可以随时暂停，下次继续。</p><span class="button play">进入冒险 →</span></div></a>
     </section>
     <p class="note">游戏进度和学习记录仅保存在当前浏览器。清除浏览器数据后，记录也会清除。</p>
@@ -194,6 +194,19 @@ export default {
     if (url.pathname === "/games/") return gamesDirectory();
     if (url.pathname === LISA_PATH) return redirect(`${LISA_PATH}/`);
     if (url.pathname.startsWith(`${LISA_PATH}/`)) return proxyLisa(request, url);
+    // Older homepage markup points here. Send only homepage clicks to the game directory;
+    // direct bookmarks and the game card continue to open Number Path.
+    if (request.method === "GET" && url.pathname === NUMBER_PATH) {
+      const referrer = request.headers.get("referer");
+      if (referrer) {
+        try {
+          const source = new URL(referrer);
+          if (source.origin === url.origin && source.pathname === "/") {
+            return new Response(null, { status: 302, headers: { Location: "/games/", "Cache-Control": "private, no-store" } });
+          }
+        } catch { /* Ignore malformed referrers. */ }
+      }
+    }
     if (url.pathname === NUMBER_PATH || url.pathname.startsWith(`${NUMBER_PATH}/`)) return proxyNumberPath(request, url);
 
     // Preserve all other existing routes through the original Custom Domain Worker.
