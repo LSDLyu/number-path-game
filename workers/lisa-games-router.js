@@ -42,59 +42,80 @@ function gamesDirectory() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#f7f1e6">
   <title>学习游戏｜自得学园</title>
-  <meta name="description" content="适合孩子自主探索的互动数学与字母游戏。">
+  <meta name="description" content="数学路径怪探与 Lisa 的字母冒险：在游戏中练习推理、认识英语单词。">
   <style>
-    :root { color-scheme: light; font-family: ui-rounded, "SF Pro Rounded", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; color: #17324d; background: radial-gradient(circle at 12% 5%, #fff7bd 0 7%, transparent 24%), linear-gradient(180deg, #bce9ff 0%, #eefbff 58%, #dff7d2 100%); }
-    a { color: inherit; }
-    .shell { width: min(1040px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 56px; }
-    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .home { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; background: rgba(255,255,255,.9); text-decoration: none; font-weight: 800; box-shadow: 0 8px 24px rgba(41,88,123,.12); }
-    h1 { margin: 42px 0 8px; text-align: center; font-size: clamp(2rem, 7vw, 4.2rem); line-height: 1; letter-spacing: -.04em; color: #134f96; text-shadow: 0 4px 0 rgba(255,255,255,.75); }
-    .lead { margin: 0 auto 30px; text-align: center; font-size: clamp(1rem, 3vw, 1.25rem); font-weight: 700; color: #376381; }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
-    .card { position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 360px; padding: 26px; border: 4px solid rgba(255,255,255,.92); border-radius: 32px; text-decoration: none; box-shadow: 0 18px 45px rgba(26,76,110,.18); transition: transform .18s ease, box-shadow .18s ease; }
-    .card:hover, .card:focus-visible { transform: translateY(-5px) rotate(-.35deg); box-shadow: 0 24px 52px rgba(26,76,110,.24); outline: none; }
-    .number { background: linear-gradient(145deg, #fff7bc, #ffd769); }
-    .letter { background: linear-gradient(145deg, #ffe6ec, #ff9fc0 55%, #9bdcff); }
-    .icon { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 24px; border-radius: 28px; background: rgba(255,255,255,.78); font-size: 3.7rem; box-shadow: inset 0 -8px 0 rgba(45,85,110,.08); transform: rotate(-3deg); }
-    .letter .icon { transform: rotate(4deg); }
-    h2 { margin: 0 0 10px; font-size: clamp(1.6rem, 4vw, 2.35rem); line-height: 1.15; }
-    p { margin: 0; font-size: 1.05rem; line-height: 1.65; font-weight: 650; }
-    .play { align-self: flex-start; margin-top: auto; padding: 12px 20px; border-radius: 999px; color: white; background: #174f94; font-weight: 900; box-shadow: 0 6px 0 #0d386b; }
-    .letter .play { background: #b82f69; box-shadow: 0 6px 0 #7e2048; }
-    .note { margin-top: 24px; text-align: center; color: #476b78; font-size: .95rem; font-weight: 650; }
-    @media (max-width: 700px) { .shell { padding-top: 18px; } h1 { margin-top: 30px; } .grid { grid-template-columns: 1fr; } .card { min-height: 300px; padding: 22px; border-radius: 26px; } .icon { width: 92px; height: 92px; font-size: 3rem; } }
-    @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+    :root { color-scheme:light; --paper:#f7f1e6; --ink:#24312f; --muted:#505b57; --teal:#17685f; --orange:#a94f25; --yellow:#f1d77a; --line:#24312f3d; --serif:"Songti SC","Noto Serif SC","STSong",Georgia,serif; --sans:"Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",Arial,sans-serif; font-family:var(--sans); color:var(--ink); background:var(--paper); }
+    *,*::before,*::after { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; }
+    a { color:inherit; }
+    a:focus-visible { outline:3px solid var(--orange); outline-offset:4px; }
+    .skip { position:absolute; left:16px; top:12px; transform:translateY(-180%); padding:10px 16px; background:var(--yellow); z-index:10; }
+    .skip:focus { transform:none; }
+    .shell { width:min(1240px,calc(100% - 64px)); margin-inline:auto; }
+    .header { position:sticky; top:0; z-index:5; background:#f7f1e6f7; border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
+    .header-inner { min-height:78px; display:grid; grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr); align-items:center; gap:24px; }
+    .brand { display:inline-flex; align-items:center; gap:12px; width:max-content; text-decoration:none; }
+    .brand-mark { display:grid; place-items:center; width:42px; height:42px; background:var(--yellow); border:2px solid var(--ink); border-radius:47% 53% 50% 50%; font:23px var(--serif); transform:rotate(-4deg); }
+    .brand strong { display:block; font:700 21px/1.05 var(--serif); letter-spacing:.08em; }
+    .brand small { display:block; margin-top:3px; font-size:9px; font-weight:800; letter-spacing:.14em; }
+    .nav { display:flex; align-items:center; gap:26px; white-space:nowrap; }
+    .nav a,.actions a { font-size:14px; font-weight:800; text-decoration:none; }
+    .nav a[aria-current] { color:var(--teal); text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:8px; }
+    .actions { justify-self:end; display:flex; align-items:center; gap:20px; white-space:nowrap; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:10px 22px; background:var(--teal); border:2px solid var(--ink); border-radius:2px; color:#fff; text-decoration:none; font-size:15px; font-weight:800; box-shadow:5px 5px 0 var(--ink); transition:transform .15s,box-shadow .15s; }
+    .button:hover { transform:translate(2px,2px); box-shadow:3px 3px 0 var(--ink); }
+    .button-small { min-height:40px; padding:8px 15px; font-size:13px !important; }
+    main { padding:58px 0 100px; }
+    .crumb { display:inline-block; color:var(--teal); font-size:14px; font-weight:800; text-decoration-thickness:1px; text-underline-offset:4px; }
+    .eyebrow { margin:44px 0 16px; color:var(--teal); font-size:13px; font-weight:850; letter-spacing:.13em; }
+    h1 { margin:0; font:700 clamp(43px,6vw,76px)/1.13 var(--serif); letter-spacing:-.03em; }
+    .intro { max-width:680px; margin:20px 0 48px; color:var(--muted); font-size:18px; line-height:1.8; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+    .card { min-width:0; display:flex; flex-direction:column; background:#fffdf8; border:2px solid var(--ink); box-shadow:7px 7px 0 var(--ink); text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .card:hover,.card:focus-visible { transform:translate(2px,2px); box-shadow:5px 5px 0 var(--ink); }
+    .card-top { display:flex; align-items:center; justify-content:space-between; min-height:100px; padding:22px 30px; border-bottom:1px solid var(--line); }
+    .number .card-top { background:#f1d77a; }
+    .letter .card-top { background:#c9e1d9; }
+    .card-top span:first-child { font:700 42px/1 var(--serif); }
+    .card-top span:last-child { font-size:13px; font-weight:800; letter-spacing:.08em; }
+    .card-body { display:flex; flex:1; flex-direction:column; align-items:flex-start; padding:30px; }
+    .tag { margin:0 0 14px; color:var(--teal); font-size:13px; font-weight:850; letter-spacing:.08em; }
+    h2 { margin:0 0 18px; font:700 clamp(26px,3vw,35px)/1.25 var(--serif); }
+    .desc { max-width:48ch; min-height:80px; margin:0 0 28px; color:var(--muted); font-size:16px; line-height:1.8; }
+    .play { margin-top:auto; }
+    .note { margin:28px 0 0; max-width:760px; color:var(--muted); font-size:14px; line-height:1.8; }
+    .footer { background:var(--ink); color:#fff; padding:44px 0; }
+    .footer-inner { display:flex; align-items:flex-end; justify-content:space-between; gap:30px; }
+    .footer strong { font:700 24px var(--serif); }
+    .footer p { color:#d7dedb; margin:8px 0 0; }
+    .footer small { color:#d7dedb; font-size:12px; }
+    .footer-links { display:flex; gap:24px; font-weight:800; }
+    @media(max-width:950px) { .header-inner { display:flex; justify-content:space-between; } .nav { display:none; } .actions { gap:12px; } }
+    @media(max-width:700px) { .shell { width:calc(100% - 32px); } .header-inner { min-height:66px; } .brand strong { font-size:18px; } .brand small { font-size:8px; } .brand-mark { width:36px; height:36px; font-size:20px; } .actions .language { display:none; } main { padding:30px 0 68px; } .eyebrow { margin-top:38px; } .intro { margin-bottom:32px; font-size:16px; } .grid { grid-template-columns:1fr; gap:20px; } .card-top { min-height:78px; padding:16px 22px; } .card-body { padding:24px; } .desc { min-height:0; } .footer-inner { display:block; } .footer-links { margin-top:24px; } }
+    @media(prefers-reduced-motion:reduce) { .button,.card { transition:none; } }
   </style>
 </head>
 <body>
-  <main class="shell">
-    <div class="top"><a class="home" href="/" aria-label="返回自得学园首页">← 返回首页</a></div>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="header"><div class="shell header-inner">
+    <a class="brand" href="/" aria-label="自得学园首页"><span class="brand-mark" aria-hidden="true">学</span><span><strong>自得学园</strong><small>ZIDE LEARNING</small></span></a>
+    <nav class="nav" aria-label="主要导航"><a href="/#method">方法</a><a href="/#guides">六册手册</a><a href="/games/" aria-current="page">学习游戏</a><a href="/#review">如何审核</a><a href="/#faq">常见问题</a></nav>
+    <div class="actions"><a class="language" href="/en" lang="en">English</a><a class="button button-small" href="/apply">申请试读</a></div>
+  </div></header>
+  <main class="shell" id="main">
+    <a class="crumb" href="/">← 返回首页</a>
+    <p class="eyebrow">边玩边探索 · 数学与英语</p>
     <h1>学习游戏</h1>
-    <p class="lead">选一个小游戏，边玩边发现新本领！</p>
+    <p class="intro">选一个游戏开始。想一想数字路线，或者和 Lisa 一起认识字母与单词；完成的进度会保存在当前浏览器。</p>
     <section class="grid" aria-label="游戏列表">
-      <a class="card number" href="/games/number-path">
-        <span class="icon" aria-hidden="true">🔢</span>
-        <h2>数学路径怪探</h2>
-        <p>数字顺序 · 路线推理</p>
-        <p>按顺序连接数字，铺满每一个格子。先想方法，再看线索；进度自动保存在这台设备。</p>
-        <span class="play">开始闯关 →</span>
-      </a>
-      <a class="card letter" href="/games/lisa-letter-adventure/">
-        <span class="icon" aria-hidden="true">🔤</span>
-        <h2>Lisa的字母冒险</h2>
-        <p>英语字母 · 听音认图 · 大小写配对</p>
-        <p>十个绘本关卡，随时暂停、回来续玩。建议横屏，跳跃时画面更宽。</p>
-        <span class="play">进入冒险 →</span>
-      </a>
+      <a class="card number" href="/games/number-path"><div class="card-top"><span aria-hidden="true">01</span><span>数学 · 路线推理</span></div><div class="card-body"><p class="tag">3×3 到 6×6 · 顺序解锁</p><h2>数学路径怪探</h2><p class="desc">按顺序连接数字，铺满每一个格子。先想方法，再逐步看线索。</p><span class="button play">开始闯关 →</span></div></a>
+      <a class="card letter" href="/games/lisa-letter-adventure/"><div class="card-top"><span aria-hidden="true">02</span><span>英语 · 字母与单词</span></div><div class="card-body"><p class="tag">十个绘本关卡 · 建议横屏</p><h2>Lisa的字母冒险</h2><p class="desc">跳跃、听词、认图，在不同的关卡里收集字母。可以随时暂停，下次继续。</p><span class="button play">进入冒险 →</span></div></a>
     </section>
-    <p class="note">进入游戏可继续上次进度，也可在菜单里查看学习记录。记录仅保存在当前浏览器，清除浏览器数据会删除记录。</p>
-    <p class="note">建议在家长陪伴下使用，并适时让眼睛休息。</p>
+    <p class="note">游戏进度和学习记录仅保存在当前浏览器。清除浏览器数据后，记录也会清除。</p>
   </main>
+  <footer class="footer"><div class="shell footer-inner"><div><strong>自得学园</strong><p>自驱成长，自得其乐</p><small>ChatGPT 协力 · 人工复核</small></div><div class="footer-links"><a href="/apply">申请试读</a><a href="https://alading.org/">返回 alading.org</a></div></div></footer>
 </body>
 </html>`;
 
