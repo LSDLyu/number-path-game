@@ -2,11 +2,13 @@
 
 Source: `workers/lisa-games-router.js`. Do not replace the current `edu-alading-org` Custom Domain Worker or publish the old local `zide-learning` checkout. The current home site has newer pages and content.
 
-After authorized Cloudflare access is restored:
+Published on 2026-09-28:
 
-1. Back up the active games route Worker and its route settings. Confirm the existing games route pattern and zone.
-2. Deploy the reviewed `workers/lisa-games-router.js` code to the existing games route Worker. Keep its current `edu.alading.org/games*` route and add the **exact** root route `edu.alading.org` to that same Worker. Cloudflare documents that a route without a path wildcard matches only the root, while the Custom Domain Worker remains available to a route via `fetch(request)`.
-3. Verify `/` contains `href="/games/">学习游戏</a>`; `/games/` renders the Zide header and both game links; `/games/number-path` shows the upgraded hint and tutorial; `/games/lisa-letter-adventure/` starts normally. Also verify `/apply` and a handbook page still respond normally.
-4. If any route fails, restore the backed-up Worker and route settings. Keep the GitHub Pages release available while investigating.
+1. Backed up the deployed `lisa-games-router` script, settings, and routes, and the `edu-alading-org` script/settings and original deployment version.
+2. Published the redesigned `/games/` directory through the two existing games routes. Both games, `/apply`, and a guide were checked live.
+3. Added a narrow, noncacheable redirect for a click from the root homepage's legacy `/games/number-path` link to `/games/`. Direct game visits and the new directory card at `/games/number-path/` continue to start the game.
+4. The main site's actual HTML navigation still says `数学游戏` and links to `/games/number-path`. A root-only Worker route was tried and removed because it did not intercept the homepage. A temporary main Worker content-only patch did not affect the served static page and was rolled back to its original deployment version. Do not claim the HTML link is fixed.
 
-The GitHub Pages build already contains the games and directory at `https://lsdlyu.github.io/number-path-game/`. Its preview directory is `https://lsdlyu.github.io/number-path-game/games/`. The official routes do not update until the Cloudflare Worker is deployed.
+Remaining: obtain the current main site's source/build for a normal targeted header update, or seek explicit approval for a site-wide route that passes other pages through to the Custom Domain Worker. An attempted `edu.alading.org/*` route was rejected by automatic approval review because it affects unrelated pages. Do not use it without a new approval review. Verify the homepage's literal link after any follow-up deployment.
+
+The GitHub Pages build contains the games and directory at `https://lsdlyu.github.io/number-path-game/`. Its preview directory is `https://lsdlyu.github.io/number-path-game/games/`.
