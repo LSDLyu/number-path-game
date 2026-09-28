@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f1e6">
+  <title>Learning Games | Zide Learning</title>
+  <meta name="description" content="Number Path Detectives and Lisa’s Letter Adventure: explore maths, letters, and words through play.">
+  <style>
+    :root { color-scheme:light; --paper:#f7f1e6; --ink:#24312f; --muted:#505b57; --teal:#17685f; --orange:#a94f25; --yellow:#f1d77a; --line:#24312f3d; --serif:"Songti SC","Noto Serif SC","STSong",Georgia,serif; --sans:"Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",Arial,sans-serif; font-family:var(--sans); color:var(--ink); background:var(--paper); }
+    *,*::before,*::after { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; }
+    a { color:inherit; }
+    a:focus-visible { outline:3px solid var(--orange); outline-offset:4px; }
+    .skip { position:absolute; left:16px; top:12px; transform:translateY(-180%); padding:10px 16px; background:var(--yellow); z-index:10; }
+    .skip:focus { transform:none; }
+    .shell { width:min(1240px,calc(100% - 64px)); margin-inline:auto; }
+    .header { position:sticky; top:0; z-index:5; background:#f7f1e6f7; border-bottom:1px solid var(--line); backdrop-filter:blur(14px); }
+    .header-inner { min-height:78px; display:grid; grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr); align-items:center; gap:24px; }
+    .brand { display:inline-flex; align-items:center; gap:12px; width:max-content; text-decoration:none; }
+    .brand-mark { display:grid; place-items:center; width:42px; height:42px; background:var(--yellow); border:2px solid var(--ink); border-radius:47% 53% 50% 50%; font:23px var(--serif); transform:rotate(-4deg); }
+    .brand strong { display:block; font:700 21px/1.05 var(--serif); letter-spacing:.08em; }
+    .brand small { display:block; margin-top:3px; font-size:9px; font-weight:800; letter-spacing:.14em; }
+    .nav { display:flex; align-items:center; gap:26px; white-space:nowrap; }
+    .nav a,.actions a { font-size:14px; font-weight:800; text-decoration:none; }
+    .nav a[aria-current] { color:var(--teal); text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:8px; }
+    .actions { justify-self:end; display:flex; align-items:center; gap:20px; white-space:nowrap; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:10px 22px; background:var(--teal); border:2px solid var(--ink); border-radius:2px; color:#fff; text-decoration:none; font-size:15px; font-weight:800; box-shadow:5px 5px 0 var(--ink); transition:transform .15s,box-shadow .15s; }
+    .button:hover { transform:translate(2px,2px); box-shadow:3px 3px 0 var(--ink); }
+    .button-small { min-height:40px; padding:8px 15px; font-size:13px !important; }
+    main { padding:58px 0 100px; }
+    .crumb { display:inline-block; color:var(--teal); font-size:14px; font-weight:800; text-decoration-thickness:1px; text-underline-offset:4px; }
+    .eyebrow { margin:44px 0 16px; color:var(--teal); font-size:13px; font-weight:850; letter-spacing:.13em; }
+    h1 { margin:0; font:700 clamp(43px,6vw,76px)/1.13 var(--serif); letter-spacing:-.03em; }
+    .intro { max-width:680px; margin:20px 0 48px; color:var(--muted); font-size:18px; line-height:1.8; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+    .card { min-width:0; display:flex; flex-direction:column; background:#fffdf8; border:2px solid var(--ink); box-shadow:7px 7px 0 var(--ink); text-decoration:none; transition:transform .15s,box-shadow .15s; }
+    .card:hover,.card:focus-visible { transform:translate(2px,2px); box-shadow:5px 5px 0 var(--ink); }
+    .card-top { display:flex; align-items:center; justify-content:space-between; min-height:100px; padding:22px 30px; border-bottom:1px solid var(--line); }
+    .number .card-top { background:#f1d77a; }
+    .letter .card-top { background:#c9e1d9; }
+    .card-top span:first-child { font:700 42px/1 var(--serif); }
+    .card-top span:last-child { font-size:13px; font-weight:800; letter-spacing:.08em; }
+    .card-body { display:flex; flex:1; flex-direction:column; align-items:flex-start; padding:30px; }
+    .tag { margin:0 0 14px; color:var(--teal); font-size:13px; font-weight:850; letter-spacing:.08em; }
+    h2 { margin:0 0 18px; font:700 clamp(26px,3vw,35px)/1.25 var(--serif); }
+    .desc { max-width:48ch; min-height:80px; margin:0 0 28px; color:var(--muted); font-size:16px; line-height:1.8; }
+    .play { margin-top:auto; }
+    .note { margin:28px 0 0; max-width:760px; color:var(--muted); font-size:14px; line-height:1.8; }
+    .footer { background:var(--ink); color:#fff; padding:44px 0; }
+    .footer-inner { display:flex; align-items:flex-end; justify-content:space-between; gap:30px; }
+    .footer strong { font:700 24px var(--serif); }
+    .footer p { color:#d7dedb; margin:8px 0 0; }
+    .footer small { color:#d7dedb; font-size:12px; }
+    .footer-links { display:flex; gap:24px; font-weight:800; }
+    @media(max-width:950px) { .header-inner { display:flex; justify-content:space-between; } .nav { display:none; } .actions { gap:12px; } }
+    @media(max-width:700px) { .shell { width:calc(100% - 32px); } .header-inner { min-height:66px; } .brand strong { font-size:18px; } .brand small { font-size:8px; } .brand-mark { width:36px; height:36px; font-size:20px; } .actions .language { display:none; } main { padding:30px 0 68px; } .eyebrow { margin-top:38px; } .intro { margin-bottom:32px; font-size:16px; } .grid { grid-template-columns:1fr; gap:20px; } .card-top { min-height:78px; padding:16px 22px; } .card-body { padding:24px; } .desc { min-height:0; } .footer-inner { display:block; } .footer-links { margin-top:24px; } }
+    @media(prefers-reduced-motion:reduce) { .button,.card { transition:none; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="header"><div class="shell header-inner">
+    <a class="brand" href="/en" aria-label="Zide Learning home"><span class="brand-mark" aria-hidden="true">学</span><span><strong>Zide Learning</strong><small>ZIDE LEARNING</small></span></a>
+    <nav class="nav" aria-label="Main navigation"><a href="/en#method">Method</a><a href="/en#guides">Six guides</a><a href="/en/games/" aria-current="page">Learning games</a><a href="/en#review">How we review</a><a href="/en#faq">FAQ</a></nav>
+    <div class="actions"><a class="language" href="/games/" lang="zh-CN">中文</a><a class="button button-small" href="/en/apply">Request a sample</a></div>
+  </div></header>
+  <main class="shell" id="main">
+    <a class="crumb" href="/en">← Back home</a>
+    <p class="eyebrow">Explore through play · maths and English</p>
+    <h1>Learning games</h1>
+    <p class="intro">Choose a game to begin. Solve a number path or join Lisa to discover letters and words. Your progress stays in this browser.</p>
+    <section class="grid" aria-label="Game list">
+      <a class="card number" href="/en/games/number-path/"><div class="card-top"><span aria-hidden="true">01</span><span>Maths · route reasoning</span></div><div class="card-body"><p class="tag">3×3 to 6×6 · unlock in order</p><h2>Number Path Detectives</h2><p class="desc">Connect the numbers in order and fill every square. Plan your route, then reveal clues when you need them.</p><span class="button play">Play Number Path →</span></div></a>
+      <a class="card letter" href="/en/games/lisa-letter-adventure/"><div class="card-top"><span aria-hidden="true">02</span><span>English · letters and words</span></div><div class="card-body"><p class="tag">10 illustrated levels · landscape recommended</p><h2>Lisa’s Letter Adventure</h2><p class="desc">Jump, listen to words, and match pictures as you collect letters. Pause anytime and pick up where you left off.</p><span class="button play">Join Lisa →</span></div></a>
+    </section>
+    <p class="note">Game progress stays in this browser. Clearing browser data also removes your saved progress.</p>
+  </main>
+  <footer class="footer"><div class="shell footer-inner"><div><strong>Zide Learning</strong><p>Self-driven growth, joyfully discovered</p><small>ChatGPT collaboration · human review</small></div><div class="footer-links"><a href="/en/apply">Request a sample</a><a href="https://alading.org/">Back to alading.org</a></div></div></footer>
+</body>
+</html>
