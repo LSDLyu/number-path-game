@@ -21,6 +21,20 @@ async function homepage(request) {
   });
 }
 
+async function englishHomepage(request) {
+  const upstream = await fetch(request);
+  if (request.method !== "GET" || upstream.status !== 200 ||
+      !(upstream.headers.get("content-type") || "").includes("text/html")) return upstream;
+  const original = await upstream.text();
+  if (!original.includes('href="/en/games/number-path"')) return new Response(original, upstream);
+  const headers = new Headers(upstream.headers);
+  headers.delete("content-length"); headers.delete("content-encoding"); headers.delete("etag");
+  return new Response(original.replaceAll(
+    '<a href="/en/games/number-path">Number Path</a>',
+    '<a href="/en/games/">Learning games</a>'
+  ), { status: upstream.status, statusText: upstream.statusText, headers });
+}
+
 async function proxyNumberPath(request, url, path = NUMBER_PATH) {
   if (!["GET", "HEAD"].includes(request.method)) {
     return new Response("Method Not Allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
@@ -239,6 +253,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/") return homepage(request);
+    if (url.pathname === "/en" || url.pathname === "/en/") return englishHomepage(request);
 
     if (url.pathname === EN_GAMES) return redirect(`${EN_GAMES}/`);
     if (url.pathname === `${EN_GAMES}/`) return gamesDirectory("en");
