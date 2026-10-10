@@ -1,5 +1,5 @@
 // jsdom lacks native dialog methods; real focus containment is checked in a browser.
-import { beforeAll } from "vitest";
+import { beforeAll, beforeEach, vi } from "vitest";
 
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function () {
@@ -10,4 +10,10 @@ beforeAll(() => {
     this.removeAttribute("open");
     this.dispatchEvent(new Event("close"));
   };
+});
+
+// jsdom cannot play media; browser checks cover real MP3 loading.
+beforeEach(() => {
+  vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
+  vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(() => {});
 });

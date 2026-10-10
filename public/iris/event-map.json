@@ -1,0 +1,36 @@
+{
+  "prompts": {
+    "common_start": {
+      "zh": "audio/prompts/zh/common_start.mp3",
+      "en": "audio/prompts/en/common_start.mp3"
+    },
+    "common_continue": {
+      "zh": "audio/prompts/zh/common_continue.mp3",
+      "en": "audio/prompts/en/common_continue.mp3"
+    },
+    "common_correct": {
+      "zh": "audio/prompts/zh/common_correct.mp3",
+      "en": "audio/prompts/en/common_correct.mp3"
+    },
+    "common_listen_again": {
+      "zh": "audio/prompts/zh/common_listen_again.mp3",
+      "en": "audio/prompts/en/common_listen_again.mp3"
+    },
+    "path_rules": {
+      "zh": "audio/prompts/zh/path_rules.mp3",
+      "en": "audio/prompts/en/path_rules.mp3"
+    },
+    "path_start_one": {
+      "zh": "audio/prompts/zh/path_start_one.mp3",
+      "en": "audio/prompts/en/path_start_one.mp3"
+    },
+    "path_dead_end": {
+      "zh": "audio/prompts/zh/path_dead_end.mp3",
+      "en": "audio/prompts/en/path_dead_end.mp3"
+    },
+    "path_solved": {
+      "zh": "audio/prompts/zh/path_solved.mp3",
+      "en": "audio/prompts/en/path_solved.mp3"
+    }
+  }
+}

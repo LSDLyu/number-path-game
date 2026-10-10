@@ -1,0 +1,68 @@
+word_apple | en | apple | audio/words/en/apple.mp3
+word_ant | en | ant | audio/words/en/ant.mp3
+word_ball | en | ball | audio/words/en/ball.mp3
+word_banana | en | banana | audio/words/en/banana.mp3
+word_cat | en | cat | audio/words/en/cat.mp3
+word_cake | en | cake | audio/words/en/cake.mp3
+word_dog | en | dog | audio/words/en/dog.mp3
+word_duck | en | duck | audio/words/en/duck.mp3
+word_egg | en | egg | audio/words/en/egg.mp3
+word_elephant | en | elephant | audio/words/en/elephant.mp3
+word_fish | en | fish | audio/words/en/fish.mp3
+word_frog | en | frog | audio/words/en/frog.mp3
+word_goat | en | goat | audio/words/en/goat.mp3
+word_grape | en | grape | audio/words/en/grape.mp3
+word_hat | en | hat | audio/words/en/hat.mp3
+word_horse | en | horse | audio/words/en/horse.mp3
+word_igloo | en | igloo | audio/words/en/igloo.mp3
+word_insect | en | insect | audio/words/en/insect.mp3
+word_jam | en | jam | audio/words/en/jam.mp3
+word_jelly | en | jelly | audio/words/en/jelly.mp3
+word_kite | en | kite | audio/words/en/kite.mp3
+word_koala | en | koala | audio/words/en/koala.mp3
+word_lion | en | lion | audio/words/en/lion.mp3
+word_lemon | en | lemon | audio/words/en/lemon.mp3
+word_moon | en | moon | audio/words/en/moon.mp3
+word_monkey | en | monkey | audio/words/en/monkey.mp3
+word_nest | en | nest | audio/words/en/nest.mp3
+word_nose | en | nose | audio/words/en/nose.mp3
+word_octopus | en | octopus | audio/words/en/octopus.mp3
+word_orange | en | orange | audio/words/en/orange.mp3
+word_penguin | en | penguin | audio/words/en/penguin.mp3
+word_panda | en | panda | audio/words/en/panda.mp3
+word_queen | en | queen | audio/words/en/queen.mp3
+word_quilt | en | quilt | audio/words/en/quilt.mp3
+word_rabbit | en | rabbit | audio/words/en/rabbit.mp3
+word_robot | en | robot | audio/words/en/robot.mp3
+word_sun | en | sun | audio/words/en/sun.mp3
+word_star | en | star | audio/words/en/star.mp3
+word_turtle | en | turtle | audio/words/en/turtle.mp3
+word_tiger | en | tiger | audio/words/en/tiger.mp3
+word_umbrella | en | umbrella | audio/words/en/umbrella.mp3
+word_unicorn | en | unicorn | audio/words/en/unicorn.mp3
+word_violin | en | violin | audio/words/en/violin.mp3
+word_volcano | en | volcano | audio/words/en/volcano.mp3
+word_whale | en | whale | audio/words/en/whale.mp3
+word_watermelon | en | watermelon | audio/words/en/watermelon.mp3
+word_xylophone | en | xylophone | audio/words/en/xylophone.mp3
+word_x_ray | en | x-ray | audio/words/en/x-ray.mp3
+word_yo_yo | en | yo-yo | audio/words/en/yo-yo.mp3
+word_yak | en | yak | audio/words/en/yak.mp3
+word_zebra | en | zebra | audio/words/en/zebra.mp3
+word_zoo | en | zoo | audio/words/en/zoo.mp3
+common_start_zh | zh | 开始游戏。 | audio/prompts/zh/common_start.mp3
+common_start_en | en | Start game. | audio/prompts/en/common_start.mp3
+common_continue_zh | zh | 继续。 | audio/prompts/zh/common_continue.mp3
+common_continue_en | en | Continue. | audio/prompts/en/common_continue.mp3
+common_correct_zh | zh | 答对啦！ | audio/prompts/zh/common_correct.mp3
+common_correct_en | en | Correct! | audio/prompts/en/common_correct.mp3
+common_listen_again_zh | zh | 再听一次。 | audio/prompts/zh/common_listen_again.mp3
+common_listen_again_en | en | Listen again. | audio/prompts/en/common_listen_again.mp3
+lisa_jump_zh | zh | 短按小跳，长按大跳。 | audio/prompts/zh/lisa_jump.mp3
+lisa_jump_en | en | Tap for a small jump. Hold for a big jump. | audio/prompts/en/lisa_jump.mp3
+lisa_picture_zh | zh | 听一听，选择对应的图片。 | audio/prompts/zh/lisa_picture.mp3
+lisa_picture_en | en | Listen and choose the matching picture. | audio/prompts/en/lisa_picture.mp3
+lisa_retry_zh | zh | 没关系，再听一次，然后再选一选。不扣爱心。 | audio/prompts/zh/lisa_retry.mp3
+lisa_retry_en | en | That’s okay. Listen and try again. No hearts lost. | audio/prompts/en/lisa_retry.mp3
+lisa_slow_zh | zh | 不扣爱心，慢慢想。 | audio/prompts/zh/lisa_slow.mp3
+lisa_slow_en | en | Take your time. No hearts lost. | audio/prompts/en/lisa_slow.mp3

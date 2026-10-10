@@ -53,3 +53,7 @@ Each board size unlocks independently. Solve cases in order to unlock the next o
 ## GitHub Pages 发布配置
 
 仓库已包含 `.github/workflows/deploy-pages.yml`，会在 `main` 更新时构建并发布 `dist`。请在仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**，无需再创建发布工作流。这样可避免“Deploy from a branch”的旧流程把源码覆盖到线上。[GitHub 官方配置说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+
+## Iris Bot 音频（2026-10-10）
+
+接入用户提供的原始 MP3：中英文玩法/反馈语音和情境音效。页面载入不自动朗读；通过游戏操作或朗读按钮启动。声音设置可保存，关闭声音和切到后台会停止录音；快速重试不会堆叠语音。素材清单与原始脚本随资源保存。

@@ -1,0 +1,16 @@
+common_start_zh | zh | 开始游戏。 | audio/prompts/zh/common_start.mp3
+common_start_en | en | Start game. | audio/prompts/en/common_start.mp3
+common_continue_zh | zh | 继续。 | audio/prompts/zh/common_continue.mp3
+common_continue_en | en | Continue. | audio/prompts/en/common_continue.mp3
+common_correct_zh | zh | 答对啦！ | audio/prompts/zh/common_correct.mp3
+common_correct_en | en | Correct! | audio/prompts/en/common_correct.mp3
+common_listen_again_zh | zh | 再听一次。 | audio/prompts/zh/common_listen_again.mp3
+common_listen_again_en | en | Listen again. | audio/prompts/en/common_listen_again.mp3
+path_rules_zh | zh | 按顺序连接数字，走满每一格，最大数字最后到达。 | audio/prompts/zh/path_rules.mp3
+path_rules_en | en | Connect the numbers in order. Fill every square. Reach the largest number last. | audio/prompts/en/path_rules.mp3
+path_start_one_zh | zh | 从数字一开始。 | audio/prompts/zh/path_start_one.mp3
+path_start_one_en | en | Start at number one. | audio/prompts/en/path_start_one.mp3
+path_dead_end_zh | zh | 这条路暂时走不通了：没有可继续的相邻格。退回一步，换个方向试试。 | audio/prompts/zh/path_dead_end.mp3
+path_dead_end_en | en | This path has no legal next square. Undo one move and try another direction. | audio/prompts/en/path_dead_end.mp3
+path_solved_zh | zh | 破案成功！ | audio/prompts/zh/path_solved.mp3
+path_solved_en | en | Case solved! | audio/prompts/en/path_solved.mp3

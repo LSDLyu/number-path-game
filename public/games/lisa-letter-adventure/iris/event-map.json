@@ -1,0 +1,90 @@
+{
+  "prompts": {
+    "common_start": {
+      "zh": "audio/prompts/zh/common_start.mp3",
+      "en": "audio/prompts/en/common_start.mp3"
+    },
+    "common_continue": {
+      "zh": "audio/prompts/zh/common_continue.mp3",
+      "en": "audio/prompts/en/common_continue.mp3"
+    },
+    "common_correct": {
+      "zh": "audio/prompts/zh/common_correct.mp3",
+      "en": "audio/prompts/en/common_correct.mp3"
+    },
+    "common_listen_again": {
+      "zh": "audio/prompts/zh/common_listen_again.mp3",
+      "en": "audio/prompts/en/common_listen_again.mp3"
+    },
+    "lisa_jump": {
+      "zh": "audio/prompts/zh/lisa_jump.mp3",
+      "en": "audio/prompts/en/lisa_jump.mp3"
+    },
+    "lisa_picture": {
+      "zh": "audio/prompts/zh/lisa_picture.mp3",
+      "en": "audio/prompts/en/lisa_picture.mp3"
+    },
+    "lisa_retry": {
+      "zh": "audio/prompts/zh/lisa_retry.mp3",
+      "en": "audio/prompts/en/lisa_retry.mp3"
+    },
+    "lisa_slow": {
+      "zh": "audio/prompts/zh/lisa_slow.mp3",
+      "en": "audio/prompts/en/lisa_slow.mp3"
+    }
+  },
+  "words": {
+    "apple": "audio/words/en/apple.mp3",
+    "ant": "audio/words/en/ant.mp3",
+    "ball": "audio/words/en/ball.mp3",
+    "banana": "audio/words/en/banana.mp3",
+    "cat": "audio/words/en/cat.mp3",
+    "cake": "audio/words/en/cake.mp3",
+    "dog": "audio/words/en/dog.mp3",
+    "duck": "audio/words/en/duck.mp3",
+    "egg": "audio/words/en/egg.mp3",
+    "elephant": "audio/words/en/elephant.mp3",
+    "fish": "audio/words/en/fish.mp3",
+    "frog": "audio/words/en/frog.mp3",
+    "goat": "audio/words/en/goat.mp3",
+    "grape": "audio/words/en/grape.mp3",
+    "hat": "audio/words/en/hat.mp3",
+    "horse": "audio/words/en/horse.mp3",
+    "igloo": "audio/words/en/igloo.mp3",
+    "insect": "audio/words/en/insect.mp3",
+    "jam": "audio/words/en/jam.mp3",
+    "jelly": "audio/words/en/jelly.mp3",
+    "kite": "audio/words/en/kite.mp3",
+    "koala": "audio/words/en/koala.mp3",
+    "lion": "audio/words/en/lion.mp3",
+    "lemon": "audio/words/en/lemon.mp3",
+    "moon": "audio/words/en/moon.mp3",
+    "monkey": "audio/words/en/monkey.mp3",
+    "nest": "audio/words/en/nest.mp3",
+    "nose": "audio/words/en/nose.mp3",
+    "octopus": "audio/words/en/octopus.mp3",
+    "orange": "audio/words/en/orange.mp3",
+    "penguin": "audio/words/en/penguin.mp3",
+    "panda": "audio/words/en/panda.mp3",
+    "queen": "audio/words/en/queen.mp3",
+    "quilt": "audio/words/en/quilt.mp3",
+    "rabbit": "audio/words/en/rabbit.mp3",
+    "robot": "audio/words/en/robot.mp3",
+    "sun": "audio/words/en/sun.mp3",
+    "star": "audio/words/en/star.mp3",
+    "turtle": "audio/words/en/turtle.mp3",
+    "tiger": "audio/words/en/tiger.mp3",
+    "umbrella": "audio/words/en/umbrella.mp3",
+    "unicorn": "audio/words/en/unicorn.mp3",
+    "violin": "audio/words/en/violin.mp3",
+    "volcano": "audio/words/en/volcano.mp3",
+    "whale": "audio/words/en/whale.mp3",
+    "watermelon": "audio/words/en/watermelon.mp3",
+    "xylophone": "audio/words/en/xylophone.mp3",
+    "x-ray": "audio/words/en/x-ray.mp3",
+    "yo-yo": "audio/words/en/yo-yo.mp3",
+    "yak": "audio/words/en/yak.mp3",
+    "zebra": "audio/words/en/zebra.mp3",
+    "zoo": "audio/words/en/zoo.mp3"
+  }
+}

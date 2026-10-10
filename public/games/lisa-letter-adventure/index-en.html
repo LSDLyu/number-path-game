@@ -668,6 +668,7 @@
   </main>
 
   <script src="audio/manifest.js"></script>
+  <script src="iris-audio.js"></script>
   <script>
     (function () {
       "use strict";
@@ -1170,7 +1171,7 @@
         document.getElementById("startOverlay").classList.add("hidden");
         saveLearning();
         if (!learningProgress.tutorials[number]) showLevelTutorial();
-        else showCoach(LEVELS[number-1].hint,5500);
+        else { showCoach(LEVELS[number-1].hint,5500); irisAudio.prompt("common_start"); }
       }
       function openLearningMenu(kind) {
         if (learningMode === "lesson") return;
@@ -1181,6 +1182,7 @@
           '<button data-learning="restart">Restart this level</button><button data-learning="tutorial">How to play</button><button data-learning="records">Learning record · for parents</button><details><summary>Choose a level</summary>'+choices+'</details><p><a href="https://edu.alading.org/en/games/">← Games</a> · <a href="audio/credits-en.html">Audio credits</a></p>');
       }
       function showLevelTutorial() {
+        irisAudio.sequence(["audio/prompts/en/lisa_jump.mp3", "audio/prompts/en/lisa_slow.mp3"]);
         var demos = ["← 👧 ↑ A →","👧⚽ ↑ 🔺 · 👧 → ⚽ ⛰️","🧺 ↑ ↓ · K L M","👧 ↑ 🟣 → 🟣","👧 ↓ U → Lisa","☁️ ↑ ↓ · 👧 ↑","🍄 ↑ 👧 · ↓ stop","🦈 · 🫧 👧 · 🐟 K","🎈 ← ↑ ↓ →","U ↓ 🌈 · 🎁 ↑"];
         showLearningDialog("tutorial",'<h2 id="dialogTitle">'+currentLevel+' / 10 · '+LEVELS[currentLevel-1].name+'</h2><span class="demo-motion" aria-hidden="true">'+demos[currentLevel-1]+'</span><p>'+LEVELS[currentLevel-1].hint+'</p><p>Tap Jump for a small jump or hold it to jump higher. After collecting a letter, listen to the word before continuing.</p><button class="primary" data-learning="go">Got it, let’s go!</button>');
       }
@@ -1217,7 +1219,7 @@
         choices.sort(function(a,b) { return a.word.localeCompare(b.word); });
         reviewState.tried = false;
         showLearningDialog("review",'<h2 id="dialogTitle">Quick review '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'Find the lowercase partner for '+lesson.char+'':'Listen and choose the matching picture')+'</p>'+(matching?'':'<button data-learning="listen">🔊 Listen again</button>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">Take your time. No hearts lost.</p>');
-        if (!matching) speakLesson(lesson);
+        if (!matching) { stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_picture.mp3", "audio/words/en/"+lesson.word+".mp3"]); }
       }
       function answerReview(answer) {
         if (reviewState.answered) return;
@@ -1228,7 +1230,7 @@
         learningProgress.words[lesson.word]=record; saveLearning();
         if (answer !== lesson.word) {
           document.getElementById("reviewFeedback").textContent="That’s okay. Listen and try again. No hearts lost.";
-          speakLesson(lesson); return;
+          stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_retry.mp3", "audio/words/en/"+lesson.word+".mp3"]); return;
         }
         reviewState.answered=true;
         document.getElementById("reviewFeedback").textContent=(answer===lesson.word?'Correct!':'Meet it again:')+' '+lesson.char+' '+lesson.char.toLowerCase()+' · '+lesson.emoji+' '+lesson.word+' · '+lesson.meaning;
@@ -1306,27 +1308,10 @@
         document.getElementById("letterCard").classList.remove("show");
       }
 
-      function primeSpeechSynthesis() {
-        if (!soundEnabled || speechPrimed || !("speechSynthesis" in window)) return;
-        try {
-          var synth = window.speechSynthesis;
-          if (!synth || typeof window.SpeechSynthesisUtterance !== "function") return;
-          speechPrimed = true;
-          if (typeof synth.resume === "function") synth.resume();
-          if (typeof synth.getVoices === "function") synth.getVoices();
-          var primer = new SpeechSynthesisUtterance("Ready!");
-          primer.lang = "en-US";
-          primer.rate = 2;
-          primer.pitch = 1;
-          primer.volume = .6;
-          activeUtterance = primer;
-          primer.onerror = function () { if (activeUtterance === primer) { speechPrimed = false; activeUtterance = null; } };
-          primer.onend = function () { if (activeUtterance === primer) activeUtterance = null; };
-          synth.speak(primer);
-        } catch (error) {
-          speechPrimed = false;
-        }
-      }
+      var irisAudio = new window.IrisAudio('iris/', "en");
+      document.addEventListener('visibilitychange', function () { if (document.hidden) { irisAudio.stop(); speechRunId++; stopWordAudio(); if (window.speechSynthesis) window.speechSynthesis.cancel(); } });
+
+      function primeSpeechSynthesis() { /* Recordings are unlocked by the player's gesture. */ }
 
       function initAudio() {
         if (!soundEnabled) return Promise.resolve(false);
@@ -1432,20 +1417,7 @@
         });
       }
 
-      function cuteVoice(kind) {
-        if (!soundEnabled) return;
-        if (kind === "short") {
-          voiceGlide(560, 900, .18, 0, .048);
-        } else if (kind === "long") {
-          voiceGlide(440, 720, .2, 0, .05);
-          voiceGlide(710, 1040, .25, .14, .046);
-        } else if (kind === "hurt") {
-          voiceGlide(680, 310, .3, 0, .055);
-          voiceGlide(430, 240, .18, .14, .035);
-        }
-
-        // Character glides never compete with the word narration queue.
-      }
+      function cuteVoice(kind) { /* Jump and retry use Iris recordings. */ }
 
       function preferredEnglishVoice() {
         if (!("speechSynthesis" in window) ||
@@ -1487,6 +1459,7 @@
       }
 
       function speakLesson(lesson) {
+        irisAudio.stop();
         if (!soundEnabled) return;
         initAudio();
         var synth = window.speechSynthesis;
@@ -1555,7 +1528,7 @@
       }
 
       function setSound(enabled) {
-        soundEnabled = enabled;
+        soundEnabled = enabled; irisAudio.setEnabled(enabled);
         if (!enabled) { speechRunId += 1; stopWordAudio(); pendingSpeechLesson = null; activeUtterance = null; }
         try { localStorage.setItem("lisa-letter-sound-v2", enabled ? "on" : "off"); } catch (error) { /* Keep playing without saved preferences. */ }
         var btn = document.getElementById("soundBtn");
@@ -1670,7 +1643,7 @@
           if (rollingBall.onGround && !rollingBall.popped) {
             rollingBall.vy = -850; rollingBall.onGround = false; rollingBall.jumpHold = 0;
             player.onGround = false; player.jumping = true; player.longJumpVoicePlayed = false;
-            tone(430, .13, "sine", .07);
+            irisAudio.effect("02_springy_jump", 250);
           }
           return;
         }
@@ -1688,7 +1661,7 @@
           player.jumping = true;
           player.jumpHold = 0;
           player.longJumpVoicePlayed = false;
-          tone(430, .13, "sine", .07);
+          irisAudio.effect("02_springy_jump", 250);
         }
       }
 
@@ -1719,9 +1692,7 @@
         player.jumping = false;
         hearts -= 1;
         updateHearts(hearts, "hurt");
-        tone(145, .32, "sawtooth", .08);
-        playHazardSound(hazardKind);
-        cuteVoice("hurt");
+        irisAudio.effect("04_gentle_retry", 1500);
         burst(player.x + player.w / 2, player.y + player.h / 2, "#ff6670", 10);
 
         if (hearts <= 0) {
@@ -1784,8 +1755,7 @@
         }
         showLetterLesson(lesson, healed);
         speakLesson(lesson);
-        tone(660, .18, "sine", .07);
-        setTimeout(function () { tone(880, .24, "sine", .06); }, 100);
+        irisAudio.effect("03_letter_collect");
         burst(x, y, healed ? "#ff6177" : "#ffd43f", 20);
         saveLearning();
       }
@@ -1840,9 +1810,7 @@
             size: 7 + Math.random() * 10
           });
         }
-        tone(523, .25, "sine", .08);
-        setTimeout(function () { tone(659, .25, "sine", .08); }, 130);
-        setTimeout(function () { tone(784, .5, "sine", .08); }, 260);
+        irisAudio.stop(); irisAudio.effect("05_level_complete");
         pendingFinishTimer = setTimeout(function () {
           var finishTitle = document.getElementById("finishTitle");
           var finishText = document.getElementById("finishText");
@@ -3918,6 +3886,7 @@
         var dt = lastTime ? Math.min(.033, (time - lastTime) / 1000) : 0;
         lastTime = time;
         update(dt);
+        if (!paused && !won && player.onGround && Math.abs(player.vx) > 30) irisAudio.effect("01_soft_step", 330);
         syncHeroSprite();
         draw();
         requestAnimationFrame(loop);

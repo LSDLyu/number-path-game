@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { IrisAudio } from "./iris-audio";
 import { Celebration } from "./Celebration";
 import { PathTutorial, newLearningRecord, readLearningRecords, skillGroup, strategyName, strategyTip, type LearningRecord } from "./PathLearning";
 import { GameDialog } from "./GameDialog";
@@ -339,6 +340,12 @@ function DetectiveCat({ label }: { label: string }) {
 
 export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const copy = gameCopy[locale];
+  const audio = useMemo(() => new IrisAudio(`${location.pathname.replace(/\/index\.html$/, '/').replace(/\/?$/, '/')}iris/`, locale), [locale]);
+  useEffect(() => {
+    const hide = () => { if (document.hidden) audio.stop(); };
+    document.addEventListener('visibilitychange', hide);
+    return () => { audio.stop(); document.removeEventListener('visibilitychange', hide); };
+  }, [audio]);
   const [size, setSize] = useState<Size>(3);
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [path, setPath] = useState<Point[]>(() => [puzzles["3"][0].route[0]]);
@@ -349,6 +356,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const [progress, setProgress] = useState<SavedProgress>(emptyProgress);
   const [hydrated, setHydrated] = useState(false);
   const [feedback, setFeedback] = useState(loadFeedback);
+  useEffect(() => { audio.setEnabled(feedback.sound); }, [audio, feedback.sound]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const lastDeadEnd = useRef("");
@@ -407,6 +415,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const percent = Math.round((path.length / total) * 100);
   const clock = useMemo(() => createPlayClock(progressRef.current.elapsedMs?.[progressKey] ?? 0), [progressKey, hydrated]);
 
+  useEffect(() => { audio.stop(); }, [audio, progressKey]);
   const deadEnd = !isComplete && !hasForwardMove(path, size, clueMap, info.end);
   const focused = feedback.focus;
   const chapter = skillGroup(puzzleIndex,puzzleList.length);
@@ -420,6 +429,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
   const updateFeedback = (key: keyof FeedbackSettings, value: boolean) => {
     const next = { ...feedback, [key]: value };
+    if (key === "sound") { audio.setEnabled(value); if (value) audio.prompt("path_start_one"); }
     setFeedback(next);
     try { window.localStorage.setItem(feedbackKey, JSON.stringify(next)); } catch { /* Optional storage. */ }
     if (key === "effects" && !value) setCelebrating(false);
@@ -559,10 +569,11 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     draggingRef.current = false;
     setCelebrating(feedback.effects && !reducedMotion);
     vibrate(celebrationLevels[size].vibration);
+    audio.stop(); audio.effect("05_level_complete"); audio.prompt("path_solved");
     setElapsed(seconds);
     setMessage(copy.success(total, info.end));
     setTone("good");
-  }, [chapter, clock, copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
+  }, [audio, chapter, clock, copy, feedback.effects, reducedMotion, vibrate, info.end, persist, progress, progressKey, puzzle.number, size, total]);
 
   const moveTo = useCallback((point: Point) => {
     if (!hydrated || isComplete || panel || pathRef.current.length === total) return;
@@ -621,7 +632,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       completeCase(nextPath);
     } else if (!hasForwardMove(nextPath, size, clueMap, info.end)) {
       const signature = `${progressKey}:${nextPath.map((step) => step.join(",")).join(";")}`;
-      if (lastDeadEnd.current !== signature) vibrate([30, 65, 30]);
+      if (lastDeadEnd.current !== signature) { vibrate([30, 65, 30]); audio.prompt("path_dead_end", 10000); audio.effect("04_gentle_retry", 2000); }
       lastDeadEnd.current = signature;
       setMessage(copy.deadEnd);
       setTone("warn");
@@ -632,7 +643,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       setMessage(copy.keepGoing);
       setTone("guide");
     }
-  }, [cancelHint, clock, clueMap, completeCase, copy, endPoint, hydrated, info.end, isComplete, panel, persist, progressKey, size, total, vibrate]);
+  }, [audio, cancelHint, clock, clueMap, completeCase, copy, endPoint, hydrated, info.end, isComplete, panel, persist, progressKey, size, total, vibrate]);
 
   const pointFromTarget = (target: EventTarget | null): Point | null => {
     const element = target instanceof Element ? target.closest<HTMLElement>("[data-cell]") : null;
@@ -848,7 +859,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
     <div className={`${styles.page} ${focused ? styles.focused : ""} ${!feedback.effects || reducedMotion ? styles.quiet : ""}`}>
       <header className={styles.hero}>
         <h1>{copy.gameTitle}</h1>
-        <button type="button" className={styles.helpButton} onClick={() => setPanel("help")}>{copy.help} <span aria-hidden="true">?</span></button>
+        <button type="button" className={styles.helpButton} onClick={() => { setPanel("help"); audio.prompt("path_rules"); }}>{copy.help} <span aria-hidden="true">?</span></button>
       </header>
       <p className={styles.lede}>{copy.shortRules}</p>
       <div className={styles.learningLinks}><button type="button" onClick={() => setPanel("tutorial")}>{locale==="zh"?"跟我练一题":"Try a guided puzzle"}</button><button type="button" onClick={() => setPanel("records")}>{locale==="zh"?"学习记录 · 家长查看":"Learning record"}</button><a href={locale==="zh" ? "https://edu.alading.org/games/" : "https://edu.alading.org/en/games/"}>{locale==="zh"?"游戏大厅":"Games"}</a></div>
@@ -963,6 +974,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
       <GameDialog open={panel === "settings"} title={copy.settings} closeLabel={copy.close} onClose={() => setPanel(null)}>
         <div className={styles.settingsPanel}>
+          <label><span>{locale === "zh" ? "声音与语音" : "Sound and voice"}</span><input type="checkbox" checked={feedback.sound} onChange={event => updateFeedback("sound", event.target.checked)} /></label>
           <label><span>{copy.effects}</span><input type="checkbox" checked={feedback.effects} onChange={(event) => updateFeedback("effects", event.target.checked)} /></label>
           <label><span>{copy.haptics}</span><input type="checkbox" checked={feedback.haptics && supportsVibration} disabled={!supportsVibration} onChange={(event) => updateFeedback("haptics", event.target.checked)} /></label>
           <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
@@ -975,6 +987,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       </GameDialog>
 
       <GameDialog open={panel === "help"} title={copy.help} closeLabel={copy.close} onClose={() => setPanel(null)}>
+        <button type="button" disabled={!feedback.sound} onClick={() => audio.prompt("path_rules")}>{locale === "zh" ? "再听一次玩法" : "Listen to instructions again"}</button>
         <p className={styles.helpLead}>{copy.shortRules}</p>
         <ol className={styles.rules}><li>{copy.ruleStart}</li><li>{copy.ruleMove}</li><li>{copy.ruleOrder}</li><li><strong>{copy.ruleEnd}</strong></li></ol>
         <p>{copy.inputNote}</p><p>{copy.unlockRule}</p>
