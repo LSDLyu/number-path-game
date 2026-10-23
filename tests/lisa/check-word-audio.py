@@ -18,6 +18,8 @@ def main():
     manifest = json.loads(match.group(1))
     credits_path = ROOT / "audio/credits.json"
     credits = json.loads(credits_path.read_text()) if credits_path.exists() else {}
+    accents_match = re.fullmatch(r'window\.LISA_WORD_ACCENTS = (\{.*\});\s*', (ROOT / 'audio/accents.js').read_text())
+    accents = json.loads(accents_match.group(1)) if accents_match else {}
     problems = []
     pending = []
     coverage = json.loads((ROOT / 'audio/coverage.json').read_text())
@@ -31,12 +33,19 @@ def main():
         attribution = credits.get(word)
         if word in credits and (not isinstance(attribution, dict) or any(not attribution.get(key) for key in ("original", "license", "source", "author", "changes"))):
             problems.append(f"{word}: source URL, original audio URL and license are required")
+        if word in credits:
+            if accents.get(word) != attribution.get('accent'):
+                problems.append(f'{word}: accent label differs from its source')
+            if not attribution.get('source_revision') or not re.fullmatch('[a-f0-9]{40}', attribution.get('original_sha1', '')):
+                problems.append(f'{word}: source revision and original media checksum required')
         file = ROOT / expected
         if not file.is_file() or file.stat().st_size < 100:
             problems.append(f"{word}: MP3 missing or empty")
             continue
         if coverage.get(word, {}).get('file') != expected or coverage.get(word, {}).get('sha256') != hashlib.sha256(file.read_bytes()).hexdigest():
             problems.append(f"{word}: coverage does not match the actual recording")
+        if word in credits and attribution.get('sha256') != hashlib.sha256(file.read_bytes()).hexdigest():
+            problems.append(f'{word}: credited audio checksum differs from the file')
         result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_name:format=duration", "-of", "json", str(file)], capture_output=True, text=True)
         try:
             info = json.loads(result.stdout)

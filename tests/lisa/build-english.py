@@ -37,6 +37,11 @@ source = re.sub(
 )
 
 translations = {
+    "录音暂时没播放出来，点“再听一次”试试。": "The recording did not play. Tap Listen again to retry.",
+    "美式真人发音": "US English recording",
+    "英式真人发音": "British English recording",
+    "澳式真人发音": "Australian English recording",
+    "英语发音": "English pronunciation",
     "适合6岁儿童的绘本风字母启蒙横版闯关游戏": "A storybook letter adventure for young learners",
     "Lisa的字母冒险游戏": "Lisa’s Letter Adventure game",
     "Lisa的字母冒险": "Lisa’s Letter Adventure",
