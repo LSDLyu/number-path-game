@@ -1,0 +1,222 @@
+{
+  "apple": {
+    "title": "File:En-us-apple.ogg",
+    "accent": "en-US"
+  },
+  "ant": {
+    "title": "File:En-us-ant.ogg",
+    "accent": "en-US"
+  },
+  "ball": {
+    "title": "File:En-us-ball.ogg",
+    "accent": "en-US"
+  },
+  "banana": {
+    "title": "File:En-us-banana.ogg",
+    "accent": "en-US"
+  },
+  "cat": {
+    "title": "File:En-us-cat.ogg",
+    "accent": "en-US"
+  },
+  "cake": {
+    "title": "File:En-us-cake.ogg",
+    "accent": "en-US"
+  },
+  "dog": {
+    "title": "File:En-us-dog.ogg",
+    "accent": "en-US"
+  },
+  "duck": {
+    "title": "File:En-us-duck.ogg",
+    "accent": "en-US"
+  },
+  "egg": {
+    "title": "File:En-us-egg.ogg",
+    "accent": "en-US"
+  },
+  "elephant": {
+    "title": "File:En-us-elephant.ogg",
+    "accent": "en-US",
+    "author_from_description": "Muke Tever"
+  },
+  "fish": {
+    "title": "File:En-us-fish.ogg",
+    "accent": "en-US",
+    "author_from_description": "Dvortygirl"
+  },
+  "frog": {
+    "title": "File:En-us-frog.ogg",
+    "accent": "en-US"
+  },
+  "goat": {
+    "title": "File:En-us-goat.ogg",
+    "accent": "en-US"
+  },
+  "grape": {
+    "title": "File:En-us-grape.ogg",
+    "accent": "en-US"
+  },
+  "hat": {
+    "title": "File:En-us-hat.ogg",
+    "accent": "en-US"
+  },
+  "horse": {
+    "title": "File:En-us-horse.ogg",
+    "accent": "en-US"
+  },
+  "igloo": {
+    "title": "File:LL-Q1860 (eng)-Vealhurl-igloo.wav",
+    "accent": "en-GB",
+    "accent_evidence": "https://en.wiktionary.org/wiki/igloo#Pronunciation"
+  },
+  "insect": {
+    "title": "File:En-us-insect.ogg",
+    "accent": "en-US"
+  },
+  "jam": {
+    "title": "File:En-us-jam.ogg",
+    "accent": "en-US"
+  },
+  "jelly": {
+    "title": "File:En-us-jelly.ogg",
+    "accent": "en-US"
+  },
+  "kite": {
+    "title": "File:En-us-kite.ogg",
+    "accent": "en-US"
+  },
+  "koala": {
+    "title": "File:En-us-koala.oga",
+    "accent": "en-US",
+    "accent_evidence": "https://en.wiktionary.org/wiki/koala#Pronunciation"
+  },
+  "lion": {
+    "title": "File:En-us-lion.ogg",
+    "accent": "en-US"
+  },
+  "lemon": {
+    "title": "File:LL-Q1860 (eng)-Simplificationalizer-lemon.wav",
+    "accent": "en-US",
+    "accent_evidence": "https://en.wiktionary.org/wiki/lemon#Pronunciation"
+  },
+  "moon": {
+    "title": "File:En-us-moon.ogg",
+    "accent": "en-US"
+  },
+  "monkey": {
+    "title": "File:En-us-monkey.ogg",
+    "accent": "en-US"
+  },
+  "nest": {
+    "title": "File:En-us-nest.ogg",
+    "accent": "en-US"
+  },
+  "nose": {
+    "title": "File:En-us-nose.ogg",
+    "accent": "en-US"
+  },
+  "octopus": {
+    "title": "File:En-us-octopus.ogg",
+    "accent": "en-US"
+  },
+  "orange": {
+    "title": "File:LL-Q1860 (eng)-Aquild-orange.wav",
+    "accent": "en-US",
+    "accent_evidence": "https://en.wiktionary.org/wiki/orange#Pronunciation"
+  },
+  "penguin": {
+    "title": "File:En-us-penguin.ogg",
+    "accent": "en-US"
+  },
+  "panda": {
+    "title": "File:En-us-panda.ogg",
+    "accent": "en-US"
+  },
+  "queen": {
+    "title": "File:En-us-queen.ogg",
+    "accent": "en-US"
+  },
+  "quilt": {
+    "title": "File:En-us-quilt.ogg",
+    "accent": "en-US"
+  },
+  "rabbit": {
+    "title": "File:En-us-rabbit.ogg",
+    "accent": "en-US"
+  },
+  "robot": {
+    "title": "File:En-us-robot.ogg",
+    "accent": "en-US"
+  },
+  "sun": {
+    "title": "File:En-us-Sun.ogg",
+    "accent": "en-US"
+  },
+  "star": {
+    "title": "File:En-us-star.ogg",
+    "accent": "en-US"
+  },
+  "turtle": {
+    "title": "File:En-us-turtle.ogg",
+    "accent": "en-US"
+  },
+  "tiger": {
+    "title": "File:En-us-tiger.ogg",
+    "accent": "en-US"
+  },
+  "umbrella": {
+    "title": "File:En-us-umbrella.ogg",
+    "accent": "en-US"
+  },
+  "unicorn": {
+    "title": "File:En-au-unicorn.ogg",
+    "accent": "en-AU",
+    "accent_evidence": "https://en.wiktionary.org/wiki/unicorn#Pronunciation"
+  },
+  "violin": {
+    "title": "File:En-us-violin.ogg",
+    "accent": "en-US"
+  },
+  "volcano": {
+    "title": "File:En-us-volcano.ogg",
+    "accent": "en-US"
+  },
+  "whale": {
+    "title": "File:En-us-whale.ogg",
+    "accent": "en-US"
+  },
+  "watermelon": {
+    "title": "File:En-us-watermelon.ogg",
+    "accent": "en-US"
+  },
+  "xylophone": {
+    "title": "File:En-us-xylophone.ogg",
+    "accent": "en-US"
+  },
+  "x-ray": {
+    "title": "File:En-us-X-ray.ogg",
+    "accent": "en-US"
+  },
+  "yo-yo": {
+    "title": "File:En-us-yo-yo.ogg",
+    "accent": "en-US"
+  },
+  "yak": {
+    "title": "File:En-au-yak.ogg",
+    "accent": "en-AU",
+    "accent_evidence": "https://en.wiktionary.org/wiki/yak#Pronunciation"
+  },
+  "zebra": {
+    "title": "File:En-us-zebra.ogg",
+    "accent": "en-US"
+  },
+  "zoo": {
+    "title": "File:En-us-zoo.ogg",
+    "accent": "en-US"
+  },
+  "hello": {
+    "title": "File:En-us-hello.ogg",
+    "accent": "en-US"
+  }
+}

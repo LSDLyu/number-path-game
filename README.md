@@ -57,3 +57,9 @@ Each board size unlocks independently. Solve cases in order to unlock the next o
 ## Iris Bot 音频（2026-10-10）
 
 接入用户提供的原始 MP3：中英文玩法/反馈语音和情境音效。页面载入不自动朗读；通过游戏操作或朗读按钮启动。声音设置可保存，关闭声音和切到后台会停止录音；快速重试不会堆叠语音。素材清单与原始脚本随资源保存。
+
+## 单词真人发音（候选分支）
+
+Lisa 的 52 个词已全部接入 Wikimedia Commons 真人录音。以美式为主，igloo 为英式，unicorn、yak 为澳式；学习卡片、复习和中英文来源页明确标注口音。教学与复习共用一份映射，加载失败提示重听，不自动换成设备合成声音。玩法提示保留 Iris。
+
+作者、逐项许可、原始文件校验和及音量调整说明随录音保存，见 [声音检查记录](docs/AUDIO_REVIEW.md)。更新素材后运行 `python3 tests/lisa/build-english.py` 和 `python3 tests/lisa/check-word-audio.py`。本分支尚未合并或发布，真机与主观试听仍待复核。

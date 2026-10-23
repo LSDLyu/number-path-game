@@ -1,0 +1,262 @@
+{
+  "apple": {
+    "file": "audio/apple.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "706e4c67ad6e66dcf55fbe2fce8a13cc3055569823a0c5fb336ee340633a9d99"
+  },
+  "ant": {
+    "file": "audio/ant.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "d5edff5bdb87bd77fa9069c36a9591eaf3c5bd671db6fef658f4d1f486931b6f"
+  },
+  "ball": {
+    "file": "audio/ball.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "472be213844c211cb2eddf480895692d3965abcae73191902ec11c545034ed26"
+  },
+  "banana": {
+    "file": "audio/banana.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "afb672286047c921012054495a3c4f34730a5cb8eb6f4bae6608bb700dc2dcc0"
+  },
+  "cat": {
+    "file": "audio/cat.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "70de2d61cf1b473e5f3a7edd3f89fce49a96fcc3809d3205f196a59f7498c823"
+  },
+  "cake": {
+    "file": "audio/cake.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "5ffc0561f725f9ac3f13d2c2a587f7b053866be81fa852b89102e57e2c2135e3"
+  },
+  "dog": {
+    "file": "audio/dog.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "02e644b51b626eca818ff36d2f69722ce4b0a01073a3c18b702cac743bf11138"
+  },
+  "duck": {
+    "file": "audio/duck.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "53594cd9c1cbb89827816b5646907157f34492003487022c7187c98ec3802e54"
+  },
+  "egg": {
+    "file": "audio/egg.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "f8e0cc3112bc558c3c7451039d838e59a01d106e42f39962dabad8888f2e46c1"
+  },
+  "elephant": {
+    "file": "audio/elephant.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "dc869d865da03a5a483d6e0a52d201fb1f7f2f43cb5a29ac91cd601d95408063"
+  },
+  "fish": {
+    "file": "audio/fish.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "6b5c2e77ca3a9bc40da34114da85f23e5c20c282078aacbeefd6cf45f142c86c"
+  },
+  "frog": {
+    "file": "audio/frog.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "1342f6ba921d689894206924300277366b08dbc4d75f36b203e42eba2c73ad85"
+  },
+  "goat": {
+    "file": "audio/goat.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "34f36a3bf41b040534768e3636c5cf8a9cfefaeed59c278cad98c8a9bafbf85b"
+  },
+  "grape": {
+    "file": "audio/grape.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "f80b09269e5264b8e78bae368c4401cf3ef7eb3fd7f96cc454bd3dbd3f07c21f"
+  },
+  "hat": {
+    "file": "audio/hat.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "365491578188d144928a719d4944bdccd60ab950a16d47b33cd94bf4590ebd7a"
+  },
+  "horse": {
+    "file": "audio/horse.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "76953a4478f456753b8c55b05f9d172270048a16d57a5c2d2a6f2dbf912e2883"
+  },
+  "igloo": {
+    "file": "audio/igloo.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "40a2cff58a9d4f8cb7233be55b55af4a6b926528fd48b3af32f3eebd8bb741b3"
+  },
+  "insect": {
+    "file": "audio/insect.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "270f29a597e35b72ffad7a1e38f32537ea8a79ccc88c631fc708bcdd021e8e2a"
+  },
+  "jam": {
+    "file": "audio/jam.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "33fb3cbfe03e162e5031f9f898e33aca88d7a6357c8fd5ed9022412cbb02b551"
+  },
+  "jelly": {
+    "file": "audio/jelly.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "a8e1f0473f6a3feedcdcf502334f846e878629d1c1e325d035d89833a42387d7"
+  },
+  "kite": {
+    "file": "audio/kite.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "105689bfab6caa17dfa189e02f4bf54c9b27fbb866cd8b64fd7b089a5b7ae313"
+  },
+  "koala": {
+    "file": "audio/koala.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "f65d3f64d6c8d3a66fdc6da77fdd6d8674ea3fc5268e6b75a36fa3c84bab1bd0"
+  },
+  "lion": {
+    "file": "audio/lion.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "69a45dfbaeb331e4dde1083c595c2b7ba7e558e5077a9618afafe2bc4b3103ab"
+  },
+  "lemon": {
+    "file": "audio/lemon.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "9d3fddfb8f5785d7fad8ad9f6008b4de1dc2145f71a4ef442f4731ec6862c271"
+  },
+  "moon": {
+    "file": "audio/moon.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "3edaf687732b05b957edd900bcf97256329ac0ed5b9b010c9fce6cccc9d91a01"
+  },
+  "monkey": {
+    "file": "audio/monkey.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "ddcfcab16b6bea99cd2bc463dc612728a4aeb6765d53d2101786e7e6703a66ad"
+  },
+  "nest": {
+    "file": "audio/nest.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "15fb82c3451e7276d55bc015c7346fd75641e05f4bdb7323c4686bb846d20064"
+  },
+  "nose": {
+    "file": "audio/nose.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "3de7f7e7cfba366e349f59d0caebc71850a723d43dd3be04e0351cf56a3efc5b"
+  },
+  "octopus": {
+    "file": "audio/octopus.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "bde647f4ca921cb855bb383957a3f7fff0b9ddf64e7b19f093560fffacc0546e"
+  },
+  "orange": {
+    "file": "audio/orange.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "9cca4bf1bc5ef01f492bedce64fb3e81a0f85c6234dba57e5d7e42f8d2f713ff"
+  },
+  "penguin": {
+    "file": "audio/penguin.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "c7b85530bfb7165fd97ff0749a408f12ed1c52fced5f1c2a5025392378f1d8cb"
+  },
+  "panda": {
+    "file": "audio/panda.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "d3a32e3589898c91b0493220b98454b24ef9803c3c40cb519ae75a0b7c2caa34"
+  },
+  "queen": {
+    "file": "audio/queen.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "256155557f8ba01c7543d0508221da2e05e6d3db7ff5a4039e16ca3172d235f0"
+  },
+  "quilt": {
+    "file": "audio/quilt.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "7f66c336106ce954fcbd0d6389c1e9de6752257a78ca44738f5738186d6a7606"
+  },
+  "rabbit": {
+    "file": "audio/rabbit.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "7d20ac252aa09a90ebcb136a398a17b42b4e10225e6d1d8af3760cd9f24b652f"
+  },
+  "robot": {
+    "file": "audio/robot.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "c97e34104f0eca5043c7b4a490d3430c81abcb0ca2025311611dafb4d378f913"
+  },
+  "sun": {
+    "file": "audio/sun.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "c05270cd5189aa5382908ece033ab3372e4c0c2df809db9e38d8c7542aaa77f1"
+  },
+  "star": {
+    "file": "audio/star.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "d500018b168df21e224978427f946ce8d3ef1673d10ec7f778cf630e99b5456e"
+  },
+  "turtle": {
+    "file": "audio/turtle.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "cb2e843561369333fe5118f0a5521fbaf018cab8184d66daf511aebc49ace8fe"
+  },
+  "tiger": {
+    "file": "audio/tiger.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "3a3520221cbef77ea6d8ed49a508d50b308212145be56b70037957db6d29218e"
+  },
+  "umbrella": {
+    "file": "audio/umbrella.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "dc1f97d236b25f878699ad03ce9ab54557602a672a9e5fb6c667074d9315a8fe"
+  },
+  "unicorn": {
+    "file": "audio/unicorn.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "5bc081d8ea7c36a663c632febf94814b46aa457748caad1d54486c69245893e2"
+  },
+  "violin": {
+    "file": "audio/violin.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "c2d0d11334efd5db2444ca940842f68b9a18f4a2f66b3e5b3dc00a2247e0250f"
+  },
+  "volcano": {
+    "file": "audio/volcano.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "82310bbce9e21e23193d8ffa35aa4141e34b0ca89e44732dcdd7a6fd29ef34b5"
+  },
+  "whale": {
+    "file": "audio/whale.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "b305b01a06bec6ad0a37224d0cb7658c3ca2d1f9441d4cfa5f1b370622f21497"
+  },
+  "watermelon": {
+    "file": "audio/watermelon.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "6638de75353f507ef3c3e0444f4d0447c9535be36002b07c4f9c64c194a91938"
+  },
+  "xylophone": {
+    "file": "audio/xylophone.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "c3e8099ecdbf43e7da49b4bcbc1705493b3765258d0fd720ad7cae9379a9a7b0"
+  },
+  "x-ray": {
+    "file": "audio/x-ray.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "41c1c2cd0fd634353ab3eadeccfd460f3577b44fa4cb7280df0b9e8517a7f4be"
+  },
+  "yo-yo": {
+    "file": "audio/yo-yo.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "ecf050ae93bae44bfe5d720793311e4575933b231a6e7074dd295b8042d8d2a5"
+  },
+  "yak": {
+    "file": "audio/yak.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "835bb35a1026e3366cbafcf163f844bc94c49f69b9a1df38c6504f3e985f9151"
+  },
+  "zebra": {
+    "file": "audio/zebra.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "e77218456f283a4ec45b30f7fb611669596db651c8ab3b3989c6b509991a2047"
+  },
+  "zoo": {
+    "file": "audio/zoo.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "37c4ecfe477449b1dd75e52fae77696c2bba52f2db587f13dae6182ab11f34d1"
+  }
+}

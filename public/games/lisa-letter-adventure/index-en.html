@@ -270,6 +270,8 @@
       overflow-wrap: anywhere;
     }
 
+    .word-accent { display:block; color:#3f5964; font-size:13px; line-height:1.5; margin:6px 0; }
+
     .letter-copy {
       grid-column: 2;
       min-width: 0;
@@ -618,6 +620,7 @@
       <div class="letter-copy">
         <span class="letter-word" id="letterWord">apple</span>
         <span class="letter-bonus" id="letterMeaning">apple</span>
+        <span class="word-accent" id="wordAccent"></span>
         <span class="letter-bonus" id="letterBonus" style="font-size:12px"></span>
       </div>
       <div class="doodle-frame">
@@ -668,6 +671,7 @@
   </main>
 
   <script src="audio/manifest.js"></script>
+  <script src="audio/accents.js"></script>
   <script src="iris-audio.js"></script>
   <script>
     (function () {
@@ -1218,8 +1222,26 @@
         var choices = [lesson,alternatives[(currentLevel*3)%alternatives.length],alternatives[(currentLevel*3+9)%alternatives.length]];
         choices.sort(function(a,b) { return a.word.localeCompare(b.word); });
         reviewState.tried = false;
-        showLearningDialog("review",'<h2 id="dialogTitle">Quick review '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'Find the lowercase partner for '+lesson.char+'':'Listen and choose the matching picture')+'</p>'+(matching?'':'<button data-learning="listen">🔊 Listen again</button>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">Take your time. No hearts lost.</p>');
-        if (!matching) { stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_picture.mp3", "audio/words/en/"+lesson.word+".mp3"]); }
+        showLearningDialog("review",'<h2 id="dialogTitle">Quick review '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'Find the lowercase partner for '+lesson.char+'':'Listen and choose the matching picture')+'</p>'+(matching?'':'<button data-learning="listen">🔊 Listen again</button>')+(matching?'':'<p class="word-accent">'+wordAccentLabel(lesson.word)+'</p>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">Take your time. No hearts lost.</p>');
+        if (!matching) speakReviewWord(lesson, "lisa_picture");
+      }
+      function wordAccentLabel(word) {
+        var accent = (window.LISA_WORD_ACCENTS || {})[word];
+        return {"en-US":"US English recording", "en-GB":"British English recording", "en-AU":"Australian English recording"}[accent] || "English pronunciation";
+      }
+      function speakReviewWord(lesson, prompt) {
+        // Cancel an in-flight lesson decode before starting the review queue.
+        speechRunId++;
+        pendingSpeechLesson = null;
+        stopWordAudio();
+        try {
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+        } catch (error) { /* A blocked device voice must not prevent recordings. */ }
+        var path = (window.LISA_WORD_AUDIO || {})[lesson.word];
+        var queue = ["audio/prompts/en/" + prompt + ".mp3"];
+        // IrisAudio resolves relative to iris/; all word contexts share the map.
+        if (path) queue.push("../" + path);
+        irisAudio.sequence(queue);
       }
       function answerReview(answer) {
         if (reviewState.answered) return;
@@ -1230,7 +1252,7 @@
         learningProgress.words[lesson.word]=record; saveLearning();
         if (answer !== lesson.word) {
           document.getElementById("reviewFeedback").textContent="That’s okay. Listen and try again. No hearts lost.";
-          stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_retry.mp3", "audio/words/en/"+lesson.word+".mp3"]); return;
+          speakReviewWord(lesson, "lisa_retry"); return;
         }
         reviewState.answered=true;
         document.getElementById("reviewFeedback").textContent=(answer===lesson.word?'Correct!':'Meet it again:')+' '+lesson.char+' '+lesson.char.toLowerCase()+' · '+lesson.emoji+' '+lesson.word+' · '+lesson.meaning;
@@ -1274,6 +1296,7 @@
         document.getElementById("letterBig").textContent = lesson.char;
         document.getElementById("letterWord").textContent = lesson.word;
         document.getElementById("letterMeaning").textContent = lesson.meaning;
+        document.getElementById("wordAccent").textContent = wordAccentLabel(lesson.word);
         document.getElementById("letterBonus").textContent = healed ? "♥ +1" : "";
         var doodle = document.getElementById("letterDoodle");
         var fallback = document.getElementById("doodleFallback");
@@ -1419,27 +1442,6 @@
 
       function cuteVoice(kind) { /* Jump and retry use Iris recordings. */ }
 
-      function preferredEnglishVoice() {
-        if (!("speechSynthesis" in window) ||
-            !window.speechSynthesis ||
-            typeof window.speechSynthesis.getVoices !== "function") return null;
-        var voices = window.speechSynthesis.getVoices();
-        var ranked = voices.filter(function (voice) { return /^en/i.test(voice.lang); });
-        ranked.sort(function (a, b) {
-          function score(voice) {
-            var name = voice.name.toLowerCase();
-            var value = /^en-US/i.test(voice.lang) ? 80 : 45;
-            if (/natural|premium|enhanced|neural/.test(name)) value += 70;
-            if (/samantha|ava|allison|susan|serena|aria|google us english/.test(name)) value += 45;
-            if (/compact/.test(name)) value -= 40;
-            if (voice.localService) value += 8;
-            return value;
-          }
-          return score(b) - score(a);
-        });
-        return ranked[0] || null;
-      }
-
       function stopWordAudio() {
         clearTimeout(lessonAudioTimer);
         if (narrationSource) {
@@ -1470,36 +1472,19 @@
           if (synth && typeof synth.resume === "function") synth.resume();
         } catch (error) { /* Recorded audio remains independent of system speech. */ }
 
-        function speakNaturally() {
+        function recordingUnavailable() {
           if (!soundEnabled || runId !== speechRunId) return;
-          if (!synth || typeof synth.speak !== "function" || typeof window.SpeechSynthesisUtterance !== "function") return;
-          try {
-            var utterance = new SpeechSynthesisUtterance(lesson.word + ".");
-            activeUtterance = utterance;
-            utterance.onstart = function () { pendingSpeechLesson = null; speechPrimed = true; };
-            utterance.onend = function () { if (activeUtterance === utterance) activeUtterance = null; };
-            utterance.onerror = function (event) {
-              if (runId !== speechRunId || !soundEnabled) return;
-              if (event.error !== "canceled" && event.error !== "interrupted") {
-                pendingSpeechLesson = lesson; speechPrimed = false;
-                showCoach("Sound is not on yet. Tap the speaker or Listen again.", 3500);
-              }
-            };
-            utterance.lang = "en-US";
-            utterance.rate = .95;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-            var voice = preferredEnglishVoice();
-            if (voice) utterance.voice = voice;
-            synth.speak(utterance);
-          } catch (error) {
-            // Keep the game running when a device voice is unavailable.
-          }
+          // Keep the selected human voice consistent. A retry can refetch after
+          // a transient network failure instead of caching a failed Promise.
+          delete audioCache[lesson.word];
+          pendingSpeechLesson = null;
+          audioNeedsGesture = true;
+          showCoach("The recording did not play. Tap Listen again to retry.", 3500);
         }
 
         var recording = preloadWordAudio(lesson.word);
         if (!recording || !audioContext || !audioContext.decodeAudioData) {
-          speakNaturally();
+          recordingUnavailable();
           return;
         }
         var settled = false;
@@ -1507,7 +1492,7 @@
           if (settled || runId !== speechRunId) return;
           settled = true;
           clearTimeout(lessonAudioTimer);
-          speakNaturally();
+          recordingUnavailable();
         }
         lessonAudioTimer = setTimeout(fallback, 2500);
         recording.then(function (bytes) {

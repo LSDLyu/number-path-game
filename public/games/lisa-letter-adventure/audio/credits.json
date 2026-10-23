@@ -1,123 +1,1458 @@
 {
   "apple": {
     "file": "audio/apple.mp3",
+    "title": "File:En-us-apple.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/9/9a/En-us-apple.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-apple.ogg",
+    "source_revision": 1229116178,
+    "original_timestamp": "2006-04-19T06:10:01Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "3f8c6ca43d97920a12e2abf17b7832525e10b21c",
+    "original_sha256": "4b4e55408b35c8663c67b21f49a0b21016e0371fe7ba9b3e90648bfce7f5d8d0",
+    "sha256": "706e4c67ad6e66dcf55fbe2fce8a13cc3055569823a0c5fb336ee340633a9d99",
+    "gain_db": 1.57,
+    "audio": {
+      "duration_seconds": 0.6037,
+      "rms_dbfs": -23.98,
+      "peak_dbfs": -5.49
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +1.57 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-apple.ogg"
   },
   "ant": {
     "file": "audio/ant.mp3",
+    "title": "File:En-us-ant.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/a/a0/En-us-ant.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-ant.ogg",
+    "source_revision": 993363035,
+    "original_timestamp": "2006-04-19T06:08:21Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "ba6c05d34ffdd608dbf39f411390c5bf6f6ea0ea",
+    "original_sha256": "72f48581693c18d8e450319fc1c4b6dabcb2de9d575a4c44f975a93b35dc6af4",
+    "sha256": "d5edff5bdb87bd77fa9069c36a9591eaf3c5bd671db6fef658f4d1f486931b6f",
+    "gain_db": 4.4,
+    "audio": {
+      "duration_seconds": 0.7082,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -6.75
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +4.40 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-ant.ogg"
   },
   "ball": {
     "file": "audio/ball.mp3",
+    "title": "File:En-us-ball.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/a/a8/En-us-ball.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-ball.ogg",
+    "source_revision": 1229118433,
+    "original_timestamp": "2006-06-03T22:16:37Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "2fe29e160d61dc431b70678ecdbf0e3b4be55d62",
+    "original_sha256": "3ede8bf8c436045b99dc2a53f630dcc607fca0b8081905720b275f195540328f",
+    "sha256": "472be213844c211cb2eddf480895692d3965abcae73191902ec11c545034ed26",
+    "gain_db": -9.58,
+    "audio": {
+      "duration_seconds": 0.5921,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -8.05
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -9.58 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-ball.ogg"
   },
   "banana": {
     "file": "audio/banana.mp3",
+    "title": "File:En-us-banana.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/6/61/En-us-banana.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-banana.ogg",
+    "source_revision": 1229118483,
+    "original_timestamp": "2006-10-28T19:28:20Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "661572dd3930eb4d00a00dd01248b23107ce01f8",
+    "original_sha256": "67b1b65f684488ec2fe1faabdc50f7f772c7aade9f5a19b467e29ad6c5a83826",
+    "sha256": "afb672286047c921012054495a3c4f34730a5cb8eb6f4bae6608bb700dc2dcc0",
+    "gain_db": -5.11,
+    "audio": {
+      "duration_seconds": 0.5921,
+      "rms_dbfs": -23.98,
+      "peak_dbfs": -10.0
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.11 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-banana.ogg"
   },
   "cat": {
     "file": "audio/cat.mp3",
+    "title": "File:En-us-cat.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/4/46/En-us-cat.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-cat.ogg",
+    "source_revision": 1229122106,
+    "original_timestamp": "2005-06-15T06:12:41Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "dd8366cc15e33dbf376db99ded74ec45bfd75bae",
+    "original_sha256": "62502d6aa7d876f597101567f13a4f573a8bd32b0b57f393eb46756455a550e8",
+    "sha256": "70de2d61cf1b473e5f3a7edd3f89fce49a96fcc3809d3205f196a59f7498c823",
+    "gain_db": 3.13,
+    "audio": {
+      "duration_seconds": 0.5224,
+      "rms_dbfs": -26.27,
+      "peak_dbfs": -4.05
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +3.13 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-cat.ogg"
   },
   "cake": {
     "file": "audio/cake.mp3",
+    "title": "File:En-us-cake.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/8/89/En-us-cake.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-cake.ogg",
+    "source_revision": 1229121645,
+    "original_timestamp": "2006-03-13T05:48:43Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "c36118ddce5946c2964ccb39ae41903b04c7fecb",
+    "original_sha256": "6beaa40e2085eabd8732e54b99b26d71505b7f792d468c1acb42844a6c5f4d96",
+    "sha256": "5ffc0561f725f9ac3f13d2c2a587f7b053866be81fa852b89102e57e2c2135e3",
+    "gain_db": 1.51,
+    "audio": {
+      "duration_seconds": 0.6037,
+      "rms_dbfs": -24.04,
+      "peak_dbfs": -6.45
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +1.51 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-cake.ogg"
   },
   "dog": {
     "file": "audio/dog.mp3",
+    "title": "File:En-us-dog.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/0/06/En-us-dog.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-dog.ogg",
+    "source_revision": 1072100029,
+    "original_timestamp": "2006-03-13T05:20:05Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "ad93d2d7d3233abe4749dc196f10bb4a1d128927",
+    "original_sha256": "7e11e95b4f3d51a99d3875b5fb4964e230fe0b852f0f629571153e1b181da469",
+    "sha256": "02e644b51b626eca818ff36d2f69722ce4b0a01073a3c18b702cac743bf11138",
+    "gain_db": -1.26,
+    "audio": {
+      "duration_seconds": 0.6269,
+      "rms_dbfs": -24.02,
+      "peak_dbfs": -7.57
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -1.26 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-dog.ogg"
   },
   "duck": {
     "file": "audio/duck.mp3",
+    "title": "File:En-us-duck.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/5/5b/En-us-duck.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-duck.ogg",
+    "source_revision": 1229129086,
+    "original_timestamp": "2007-03-07T15:22:51Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "5db0b3881963a7f8b9a04258be0e113b6feb637c",
+    "original_sha256": "cb116aba987b1f7ac0c7b2b3da2ffb44171f51d00689d4e2a6ade8a44d4def0d",
+    "sha256": "53594cd9c1cbb89827816b5646907157f34492003487022c7187c98ec3802e54",
+    "gain_db": -3.36,
+    "audio": {
+      "duration_seconds": 0.95,
+      "rms_dbfs": -26.41,
+      "peak_dbfs": -3.9
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.36 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-duck.ogg"
   },
   "egg": {
     "file": "audio/egg.mp3",
+    "title": "File:En-us-egg.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/8/88/En-us-egg.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-egg.ogg",
+    "source_revision": 1222621374,
+    "original_timestamp": "2006-06-11T03:18:49Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "cffad4ae3ddd88025c9a07d5bab59a57bb260e59",
+    "original_sha256": "62118470eda444609d54f68d8235a693fee1c32d4d050c4a7f84fc7faf0f5929",
+    "sha256": "f8e0cc3112bc558c3c7451039d838e59a01d106e42f39962dabad8888f2e46c1",
+    "gain_db": -7.59,
+    "audio": {
+      "duration_seconds": 0.5573,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -7.32
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -7.59 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-egg.ogg"
   },
   "frog": {
     "file": "audio/frog.mp3",
+    "title": "File:En-us-frog.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/0/0e/En-us-frog.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-frog.ogg",
+    "source_revision": 1210062701,
+    "original_timestamp": "2006-03-13T05:25:00Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "0af49961bd86d3a69bc951cc05ea94b2974a691f",
+    "original_sha256": "bfe43f020afbe5a5822b40ecccd60071ab500dbdb12be4751034080a8902753e",
+    "sha256": "1342f6ba921d689894206924300277366b08dbc4d75f36b203e42eba2c73ad85",
+    "gain_db": -2.19,
+    "audio": {
+      "duration_seconds": 0.5457,
+      "rms_dbfs": -23.98,
+      "peak_dbfs": -6.27
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -2.19 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-frog.ogg"
   },
   "goat": {
     "file": "audio/goat.mp3",
+    "title": "File:En-us-goat.ogg",
     "original": "https://upload.wikimedia.org/wikipedia/commons/0/01/En-us-goat.ogg",
     "source": "https://commons.wikimedia.org/wiki/File:En-us-goat.ogg",
+    "source_revision": 1229135114,
+    "original_timestamp": "2006-06-13T04:33:19Z",
     "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
     "license": {
       "name": "CC BY-SA 3.0",
       "url": "https://creativecommons.org/licenses/by-sa/3.0/"
     },
-    "changes": "Converted from Ogg to MP3; pronunciation unchanged. MP3 retains the source license."
+    "original_sha1": "b70ed59364e8a7d2cfa1a252c7a607878bb45f09",
+    "original_sha256": "ba86eb29964f3284f45e6d591df230ab53f18f9a8b892453f37ee6390226e7b7",
+    "sha256": "34f36a3bf41b040534768e3636c5cf8a9cfefaeed59c278cad98c8a9bafbf85b",
+    "gain_db": -9.82,
+    "audio": {
+      "duration_seconds": 0.4992,
+      "rms_dbfs": -24.02,
+      "peak_dbfs": -9.97
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -9.82 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-goat.ogg"
+  },
+  "elephant": {
+    "file": "audio/elephant.mp3",
+    "title": "File:En-us-elephant.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f2/En-us-elephant.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-elephant.ogg",
+    "source_revision": 1229129809,
+    "original_timestamp": "2004-11-28T15:50:44Z",
+    "author": "Muke Tever",
+    "author_evidence": "File-description wikitext at the recorded source revision",
+    "accent": "en-US",
+    "license": {
+      "name": "Public domain (PD-self)",
+      "url": "https://commons.wikimedia.org/wiki/Template:PD-self"
+    },
+    "original_sha1": "1711fae881de21bbf568d3b88cce49b474fd5dea",
+    "original_sha256": "f2112a8bea561d6277feb91eb0ea72d60404a8f92e774f87d9007895daa05ddf",
+    "sha256": "dc869d865da03a5a483d6e0a52d201fb1f7f2f43cb5a29ac91cd601d95408063",
+    "gain_db": -6.4,
+    "audio": {
+      "duration_seconds": 0.9636,
+      "rms_dbfs": -23.98,
+      "peak_dbfs": -7.28
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -6.40 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-elephant.ogg"
+  },
+  "fish": {
+    "file": "audio/fish.mp3",
+    "title": "File:En-us-fish.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/3/3e/En-us-fish.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-fish.ogg",
+    "source_revision": 1229132901,
+    "original_timestamp": "2005-08-14T06:29:30Z",
+    "author": "Dvortygirl",
+    "author_evidence": "File-description wikitext at the recorded source revision",
+    "accent": "en-US",
+    "license": {
+      "name": "Public domain (PD-self)",
+      "url": "https://commons.wikimedia.org/wiki/Template:PD-self"
+    },
+    "original_sha1": "578d43b04556b42ab4e515725831706c0c60def9",
+    "original_sha256": "8bc9547fdbd689b4dda749a8faff5de4096bbafd3adc3b4466a788e27cc725e6",
+    "sha256": "6b5c2e77ca3a9bc40da34114da85f23e5c20c282078aacbeefd6cf45f142c86c",
+    "gain_db": 0.21,
+    "audio": {
+      "duration_seconds": 0.7314,
+      "rms_dbfs": -24.04,
+      "peak_dbfs": -6.6
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +0.21 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-fish.ogg"
+  },
+  "grape": {
+    "file": "audio/grape.mp3",
+    "title": "File:En-us-grape.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/0f/En-us-grape.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-grape.ogg",
+    "source_revision": 1229135517,
+    "original_timestamp": "2007-03-09T09:02:46Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "853d6be38287f68e4d5c2edb01029371104ad57d",
+    "original_sha256": "cfa0b7290fa2e0477b554f3e2b0751c6ca676d231497e78e98abe9be18f16673",
+    "sha256": "f80b09269e5264b8e78bae368c4401cf3ef7eb3fd7f96cc454bd3dbd3f07c21f",
+    "gain_db": -3.74,
+    "audio": {
+      "duration_seconds": 0.95,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -4.56
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.74 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-grape.ogg"
+  },
+  "hat": {
+    "file": "audio/hat.mp3",
+    "title": "File:En-us-hat.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/8b/En-us-hat.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-hat.ogg",
+    "source_revision": 1229136546,
+    "original_timestamp": "2006-06-13T04:51:20Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "2ea01aa1a18df44053c4e351be76569e4212cc00",
+    "original_sha256": "e7efaa4fbd833f25d37c0c86fc2b31a756a36fc97d0e742ecab5d9e19f7d9067",
+    "sha256": "365491578188d144928a719d4944bdccd60ab950a16d47b33cd94bf4590ebd7a",
+    "gain_db": -5.38,
+    "audio": {
+      "duration_seconds": 0.6734,
+      "rms_dbfs": -26.65,
+      "peak_dbfs": -4.02
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.38 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-hat.ogg"
+  },
+  "horse": {
+    "file": "audio/horse.mp3",
+    "title": "File:En-us-horse.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/fb/En-us-horse.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-horse.ogg",
+    "source_revision": 1229137863,
+    "original_timestamp": "2006-02-20T18:07:48Z",
+    "author": "No machine-readable author provided. Dvortygirl assumed (based on copyright claims).",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "50bd98c7a70a62b5dfaa62b826b08cc8cdaae7ef",
+    "original_sha256": "566ea30f153906c33d4de51ff00b4efdfddeb28d2ec98a4a556d4234fc1c4b0b",
+    "sha256": "76953a4478f456753b8c55b05f9d172270048a16d57a5c2d2a6f2dbf912e2883",
+    "gain_db": -7.64,
+    "audio": {
+      "duration_seconds": 0.6734,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -7.08
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -7.64 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-horse.ogg"
+  },
+  "igloo": {
+    "file": "audio/igloo.mp3",
+    "title": "File:LL-Q1860 (eng)-Vealhurl-igloo.wav",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/b/be/LL-Q1860_%28eng%29-Vealhurl-igloo.wav",
+    "source": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Vealhurl-igloo.wav",
+    "source_revision": 1252331063,
+    "original_timestamp": "2021-02-04T14:26:14Z",
+    "author": "Speaker: Vealhurl Recorder: Vealhurl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-GB",
+    "license": {
+      "name": "CC BY-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "original_sha1": "9f7d035c8663f1d9477983830d92d526e28c5d51",
+    "original_sha256": "39805081c1dcc79a2359ff96991ce019f6782162d590e5df5c9c5c9b3da99c0d",
+    "sha256": "40a2cff58a9d4f8cb7233be55b55af4a6b926528fd48b3af32f3eebd8bb741b3",
+    "gain_db": -0.38,
+    "audio": {
+      "duration_seconds": 0.7973,
+      "rms_dbfs": -24.01,
+      "peak_dbfs": -4.55
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -0.38 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/igloo#Pronunciation"
+  },
+  "insect": {
+    "file": "audio/insect.mp3",
+    "title": "File:En-us-insect.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/e/ea/En-us-insect.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-insect.ogg",
+    "source_revision": 1030811557,
+    "original_timestamp": "2006-06-13T05:39:24Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "0faa0796596d443d16385b5192311404b9eb7dda",
+    "original_sha256": "5bfc688eddfdd71e657ae758275d98dd7db3b80e6c71fbef16829e9fe07817d9",
+    "sha256": "270f29a597e35b72ffad7a1e38f32537ea8a79ccc88c631fc708bcdd021e8e2a",
+    "gain_db": -5.94,
+    "audio": {
+      "duration_seconds": 1.1029,
+      "rms_dbfs": -24.02,
+      "peak_dbfs": -4.53
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.94 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-insect.ogg"
+  },
+  "jam": {
+    "file": "audio/jam.mp3",
+    "title": "File:En-us-jam.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/d/dc/En-us-jam.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-jam.ogg",
+    "source_revision": 1195610749,
+    "original_timestamp": "2007-03-10T20:54:47Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "fba2340b0bacf0fa4bb9c1bdf14850d32c4bd5d5",
+    "original_sha256": "19260d572dd798c8a5659ef8ca198c029f308a39db8b0943dd1658ee85801fd2",
+    "sha256": "33fb3cbfe03e162e5031f9f898e33aca88d7a6357c8fd5ed9022412cbb02b551",
+    "gain_db": -5.79,
+    "audio": {
+      "duration_seconds": 0.9,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -6.4
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.79 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-jam.ogg"
+  },
+  "jelly": {
+    "file": "audio/jelly.mp3",
+    "title": "File:En-us-jelly.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/5/5e/En-us-jelly.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-jelly.ogg",
+    "source_revision": 1017165662,
+    "original_timestamp": "2006-06-13T05:46:36Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "f2428699c299010ce4b792eeeea78d75c0ad6b0c",
+    "original_sha256": "d24b379d307250e8d1f0ee2e277e80e546c9e8e05faaf404d8434f06ef59167f",
+    "sha256": "a8e1f0473f6a3feedcdcf502334f846e878629d1c1e325d035d89833a42387d7",
+    "gain_db": -10.07,
+    "audio": {
+      "duration_seconds": 0.7546,
+      "rms_dbfs": -24.03,
+      "peak_dbfs": -8.71
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -10.07 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-jelly.ogg"
+  },
+  "kite": {
+    "file": "audio/kite.mp3",
+    "title": "File:En-us-kite.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/6/66/En-us-kite.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-kite.ogg",
+    "source_revision": 1229141333,
+    "original_timestamp": "2014-11-03T21:51:04Z",
+    "author": "Mx. Granger",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC0 1.0",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "original_sha1": "97abeddc2ee975907443761a5dabff71cae5afa9",
+    "original_sha256": "97146747999a8c45008cbfb1a6c001ba9cd0ee872613450ff175c094896a150f",
+    "sha256": "105689bfab6caa17dfa189e02f4bf54c9b27fbb866cd8b64fd7b089a5b7ae313",
+    "gain_db": 3.12,
+    "audio": {
+      "duration_seconds": 1.1669,
+      "rms_dbfs": -30.45,
+      "peak_dbfs": -3.97
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +3.12 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-kite.ogg"
+  },
+  "koala": {
+    "file": "audio/koala.mp3",
+    "title": "File:En-us-koala.oga",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/3/3f/En-us-koala.oga",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-koala.oga",
+    "source_revision": 1131750846,
+    "original_timestamp": "2021-11-04T20:04:55Z",
+    "author": "Paul2520",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "original_sha1": "4d50d73ab46b7d53812da6989915dcbf447d6134",
+    "original_sha256": "7c140b35b858f04e9162cfad853fa3fef079fc87472c3586dc7ebf46cf504d68",
+    "sha256": "f65d3f64d6c8d3a66fdc6da77fdd6d8674ea3fc5268e6b75a36fa3c84bab1bd0",
+    "gain_db": 0.8,
+    "audio": {
+      "duration_seconds": 0.7663,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -7.92
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +0.80 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/koala#Pronunciation"
+  },
+  "lion": {
+    "file": "audio/lion.mp3",
+    "title": "File:En-us-lion.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/aa/En-us-lion.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-lion.ogg",
+    "source_revision": 1229142745,
+    "original_timestamp": "2006-06-25T15:45:14Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "f9166a3e24a67ef231e73995fb0c5b6926789723",
+    "original_sha256": "745cfa98153a8acd90dade7dd6fcba039af3f0dc349f03a209a4a076e86f073b",
+    "sha256": "69a45dfbaeb331e4dde1083c595c2b7ba7e558e5077a9618afafe2bc4b3103ab",
+    "gain_db": -1.96,
+    "audio": {
+      "duration_seconds": 0.7779,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -7.17
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -1.96 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-lion.ogg"
+  },
+  "lemon": {
+    "file": "audio/lemon.mp3",
+    "title": "File:LL-Q1860 (eng)-Simplificationalizer-lemon.wav",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/4/4e/LL-Q1860_%28eng%29-Simplificationalizer-lemon.wav",
+    "source": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Simplificationalizer-lemon.wav",
+    "source_revision": 748508681,
+    "original_timestamp": "2021-12-22T17:52:06Z",
+    "author": "Speaker: Simplificationalizer Recorder: Simplificationalizer",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC0 1.0",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "original_sha1": "cad069836aa0541e77cba271fceab4a2203be0ea",
+    "original_sha256": "c7d6bf68ecd645d48674b49bf5be6f97f2cc9f4ea3a06860959865b449e14a7d",
+    "sha256": "9d3fddfb8f5785d7fad8ad9f6008b4de1dc2145f71a4ef442f4731ec6862c271",
+    "gain_db": -1.27,
+    "audio": {
+      "duration_seconds": 0.968,
+      "rms_dbfs": -25.32,
+      "peak_dbfs": -3.98
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -1.27 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/lemon#Pronunciation"
+  },
+  "moon": {
+    "file": "audio/moon.mp3",
+    "title": "File:En-us-moon.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/7/75/En-us-moon.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-moon.ogg",
+    "source_revision": 1229145542,
+    "original_timestamp": "2006-08-30T04:19:39Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "49c2497c18538f976e5ee474c3b5822316069b2e",
+    "original_sha256": "2dd3469562997e91330a570938852f40e78eddbf5e0ce2923bbae817d083b3c2",
+    "sha256": "3edaf687732b05b957edd900bcf97256329ac0ed5b9b010c9fce6cccc9d91a01",
+    "gain_db": -2.35,
+    "audio": {
+      "duration_seconds": 0.5805,
+      "rms_dbfs": -23.96,
+      "peak_dbfs": -9.29
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -2.35 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-moon.ogg"
+  },
+  "monkey": {
+    "file": "audio/monkey.mp3",
+    "title": "File:En-us-monkey.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/7/74/En-us-monkey.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-monkey.ogg",
+    "source_revision": 1229145446,
+    "original_timestamp": "2006-08-30T04:16:55Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "23cd1a4ed87388f8275c76b0570e5fa4b5188b8a",
+    "original_sha256": "65b6a8fb778c183c41b54d65dc944ce2f9fe7e0ce51266de2f1cccc4f7ef08d3",
+    "sha256": "ddcfcab16b6bea99cd2bc463dc612728a4aeb6765d53d2101786e7e6703a66ad",
+    "gain_db": -4.9,
+    "audio": {
+      "duration_seconds": 0.5805,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -7.17
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -4.90 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-monkey.ogg"
+  },
+  "nest": {
+    "file": "audio/nest.mp3",
+    "title": "File:En-us-nest.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f1/En-us-nest.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-nest.ogg",
+    "source_revision": 1229147093,
+    "original_timestamp": "2007-05-13T07:49:55Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "a21fe7643c9109e6dfd388a7154ae908ca21a46d",
+    "original_sha256": "98da9ae2ef317cff9b9a9b7a85c8d3bf77efdfb257db400425f4c38b316962c6",
+    "sha256": "15fb82c3451e7276d55bc015c7346fd75641e05f4bdb7323c4686bb846d20064",
+    "gain_db": -4.18,
+    "audio": {
+      "duration_seconds": 1.1,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -4.69
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -4.18 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-nest.ogg"
+  },
+  "nose": {
+    "file": "audio/nose.mp3",
+    "title": "File:En-us-nose.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/7/7f/En-us-nose.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-nose.ogg",
+    "source_revision": 1229147622,
+    "original_timestamp": "2006-08-30T04:40:21Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "3da4b2b7f3d718f268593bfa9145e33def557654",
+    "original_sha256": "f71f380efba0cfe2aa239b471097418c211dbe0962963aca2970887c106359d6",
+    "sha256": "3de7f7e7cfba366e349f59d0caebc71850a723d43dd3be04e0351cf56a3efc5b",
+    "gain_db": -6.03,
+    "audio": {
+      "duration_seconds": 0.6037,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -8.77
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -6.03 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-nose.ogg"
+  },
+  "octopus": {
+    "file": "audio/octopus.mp3",
+    "title": "File:En-us-octopus.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/86/En-us-octopus.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-octopus.ogg",
+    "source_revision": 1018061438,
+    "original_timestamp": "2007-03-09T09:07:16Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "9ef9f145756f027070350e4bf379fb383ea5e281",
+    "original_sha256": "ae981a1ee8e8872dff603f9a5a120b1f91cc587d47e05e16021ed1da46dbad48",
+    "sha256": "bde647f4ca921cb855bb383957a3f7fff0b9ddf64e7b19f093560fffacc0546e",
+    "gain_db": -3.15,
+    "audio": {
+      "duration_seconds": 1.25,
+      "rms_dbfs": -26.97,
+      "peak_dbfs": -4.05
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.15 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-octopus.ogg"
+  },
+  "orange": {
+    "file": "audio/orange.mp3",
+    "title": "File:LL-Q1860 (eng)-Aquild-orange.wav",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/e/e4/LL-Q1860_%28eng%29-Aquild-orange.wav",
+    "source": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Aquild-orange.wav",
+    "source_revision": 1127973652,
+    "original_timestamp": "2024-11-14T21:00:38Z",
+    "author": "Speaker: Aquild Recorder: Aquild",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0"
+    },
+    "original_sha1": "b1ebcfa8ce09aee9179489b568561cb6db0f5087",
+    "original_sha256": "d214597a89ae1aa384e5d4da9c86bca738e27a7e2cefe4f0653231a9926bbe58",
+    "sha256": "9cca4bf1bc5ef01f492bedce64fb3e81a0f85c6234dba57e5d7e42f8d2f713ff",
+    "gain_db": 7.28,
+    "audio": {
+      "duration_seconds": 0.712,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -7.46
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +7.28 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/orange#Pronunciation"
+  },
+  "penguin": {
+    "file": "audio/penguin.mp3",
+    "title": "File:En-us-penguin.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/0e/En-us-penguin.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-penguin.ogg",
+    "source_revision": 1202740513,
+    "original_timestamp": "2007-03-09T09:57:32Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "3d7b227903dbd24cae94cbc56608901e6993f23f",
+    "original_sha256": "fdd0de0ff61e26ae08cbe3c00ed22c3ae1db915e9ee0d98a441e92220fc6f346",
+    "sha256": "c7b85530bfb7165fd97ff0749a408f12ed1c52fced5f1c2a5025392378f1d8cb",
+    "gain_db": -5.09,
+    "audio": {
+      "duration_seconds": 0.95,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -6.04
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.09 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-penguin.ogg"
+  },
+  "panda": {
+    "file": "audio/panda.mp3",
+    "title": "File:En-us-panda.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/d/da/En-us-panda.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-panda.ogg",
+    "source_revision": 1229150686,
+    "original_timestamp": "2007-03-10T21:43:03Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "4df6bbb17ef67c529e0fbcd025597a53d600431e",
+    "original_sha256": "3e249743609e215942d98e17dbbca099a84d67e774715ea921a827ced88db739",
+    "sha256": "d3a32e3589898c91b0493220b98454b24ef9803c3c40cb519ae75a0b7c2caa34",
+    "gain_db": -5.73,
+    "audio": {
+      "duration_seconds": 1.0,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -6.06
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.73 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-panda.ogg"
+  },
+  "queen": {
+    "file": "audio/queen.mp3",
+    "title": "File:En-us-queen.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/d/d0/En-us-queen.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-queen.ogg",
+    "source_revision": 1176427000,
+    "original_timestamp": "2006-09-25T14:39:04Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "587f9beea261e33bbb74ff4eb62a22ea98e51f3f",
+    "original_sha256": "47efb23b061e67b805f1a4c911da57c1fbafe2738fdc2b06b34fbe36c37ab493",
+    "sha256": "256155557f8ba01c7543d0508221da2e05e6d3db7ff5a4039e16ca3172d235f0",
+    "gain_db": 0.93,
+    "audio": {
+      "duration_seconds": 0.6385,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -7.26
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +0.93 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-queen.ogg"
+  },
+  "quilt": {
+    "file": "audio/quilt.mp3",
+    "title": "File:En-us-quilt.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/a3/En-us-quilt.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-quilt.ogg",
+    "source_revision": 1198689629,
+    "original_timestamp": "2016-07-04T03:45:49Z",
+    "author": "Sylvanmoon",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "original_sha1": "55e6627f313b35fa6f8ce18b31c98040bfad5e06",
+    "original_sha256": "d703a0fde82979e3f297f3a7c5a3805e5454f4bdd90150bc088b023ed785f1b1",
+    "sha256": "7f66c336106ce954fcbd0d6389c1e9de6752257a78ca44738f5738186d6a7606",
+    "gain_db": -11.29,
+    "audio": {
+      "duration_seconds": 0.9752,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -8.14
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -11.29 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-quilt.ogg"
+  },
+  "rabbit": {
+    "file": "audio/rabbit.mp3",
+    "title": "File:En-us-rabbit.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f0/En-us-rabbit.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-rabbit.ogg",
+    "source_revision": 1202739864,
+    "original_timestamp": "2007-03-09T09:59:22Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "e1eeb7f9caab1391b85b71be3cb31570425bcab6",
+    "original_sha256": "4f363523ef90d53b02000f3098b984d731b45565d9f02c236ca742edb7a3b885",
+    "sha256": "7d20ac252aa09a90ebcb136a398a17b42b4e10225e6d1d8af3760cd9f24b652f",
+    "gain_db": -3.42,
+    "audio": {
+      "duration_seconds": 1.05,
+      "rms_dbfs": -24.56,
+      "peak_dbfs": -3.92
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.42 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-rabbit.ogg"
+  },
+  "robot": {
+    "file": "audio/robot.mp3",
+    "title": "File:En-us-robot.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/3/3a/En-us-robot.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-robot.ogg",
+    "source_revision": 1229159785,
+    "original_timestamp": "2006-11-01T06:15:47Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "be35d4b8cfd60c792fc304d5c90f9bb7b0bedcba",
+    "original_sha256": "15e0a394c2a34d1d204ad95c06dce8f8a7c67860ca6562eda2faa8281a27677a",
+    "sha256": "c97e34104f0eca5043c7b4a490d3430c81abcb0ca2025311611dafb4d378f913",
+    "gain_db": -2.89,
+    "audio": {
+      "duration_seconds": 0.7663,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -8.62
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -2.89 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-robot.ogg"
+  },
+  "sun": {
+    "file": "audio/sun.mp3",
+    "title": "File:En-us-Sun.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/4/4b/En-us-Sun.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-Sun.ogg",
+    "source_revision": 1229108481,
+    "original_timestamp": "2007-03-14T07:28:13Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "29c66a351ddd18ad9c5ef48d390409586492c36c",
+    "original_sha256": "5810bde2650c3d61828ba2d5b8a36759ade03ec32e197e360877af7619030de8",
+    "sha256": "c05270cd5189aa5382908ece033ab3372e4c0c2df809db9e38d8c7542aaa77f1",
+    "gain_db": -3.28,
+    "audio": {
+      "duration_seconds": 1.05,
+      "rms_dbfs": -24.91,
+      "peak_dbfs": -3.98
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.28 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-Sun.ogg"
+  },
+  "star": {
+    "file": "audio/star.mp3",
+    "title": "File:En-us-star.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/a/a6/En-us-star.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-star.ogg",
+    "source_revision": 1229164640,
+    "original_timestamp": "2006-09-10T04:43:06Z",
+    "author": "No machine-readable author provided. Dvortygirl assumed (based on copyright claims).",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "231dfb6196a93bb5ce42fccb3c104d299af270ed",
+    "original_sha256": "de31c7f86f3aeec38b507972d1036cb401d604aab42c3f7d586c8f32e42c8ddf",
+    "sha256": "d500018b168df21e224978427f946ce8d3ef1673d10ec7f778cf630e99b5456e",
+    "gain_db": -3.93,
+    "audio": {
+      "duration_seconds": 0.7895,
+      "rms_dbfs": -24.23,
+      "peak_dbfs": -3.99
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.93 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-star.ogg"
+  },
+  "turtle": {
+    "file": "audio/turtle.mp3",
+    "title": "File:En-us-turtle.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/3/3a/En-us-turtle.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-turtle.ogg",
+    "source_revision": 1017715476,
+    "original_timestamp": "2007-03-09T09:15:58Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "7bf1fd319b5d235212ae464753fb75663a5e5862",
+    "original_sha256": "6b3f24edbdf88d22759024c1673b564669e50d0cb14ec3ff36c09756d1fd3857",
+    "sha256": "cb2e843561369333fe5118f0a5521fbaf018cab8184d66daf511aebc49ace8fe",
+    "gain_db": -5.68,
+    "audio": {
+      "duration_seconds": 0.95,
+      "rms_dbfs": -23.97,
+      "peak_dbfs": -6.25
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.68 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-turtle.ogg"
+  },
+  "tiger": {
+    "file": "audio/tiger.mp3",
+    "title": "File:En-us-tiger.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/e/ee/En-us-tiger.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-tiger.ogg",
+    "source_revision": 1229168022,
+    "original_timestamp": "2007-03-07T15:32:06Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "4b50995aa9bf69e3d350762433d1405acdaed628",
+    "original_sha256": "35b81ac772850032437d3f25569b5c68bc94392c617b52dcfa5ece6c92a30234",
+    "sha256": "3a3520221cbef77ea6d8ed49a508d50b308212145be56b70037957db6d29218e",
+    "gain_db": -5.28,
+    "audio": {
+      "duration_seconds": 1.0,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -5.82
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.28 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-tiger.ogg"
+  },
+  "umbrella": {
+    "file": "audio/umbrella.mp3",
+    "title": "File:En-us-umbrella.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/8a/En-us-umbrella.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-umbrella.ogg",
+    "source_revision": 1207086389,
+    "original_timestamp": "2006-09-22T06:26:50Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "a85516fcde5831950534eb03d722e45dc1334621",
+    "original_sha256": "10403e6f336f13703571941dd3de90ab78ea646da0101119e219be650370caa5",
+    "sha256": "dc1f97d236b25f878699ad03ce9ab54557602a672a9e5fb6c667074d9315a8fe",
+    "gain_db": -5.11,
+    "audio": {
+      "duration_seconds": 0.8243,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -10.62
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.11 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-umbrella.ogg"
+  },
+  "unicorn": {
+    "file": "audio/unicorn.mp3",
+    "title": "File:En-au-unicorn.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/5/5c/En-au-unicorn.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-au-unicorn.ogg",
+    "source_revision": 1036666688,
+    "original_timestamp": "2019-05-26T07:05:06Z",
+    "author": "Commander Keane",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-AU",
+    "license": {
+      "name": "CC BY-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "original_sha1": "90d3bcb9b8a01745d43126b4a478c519de38edf3",
+    "original_sha256": "627882ce92c0b8bc42c0dab70bffd399b82d5af4b14b1d2fa76613ec963c085d",
+    "sha256": "5bc081d8ea7c36a663c632febf94814b46aa457748caad1d54486c69245893e2",
+    "gain_db": -2.19,
+    "audio": {
+      "duration_seconds": 1.0925,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -8.12
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -2.19 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/unicorn#Pronunciation"
+  },
+  "violin": {
+    "file": "audio/violin.mp3",
+    "title": "File:En-us-violin.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f4/En-us-violin.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-violin.ogg",
+    "source_revision": 1097268648,
+    "original_timestamp": "2007-03-09T09:16:59Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "f9007c21610e0767de05d382b6fef180d3188636",
+    "original_sha256": "34eea31fb206fd77486905f50387377f86f7c109a7f8d5df9ea27a5c79a60545",
+    "sha256": "c2d0d11334efd5db2444ca940842f68b9a18f4a2f66b3e5b3dc00a2247e0250f",
+    "gain_db": -4.01,
+    "audio": {
+      "duration_seconds": 1.1505,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -5.96
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -4.01 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-violin.ogg"
+  },
+  "volcano": {
+    "file": "audio/volcano.mp3",
+    "title": "File:En-us-volcano.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/1/1b/En-us-volcano.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-volcano.ogg",
+    "source_revision": 1209850382,
+    "original_timestamp": "2007-03-13T09:34:20Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "f3faf777833383873546f643a3a0da31fedb1de2",
+    "original_sha256": "ae42444bdfcd85057e61245fd2ecb95a53995f7f3f66d38f1b52541a351a75bf",
+    "sha256": "82310bbce9e21e23193d8ffa35aa4141e34b0ca89e44732dcdd7a6fd29ef34b5",
+    "gain_db": -4.62,
+    "audio": {
+      "duration_seconds": 1.2,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -5.26
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -4.62 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-volcano.ogg"
+  },
+  "whale": {
+    "file": "audio/whale.mp3",
+    "title": "File:En-us-whale.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/f/f6/En-us-whale.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-whale.ogg",
+    "source_revision": 981268682,
+    "original_timestamp": "2006-03-10T06:24:22Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "99562d619c4c307d32cdc74eefe446f9080d95a9",
+    "original_sha256": "22af4461de101c69aac65bd9ac6f2fb3bf60aa38aed4465a1bd3630781b01141",
+    "sha256": "b305b01a06bec6ad0a37224d0cb7658c3ca2d1f9441d4cfa5f1b370622f21497",
+    "gain_db": -3.39,
+    "audio": {
+      "duration_seconds": 0.5805,
+      "rms_dbfs": -23.95,
+      "peak_dbfs": -9.0
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.39 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-whale.ogg"
+  },
+  "watermelon": {
+    "file": "audio/watermelon.mp3",
+    "title": "File:En-us-watermelon.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/8/85/En-us-watermelon.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-watermelon.ogg",
+    "source_revision": 1229172118,
+    "original_timestamp": "2005-06-22T23:05:07Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "d891d263bf003dee4d2ffa2b420d3a9ebeb1ef0d",
+    "original_sha256": "6b67a784065a6e2dd502a3582ffc501ff9982ba798b0f02d85b3aad4f7a57177",
+    "sha256": "6638de75353f507ef3c3e0444f4d0447c9535be36002b07c4f9c64c194a91938",
+    "gain_db": -5.54,
+    "audio": {
+      "duration_seconds": 0.685,
+      "rms_dbfs": -24.01,
+      "peak_dbfs": -5.39
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -5.54 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-watermelon.ogg"
+  },
+  "xylophone": {
+    "file": "audio/xylophone.mp3",
+    "title": "File:En-us-xylophone.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/3/37/En-us-xylophone.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-xylophone.ogg",
+    "source_revision": 1229173933,
+    "original_timestamp": "2007-03-07T15:34:31Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "38766e9ec44aec7117f7990c9e319f083aafcc4c",
+    "original_sha256": "d42eb07ddce55155a177b106f7484fda0ee5a2e54ad704980e0e236d4a05426e",
+    "sha256": "c3e8099ecdbf43e7da49b4bcbc1705493b3765258d0fd720ad7cae9379a9a7b0",
+    "gain_db": -3.39,
+    "audio": {
+      "duration_seconds": 1.1505,
+      "rms_dbfs": -24.56,
+      "peak_dbfs": -4.03
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.39 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-xylophone.ogg"
+  },
+  "x-ray": {
+    "file": "audio/x-ray.mp3",
+    "title": "File:En-us-X-ray.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/d/da/En-us-X-ray.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-X-ray.ogg",
+    "source_revision": 1108102127,
+    "original_timestamp": "2007-03-07T15:09:09Z",
+    "author": "Dvortygirl",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "2480db8a1487b4e4d9944ff65c2370194a3690ca",
+    "original_sha256": "b765c90076c9c5a57a74b61e6bce4e653fe03dececa4dd93456a73e2f668aac9",
+    "sha256": "41c1c2cd0fd634353ab3eadeccfd460f3577b44fa4cb7280df0b9e8517a7f4be",
+    "gain_db": -3.7,
+    "audio": {
+      "duration_seconds": 1.1,
+      "rms_dbfs": -24.4,
+      "peak_dbfs": -3.95
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.70 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-X-ray.ogg"
+  },
+  "yo-yo": {
+    "file": "audio/yo-yo.mp3",
+    "title": "File:En-us-yo-yo.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/1/15/En-us-yo-yo.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-yo-yo.ogg",
+    "source_revision": 1229174157,
+    "original_timestamp": "2005-08-28T15:40:09Z",
+    "author": "No machine-readable author provided. Dvortygirl assumed (based on copyright claims).",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "0be87d46e1ccc7d028591262c5578a2099a3a025",
+    "original_sha256": "2cdcf87d27efc597a66a03efbf7e88d6817a07ef9b7795799cba2764c61a9f38",
+    "sha256": "ecf050ae93bae44bfe5d720793311e4575933b231a6e7074dd295b8042d8d2a5",
+    "gain_db": -1.13,
+    "audio": {
+      "duration_seconds": 0.7314,
+      "rms_dbfs": -24.0,
+      "peak_dbfs": -7.73
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -1.13 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-yo-yo.ogg"
+  },
+  "yak": {
+    "file": "audio/yak.mp3",
+    "title": "File:En-au-yak.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/0/05/En-au-yak.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-au-yak.ogg",
+    "source_revision": 1229068907,
+    "original_timestamp": "2019-05-26T07:07:35Z",
+    "author": "Commander Keane",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-AU",
+    "license": {
+      "name": "CC BY-SA 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "original_sha1": "4aafc4585652812b3a347a1233769e04cffc5ef2",
+    "original_sha256": "9b3abb23ad8a4c4d47cbfbc3b1b4a35fb8564e6328cf64c050fe38c3fedcb6e1",
+    "sha256": "835bb35a1026e3366cbafcf163f844bc94c49f69b9a1df38c6504f3e985f9151",
+    "gain_db": 5.72,
+    "audio": {
+      "duration_seconds": 0.8461,
+      "rms_dbfs": -23.99,
+      "peak_dbfs": -5.47
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +5.72 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://en.wiktionary.org/wiki/yak#Pronunciation"
+  },
+  "zebra": {
+    "file": "audio/zebra.mp3",
+    "title": "File:En-us-zebra.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/4/4e/En-us-zebra.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-zebra.ogg",
+    "source_revision": 991676406,
+    "original_timestamp": "2006-05-20T05:14:41Z",
+    "author": "No machine-readable author provided. Dvortygirl assumed (based on copyright claims).",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+    },
+    "original_sha1": "5472d1b0fc0137c3268b375143b51cfb46b72910",
+    "original_sha256": "1d6dba97eeb65c99c63b2a56d3751c0241446b051f7257430611eac552eb03cf",
+    "sha256": "e77218456f283a4ec45b30f7fb611669596db651c8ab3b3989c6b509991a2047",
+    "gain_db": -3.75,
+    "audio": {
+      "duration_seconds": 0.7895,
+      "rms_dbfs": -24.01,
+      "peak_dbfs": -6.96
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain -3.75 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-zebra.ogg"
+  },
+  "zoo": {
+    "file": "audio/zoo.mp3",
+    "title": "File:En-us-zoo.ogg",
+    "original": "https://upload.wikimedia.org/wikipedia/commons/2/2d/En-us-zoo.ogg",
+    "source": "https://commons.wikimedia.org/wiki/File:En-us-zoo.ogg",
+    "source_revision": 1229174443,
+    "original_timestamp": "2011-11-04T20:13:57Z",
+    "author": "No machine-readable author provided. Neoglitch assumed (based on copyright claims).",
+    "author_evidence": "Commons extmetadata.Artist",
+    "accent": "en-US",
+    "license": {
+      "name": "CC BY-SA 3.0",
+      "url": "https://creativecommons.org/licenses/by-sa/3.0"
+    },
+    "original_sha1": "92be0cfa407f06959e4f5a076ff780f2b06cb54c",
+    "original_sha256": "d8bc470a09fe75f88d16272928ad580a3771e85a313e591ecd3f3ee4e4289ef4",
+    "sha256": "37c4ecfe477449b1dd75e52fae77696c2bba52f2db587f13dae6182ab11f34d1",
+    "gain_db": 1.1,
+    "audio": {
+      "duration_seconds": 0.7663,
+      "rms_dbfs": -24.01,
+      "peak_dbfs": -12.09
+    },
+    "retrieved_utc": "2026-10-23",
+    "pronunciation_listened": false,
+    "changes": "Converted to mono MP3, 44.1 kHz; constant gain +1.10 dB. No cuts, pitch or speed changes. Source licensing status retained.",
+    "accent_evidence": "https://commons.wikimedia.org/wiki/File:En-us-zoo.ogg"
   }
 }
