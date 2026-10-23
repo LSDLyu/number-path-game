@@ -217,16 +217,7 @@ if remaining:
 
 source = source.replace("new window.IrisAudio('iris/', \"zh\")", "new window.IrisAudio('iris/', \"en\")").replace('audio/prompts/zh/', 'audio/prompts/en/')
 (ROOT / "index-en.html").write_text(source)
-credits = (ROOT / "audio/credits.html").read_text()
-for chinese, english in {
-    'lang="zh-CN"': 'lang="en"',
-    '单词录音来源': 'Word audio credits',
-    '以下 11 个词使用 Wikimedia Commons 真人录音。录音由 Ogg 转为 MP3，发音内容未改动；各 MP3 沿用表列许可。其余单词使用设备语音。':
-        'Eleven words use human recordings from Wikimedia Commons. The audio was converted from Ogg to MP3 without changing the spoken content. Each MP3 retains the license shown below. Other words use your device’s speech voice.',
-    '当前游戏的 52 个单词使用用户提供的 Iris Bot 音频包。下表保留旧版录音的来源与许可信息，旧录音不再作为默认发音。': 'The game now uses 52 word recordings from the user-provided Iris Bot audio pack. The table below preserves attribution for legacy recordings, which are no longer the default pronunciations.',
-    '单词': 'Word', '录音者': 'Speaker', '来源': 'Source', '许可': 'License',
-    '原始录音': 'Original recording', '返回游戏': 'Back to game',
-}.items():
-    credits = credits.replace(chinese, english)
-(ROOT / "audio/credits-en.html").write_text(credits)
+# Generate both credits pages from the same manifest as gameplay.
+import runpy
+runpy.run_path(str(Path(__file__).with_name("build-word-audio.py")), run_name="__main__")
 print(f"Wrote {ROOT / 'index-en.html'}")

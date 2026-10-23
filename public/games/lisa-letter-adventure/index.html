@@ -1223,7 +1223,21 @@
         choices.sort(function(a,b) { return a.word.localeCompare(b.word); });
         reviewState.tried = false;
         showLearningDialog("review",'<h2 id="dialogTitle">轻松复习 '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'找到大写 '+lesson.char+' 的小写伙伴':'听一听，选择对应的图片')+'</p>'+(matching?'':'<button data-learning="listen">🔊 再听一次</button>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">不扣爱心，慢慢想。</p>');
-        if (!matching) { stopWordAudio(); irisAudio.sequence(["audio/prompts/zh/lisa_picture.mp3", "audio/words/en/"+lesson.word+".mp3"]); }
+        if (!matching) speakReviewWord(lesson, "lisa_picture");
+      }
+      function speakReviewWord(lesson, prompt) {
+        // Cancel an in-flight lesson decode before starting the review queue.
+        speechRunId++;
+        pendingSpeechLesson = null;
+        stopWordAudio();
+        try {
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+        } catch (error) { /* A blocked device voice must not prevent recordings. */ }
+        var path = (window.LISA_WORD_AUDIO || {})[lesson.word];
+        var queue = ["audio/prompts/zh/" + prompt + ".mp3"];
+        // IrisAudio resolves relative to iris/; all word contexts share the map.
+        if (path) queue.push("../" + path);
+        irisAudio.sequence(queue);
       }
       function answerReview(answer) {
         if (reviewState.answered) return;
@@ -1234,7 +1248,7 @@
         learningProgress.words[lesson.word]=record; saveLearning();
         if (answer !== lesson.word) {
           document.getElementById("reviewFeedback").textContent="没关系，再听一次，然后再选一选。不扣爱心。";
-          stopWordAudio(); irisAudio.sequence(["audio/prompts/zh/lisa_retry.mp3", "audio/words/en/"+lesson.word+".mp3"]); return;
+          speakReviewWord(lesson, "lisa_retry"); return;
         }
         reviewState.answered=true;
         document.getElementById("reviewFeedback").textContent=(answer===lesson.word?'答对啦！':'再认识一下：')+' '+lesson.char+' '+lesson.char.toLowerCase()+' · '+lesson.emoji+' '+lesson.word+' · '+lesson.meaning;

@@ -4,13 +4,13 @@ import html
 import json
 import pathlib
 import re
+import runpy
 import subprocess
 import threading
 import urllib.parse
 import urllib.request
 
-SITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
-ROOT = SITE_ROOT / 'dist' if (SITE_ROOT / 'dist').is_dir() else SITE_ROOT.parent / 'public/games/lisa-letter-adventure'
+ROOT = pathlib.Path(__file__).resolve().parents[2] / 'public/games/lisa-letter-adventure'
 WORDS = 'apple ant ball banana cat cake dog duck egg elephant fish frog goat grape hat horse igloo insect jam jelly kite koala lion lemon moon monkey nest nose octopus orange penguin panda queen quilt rabbit robot sun star turtle tiger umbrella unicorn violin volcano whale watermelon xylophone x-ray yo-yo yak zebra zoo'.split()
 CACHE = pathlib.Path('/tmp/lisa-commons')
 CACHE.mkdir(exist_ok=True)
@@ -23,7 +23,8 @@ def fetch(url, path):
     if RATE_LIMITED.is_set():
         return False
     result = subprocess.run(['curl', '-fsSL', '--max-time', '20', '-w', '%{http_code}', '-o', str(path)+'.part', url], capture_output=True, text=True)
-    if result.stdout.strip() == '429':
+    if result.stdout.strip() in ('403', '429') or 'CONNECT tunnel failed' in result.stderr:
+        # A denied destination or rate limit needs configuration/review, not retries.
         RATE_LIMITED.set()
     partial = pathlib.Path(str(path)+'.part')
     if result.returncode == 0 and partial.exists() and partial.stat().st_size > 100:
@@ -36,7 +37,9 @@ def plain(value):
     return html.unescape(re.sub('<[^>]+>', '', value)).strip()
 
 def acquire(word):
-    for prefix in ['En-us-', 'En-uk-', 'En-']:
+    # Match the game's existing en-US teaching voice. Missing words stay pending;
+    # a different accent requires an explicit, reviewed selection.
+    for prefix in ['En-us-']:
         name = prefix + word + '.ogg'
         source = 'https://commons.wikimedia.org/wiki/File:' + urllib.parse.quote(name)
         page = CACHE / (name + '.html')
@@ -75,10 +78,10 @@ if __name__ == '__main__':
     credits_path = ROOT / 'audio/credits.json'
     credits = json.loads(credits_path.read_text()) if credits_path.exists() else {}
     pending = [w for w in WORDS if w not in credits]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
         for word, credit in pool.map(acquire, pending):
             if credit:
                 credits[word] = credit
     credits_path.write_text(json.dumps(credits, ensure_ascii=False, indent=2))
-    (ROOT / 'audio/manifest.js').write_text('window.LISA_WORD_AUDIO = '+json.dumps({w:c['file'] for w,c in credits.items()})+';\n')
+    runpy.run_path(str(pathlib.Path(__file__).with_name('build-word-audio.py')), run_name='__main__')
     print(json.dumps({'recordings':len(credits),'missing':[w for w in WORDS if w not in credits]}), flush=True)

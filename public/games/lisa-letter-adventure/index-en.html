@@ -1219,7 +1219,21 @@
         choices.sort(function(a,b) { return a.word.localeCompare(b.word); });
         reviewState.tried = false;
         showLearningDialog("review",'<h2 id="dialogTitle">Quick review '+(reviewState.index+1)+' / '+reviewState.words.length+'</h2><p>'+(matching?'Find the lowercase partner for '+lesson.char+'':'Listen and choose the matching picture')+'</p>'+(matching?'':'<button data-learning="listen">🔊 Listen again</button>')+'<div class="choices">'+choices.map(function (word) { return '<button data-learning="answer" data-answer="'+word.word+'" aria-label="'+(matching?word.char.toLowerCase():word.meaning)+'">'+(matching?word.char.toLowerCase():(word.art?'<img src="'+word.art+'" alt="'+word.meaning+'" width="88" height="88">':word.emoji))+'</button>'; }).join("")+'</div><p id="reviewFeedback" aria-live="polite">Take your time. No hearts lost.</p>');
-        if (!matching) { stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_picture.mp3", "audio/words/en/"+lesson.word+".mp3"]); }
+        if (!matching) speakReviewWord(lesson, "lisa_picture");
+      }
+      function speakReviewWord(lesson, prompt) {
+        // Cancel an in-flight lesson decode before starting the review queue.
+        speechRunId++;
+        pendingSpeechLesson = null;
+        stopWordAudio();
+        try {
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+        } catch (error) { /* A blocked device voice must not prevent recordings. */ }
+        var path = (window.LISA_WORD_AUDIO || {})[lesson.word];
+        var queue = ["audio/prompts/en/" + prompt + ".mp3"];
+        // IrisAudio resolves relative to iris/; all word contexts share the map.
+        if (path) queue.push("../" + path);
+        irisAudio.sequence(queue);
       }
       function answerReview(answer) {
         if (reviewState.answered) return;
@@ -1230,7 +1244,7 @@
         learningProgress.words[lesson.word]=record; saveLearning();
         if (answer !== lesson.word) {
           document.getElementById("reviewFeedback").textContent="That’s okay. Listen and try again. No hearts lost.";
-          stopWordAudio(); irisAudio.sequence(["audio/prompts/en/lisa_retry.mp3", "audio/words/en/"+lesson.word+".mp3"]); return;
+          speakReviewWord(lesson, "lisa_retry"); return;
         }
         reviewState.answered=true;
         document.getElementById("reviewFeedback").textContent=(answer===lesson.word?'Correct!':'Meet it again:')+' '+lesson.char+' '+lesson.char.toLowerCase()+' · '+lesson.emoji+' '+lesson.word+' · '+lesson.meaning;

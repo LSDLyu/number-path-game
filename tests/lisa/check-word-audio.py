@@ -1,12 +1,12 @@
 """Release gate for Lisa's fixed word recordings and per-file attribution."""
 import json
+import hashlib
 import pathlib
 import re
 import subprocess
 import sys
 
-SITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
-ROOT = SITE_ROOT / "dist" if (SITE_ROOT / "dist").is_dir() else SITE_ROOT.parent / "public/games/lisa-letter-adventure"
+ROOT = pathlib.Path(__file__).resolve().parents[2] / "public/games/lisa-letter-adventure"
 WORDS = set("apple ant ball banana cat cake dog duck egg elephant fish frog goat grape hat horse igloo insect jam jelly kite koala lion lemon moon monkey nest nose octopus orange penguin panda queen quilt rabbit robot sun star turtle tiger umbrella unicorn violin volcano whale watermelon xylophone x-ray yo-yo yak zebra zoo".split())
 
 
@@ -19,18 +19,24 @@ def main():
     credits_path = ROOT / "audio/credits.json"
     credits = json.loads(credits_path.read_text()) if credits_path.exists() else {}
     problems = []
+    pending = []
+    coverage = json.loads((ROOT / 'audio/coverage.json').read_text())
     for word in sorted(WORDS):
-        expected = f"audio/{word}.mp3"
+        expected = f"audio/{word}.mp3" if word in credits else f"iris/audio/words/en/{word}.mp3"
+        if word not in credits:
+            pending.append(word)
         if manifest.get(word) != expected:
             problems.append(f"{word}: manifest entry must be {expected}")
             continue
         attribution = credits.get(word)
-        if not isinstance(attribution, dict) or any(not attribution.get(key) for key in ("original", "license", "source")):
+        if word in credits and (not isinstance(attribution, dict) or any(not attribution.get(key) for key in ("original", "license", "source", "author", "changes"))):
             problems.append(f"{word}: source URL, original audio URL and license are required")
         file = ROOT / expected
         if not file.is_file() or file.stat().st_size < 100:
             problems.append(f"{word}: MP3 missing or empty")
             continue
+        if coverage.get(word, {}).get('file') != expected or coverage.get(word, {}).get('sha256') != hashlib.sha256(file.read_bytes()).hexdigest():
+            problems.append(f"{word}: coverage does not match the actual recording")
         result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=codec_name:format=duration", "-of", "json", str(file)], capture_output=True, text=True)
         try:
             info = json.loads(result.stdout)
@@ -46,7 +52,12 @@ def main():
     if problems:
         print(f"Fixed audio incomplete: {len(problems)} issue(s):", *problems, sep="\n- ")
         return 1
-    print("PASS 52 fixed MP3 pronunciations, audio duration and per-word source/license metadata")
+    print(f"PASS 52 playable MP3 files and checksums; {len(credits)} attributed Commons recordings")
+    if pending:
+        print("PENDING Commons recordings: " + ', '.join(pending))
+        if '--allow-pending' not in sys.argv:
+            print('Release blocked: Wikimedia replacement is not complete. --allow-pending is for draft validation only.')
+            return 1
     return 0
 
 

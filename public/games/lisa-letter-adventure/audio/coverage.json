@@ -1,0 +1,262 @@
+{
+  "apple": {
+    "file": "audio/apple.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "9a87b052e9ac29183430c02a8f1d4171444f8d02bf4c56c32a79ec96f78c0eb0"
+  },
+  "ant": {
+    "file": "audio/ant.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "302a06b9cb36a442efda2e189f4287e4d7a0ae6ea2f18ba74750c4ac0aef04e5"
+  },
+  "ball": {
+    "file": "audio/ball.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "2406d279843927fa2a0502e32d8055dad08ad553e68db3c1e108ee65488fafce"
+  },
+  "banana": {
+    "file": "audio/banana.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "99f40be71c26a899c5461c93cdc4c3d333576ab6a7af61edcff7a8a621c8f413"
+  },
+  "cat": {
+    "file": "audio/cat.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "ade91c2fbab2d80240e62733a61537b0d184d7f8707e7f6f6220783002b06841"
+  },
+  "cake": {
+    "file": "audio/cake.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "619d65aefc4181a1ba9d8d193513d274354a706bd6cde8d6935584330dd861a2"
+  },
+  "dog": {
+    "file": "audio/dog.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "01b4604376d3012a4899e6a67a3bd8a1c3a940429c6eb479fc0298547838a10b"
+  },
+  "duck": {
+    "file": "audio/duck.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "5d9f9b7084f28b86b8d3cbba93cb7b7e8fc039814eb3df0483d8b6dccd7f148d"
+  },
+  "egg": {
+    "file": "audio/egg.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "68b34a7157617dfe7783464754511d60833213280e58376610e1bea44175c6a3"
+  },
+  "elephant": {
+    "file": "iris/audio/words/en/elephant.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "894a91883959417f7cef7d92b099803ecce92a16d5b5dca1483dd0cf14910799"
+  },
+  "fish": {
+    "file": "iris/audio/words/en/fish.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "b56932e345d0b2623b193d76faed839cf19fd8da6c08bce73d9ac6b6904b9c2d"
+  },
+  "frog": {
+    "file": "audio/frog.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "22b26eefbe91063e2844c77118770de0d96d67d51df5df1a2e4da5659f225bd3"
+  },
+  "goat": {
+    "file": "audio/goat.mp3",
+    "source": "Wikimedia Commons",
+    "sha256": "65e809d08651dec7e5bd7490e22a6d925a98390c2cb956c1a992c918ad506331"
+  },
+  "grape": {
+    "file": "iris/audio/words/en/grape.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f53ff3b937a35853652a79cf4d3e25c35b837cca0bfe2a6d2b3a0d2dec976118"
+  },
+  "hat": {
+    "file": "iris/audio/words/en/hat.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "8b01be20da251dc6e6ffecc0372caf25090a618c13bdd14253db9d9391d88a45"
+  },
+  "horse": {
+    "file": "iris/audio/words/en/horse.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f1a97369553bf10592da64f8a19163cb38ccac38fab938436bd7845acf1a3306"
+  },
+  "igloo": {
+    "file": "iris/audio/words/en/igloo.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f679292ac1d852130cd137a4af206b2869f22c03006ed3cbd223bdb2a1426268"
+  },
+  "insect": {
+    "file": "iris/audio/words/en/insect.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "187dd02dc15baf973500325ebff7eaac324cd236e6a2bc2c16273f85ef66e3e8"
+  },
+  "jam": {
+    "file": "iris/audio/words/en/jam.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "fe1f41840d3b8971fc4a88ab9ee0bd3ff17dd614c1cdb3f6e17df88d317d0c8d"
+  },
+  "jelly": {
+    "file": "iris/audio/words/en/jelly.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "e6c7523540f3018174c09926b589d72a72c3194cdfdb022ecb49624dea6fe90e"
+  },
+  "kite": {
+    "file": "iris/audio/words/en/kite.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "01ae22cc2d30233a8581772408d0424fe79db4b064f03e716a68044b21ea609c"
+  },
+  "koala": {
+    "file": "iris/audio/words/en/koala.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "0ee0da72a8a7fa89217150c4a0188e62ed7570f62986f4d3fa73efe61a5d9a3c"
+  },
+  "lion": {
+    "file": "iris/audio/words/en/lion.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "a4c021200190075773f2516a16caa913ff6a1335582f75d1b944c8f8d9e00dd9"
+  },
+  "lemon": {
+    "file": "iris/audio/words/en/lemon.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "21824f3054b614bc7e600b8648178b395018605f2196d5e049bb8b2a076d47fd"
+  },
+  "moon": {
+    "file": "iris/audio/words/en/moon.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "ca1681584f925207bf3b216f3dab7e071bb32e08ebe2e92a39ad0984ee808fc3"
+  },
+  "monkey": {
+    "file": "iris/audio/words/en/monkey.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "fe0a0819585084977523d892dfc497d6e5770c029c4f87609b5778e7bfdaf7ae"
+  },
+  "nest": {
+    "file": "iris/audio/words/en/nest.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "a82ac2f51f3f951d11d701d87660746fe0d308f56fa12a52cd0746d6b6b282b5"
+  },
+  "nose": {
+    "file": "iris/audio/words/en/nose.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f620202a09a2691f2faf426ee6a6fe524b2421e9d6e13edd8537dc05c45eaf08"
+  },
+  "octopus": {
+    "file": "iris/audio/words/en/octopus.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "1256274a0a7776b260c0a22ad4ee60db02b9b9038e91c4559e0ea07733bd1ee5"
+  },
+  "orange": {
+    "file": "iris/audio/words/en/orange.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f2153ca8601118cedb774b22a50d5c64a509885504e3e5a1cae59116f8b506cf"
+  },
+  "penguin": {
+    "file": "iris/audio/words/en/penguin.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "ebd87366353a2ec538b2da169d9c735bd021bcb65e524bb8ba1b7fa917e9c6b4"
+  },
+  "panda": {
+    "file": "iris/audio/words/en/panda.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "8a73b7788a515319dcf9f5a79c94153d2b5c4d5f2d63a72d76c4ef61926f383b"
+  },
+  "queen": {
+    "file": "iris/audio/words/en/queen.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "793cd13f212667586cab52e44a6dc8a13e1f075a2e0131cdd5ad5997faab3afe"
+  },
+  "quilt": {
+    "file": "iris/audio/words/en/quilt.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "1dce72dada6b79629317eec10cdf33ac5502f0cc2c2aa32b4ea07fa535465d6b"
+  },
+  "rabbit": {
+    "file": "iris/audio/words/en/rabbit.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "1e41bccc2093006e9fd4819d39a8912f5911b556c9d55bd0f02cdd7e9822ddec"
+  },
+  "robot": {
+    "file": "iris/audio/words/en/robot.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "e96ad6d83f5054a4089f04ac8b572d5cff358e79e67b7931675f3a66b3ae1ee1"
+  },
+  "sun": {
+    "file": "iris/audio/words/en/sun.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "f173631602903451326effd6ea10efaf964d73f18748cff2c4f0900d97fe9dd9"
+  },
+  "star": {
+    "file": "iris/audio/words/en/star.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "43cd1c63d00ec3502c9ce7d48b965cb0825b8eaee0ec79e9ce36d8c131e6589d"
+  },
+  "turtle": {
+    "file": "iris/audio/words/en/turtle.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "01d22c74a695d6c817206e2f9f11f08e4d89e412c54727a62f47e557aaa381dc"
+  },
+  "tiger": {
+    "file": "iris/audio/words/en/tiger.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "c38bc8ba1ed7e5d962b7e1cf47f5fa8ddce88ede8562feabd87cfe555bcbb129"
+  },
+  "umbrella": {
+    "file": "iris/audio/words/en/umbrella.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "87d911c13e51ee6f7b642c1be9d2206293586827bc1baee38893d83c6ec6f0f9"
+  },
+  "unicorn": {
+    "file": "iris/audio/words/en/unicorn.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "ed41123d7d51f22976d23fb1ba9bf699fb9eae1ccba23d3606a7ce2893d3fe1a"
+  },
+  "violin": {
+    "file": "iris/audio/words/en/violin.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "4624e99c380f0cf8516a30450e4e20e24c740334d9088d89ef6fc4290cf0a7b2"
+  },
+  "volcano": {
+    "file": "iris/audio/words/en/volcano.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "6b30440f58c5cfb3afd00795ebcd4d3cbd9c6ddc4262b2870158cc4304193a17"
+  },
+  "whale": {
+    "file": "iris/audio/words/en/whale.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "23f402d6a45bc2e7ec11b6dc18f3f4af664fae5bb4bbc8a8f909f36f8b043c1e"
+  },
+  "watermelon": {
+    "file": "iris/audio/words/en/watermelon.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "7e3a4296c03ec9543c24a1e3c6a5b661694895cf71eeca6603e9a239467b7eba"
+  },
+  "xylophone": {
+    "file": "iris/audio/words/en/xylophone.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "a29406b18a09d43bc78caab2dc3923dbd16c432ab1129606dc4f900b5b009bd0"
+  },
+  "x-ray": {
+    "file": "iris/audio/words/en/x-ray.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "98707f8bc22d26a83cabebba01e619f3ff8554eb1cb117835b76747ed6d4eca5"
+  },
+  "yo-yo": {
+    "file": "iris/audio/words/en/yo-yo.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "201d2d16de9db2653795c5accd530385886b6cefb3fcdc1f8311fb444b6c9cb9"
+  },
+  "yak": {
+    "file": "iris/audio/words/en/yak.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "91fbe19f42cb13fa7de66a291c75eb6047f65be83818eaccd3972d93dbb04f48"
+  },
+  "zebra": {
+    "file": "iris/audio/words/en/zebra.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "ec33b720fdeedac7a282d979040f1eba31170a8ea6ca5099db18c90ac52b1f39"
+  },
+  "zoo": {
+    "file": "iris/audio/words/en/zoo.mp3",
+    "source": "Iris (synthesized)",
+    "sha256": "14330baf2898dfe445747bb1cba82a97df042ecd72c3ad15be62f419eb8f37ca"
+  }
+}
