@@ -63,3 +63,8 @@ Each board size unlocks independently. Solve cases in order to unlock the next o
 Lisa 的 52 个词已全部接入 Wikimedia Commons 真人录音。以美式为主，igloo 为英式，unicorn、yak 为澳式；学习卡片、复习和中英文来源页明确标注口音。教学与复习共用一份映射，加载失败提示重听，不自动换成设备合成声音。玩法提示保留 Iris。
 
 作者、逐项许可、原始文件校验和及音量调整说明随录音保存，见 [声音检查记录](docs/AUDIO_REVIEW.md)。更新素材后运行 `python3 tests/lisa/build-english.py` 和 `python3 tests/lisa/check-word-audio.py`。本分支尚未合并或发布，真机与主观试听仍待复核。
+
+
+## 统一游戏导航
+
+数学路径与字母冒险（中英文）接入统一页首、页尾。滚动时页首收窄，保留键盘跳转和至少 44 px 的导航点击区。两个 `game-shell.js` 副本来自 edu-site/public/game-shell.js，须保持一致；字母冒险为导航保留屏幕高度，游戏进度与音频逻辑不变。
