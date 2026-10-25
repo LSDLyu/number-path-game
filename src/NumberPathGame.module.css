@@ -21,7 +21,7 @@
 .helpButton { display: flex; align-items: center; gap: 7px; flex-shrink: 0; min-height: 44px; padding: 8px; border: 0; background: none; color: #52665a; font-size: 13px !important; }
 .helpButton span { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; }
 .sizeTabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; margin-bottom: 10px; border: 1px solid var(--game-line); border-radius: 16px; background: #efefe6; }
-.sizeTabs button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 6px; border: 0; border-radius: 11px; background: none; color: #66766c; }
+.sizeTabs button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 6px; border: 0; border-radius: 11px; background: none; color: #4f6257; }
 .sizeTabs button span { font-size: 20px; font-weight: 700; }
 .sizeTabs button small { font-size: 12px; }
 .sizeTabs .activeSize { background: #fffef9; color: var(--game-teal-deep); box-shadow: 0 2px 6px #273c3512; }
@@ -77,12 +77,12 @@
 .pager button { min-height: 44px; padding: 4px; border: 0; background: none; color: #4c6a59; font-size: 12px; }
 .pager button:first-child { text-align: left; }
 .pager button:last-child { text-align: right; }
-.pager span { color: #6f7d71; font-size: 11px; }
-.saveNote { margin: 14px 0 0; color: #768173; font-size: 11px; text-align: center; line-height: 1.5; }
+.pager span { color: #526658; font-size: 11px; }
+.saveNote { margin: 14px 0 0; color: #526658; font-size: 11px; text-align: center; line-height: 1.5; }
 .saveNote[role="status"] { color: #904721; }
 .focused .boardPanel { border-color: #799d80; box-shadow: 0 8px 30px #274b3522; }
 .hero, .lede, .sizeTabs, .saveNote { transition: opacity 180ms ease; }
-.focused :is(.hero, .lede, .sizeTabs, .saveNote) { opacity: .7; }
+.focused :is(.hero, .lede, .sizeTabs, .saveNote) { opacity: 1; }
 .focused :is(.hero, .sizeTabs):is(:hover, :focus-within) { opacity: 1; }
 .deadEnd { border-color: #a9532c; }
 .deadEnd .lastCell::after { border-color: #a9532c; }

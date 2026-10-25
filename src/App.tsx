@@ -39,6 +39,8 @@ const appCopy = {
 function initialLocale(): Locale {
   const requested = new URLSearchParams(window.location.search).get("lang");
   if (requested === "zh" || requested === "en") return requested;
+  if (/^\/en\/games\/number-path(?:\/|$)/.test(window.location.pathname)) return "en";
+  if (/^\/games\/number-path(?:\/|$)/.test(window.location.pathname)) return "zh";
   return window.navigator.language.toLowerCase().startsWith("en") ? "en" : "zh";
 }
 
@@ -78,7 +80,7 @@ export function App() {
           </a>
         </nav>
       </header>
-      <main><NumberPathGame key={locale} locale={locale} /></main>
+      <main id="zide-game-content"><NumberPathGame key={locale} locale={locale} /></main>
       <footer className="site-footer">
         <div>
           <strong>{copy.brand}</strong>

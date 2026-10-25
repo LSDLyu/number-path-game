@@ -28,12 +28,16 @@ for (const [file, lang] of [['index.html', 'zh'], ['index-en.html', 'en']]) {
       if (!context.audioCache[word]) context.audioCache[word] = Promise.resolve(new ArrayBuffer(8));
       return context.audioCache[word];
     };
-    vm.createContext(context); vm.runInContext(helper, context);
+    vm.createContext(context); vm.runInContext(readFileSync(new URL('iris-audio.js', root), 'utf8'), context); vm.runInContext(helper, context);
     context.speakLesson({ word: 'apple' });
     for (let i = 0; i < 12; i++) await Promise.resolve();
     assert.equal(starts, 0); assert.equal(speech, 0);
     assert.equal(messages.length, 1);
     assert.equal(context.audioCache.apple, undefined);
+    context.window.ZideAudio={allows:()=>false};
+    context.speakLesson({word:'apple'});
+    assert.equal(requests,1);
+    context.window.ZideAudio={allows:()=>true};
     context.speakLesson({ word: 'apple' });
     for (let i = 0; i < 12; i++) await Promise.resolve();
     assert.equal(requests, 2); assert.equal(starts, 1); assert.equal(speech, 0);
@@ -42,7 +46,7 @@ for (const [file, lang] of [['index.html', 'zh'], ['index-en.html', 'en']]) {
     const html = readFileSync(new URL(file, root), 'utf8');
     const helper = html.slice(html.indexOf('      function wordAccentLabel('), html.indexOf('      function speakReviewWord('));
     const context = { window: manifest };
-    vm.createContext(context); vm.runInContext(helper, context);
+    vm.createContext(context); vm.runInContext(readFileSync(new URL('iris-audio.js', root), 'utf8'), context); vm.runInContext(helper, context);
     assert.equal(Object.keys(manifest.LISA_WORD_ACCENTS).length, 52);
     assert.match(context.wordAccentLabel('igloo'), lang === 'zh' ? /英式/ : /British/);
     for (const word of ['unicorn', 'yak']) assert.match(context.wordAccentLabel(word), lang === 'zh' ? /澳式/ : /Australian/);
