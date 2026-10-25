@@ -1,3 +1,4 @@
+function lisaSiteAudioAllowed(kind) { if(window.ZideAudio)return window.ZideAudio.allows(kind);try{var prefs=JSON.parse(localStorage.getItem('zide-audio-preferences-v1')||'{}');return prefs.muted!==true&&prefs[kind]!==false}catch{return true} }
 /** Iris recordings: one narration channel, bounded effects, no autoplay on load. */
 window.IrisAudio = class IrisAudio {
     base;
@@ -23,7 +24,7 @@ window.IrisAudio = class IrisAudio {
     prompt(name, cooldown = 0) { this.say(`audio/prompts/${this.locale}/${name}.mp3`, cooldown); }
     say(path, cooldown = 0) { this.sequence([path], cooldown); }
     sequence(paths, cooldown = 0) {
-        if (!this.enabled || typeof Audio === 'undefined' || !paths.length)
+        if (!this.enabled || !lisaSiteAudioAllowed('voice') || typeof Audio === 'undefined' || !paths.length)
             return;
         const now = Date.now();
         if (now - (this.last.get(paths[0]) ?? -Infinity) < cooldown)
@@ -32,7 +33,7 @@ window.IrisAudio = class IrisAudio {
         this.voice?.pause();
         const generation = ++this.generation;
         const next = (index) => {
-            if (!this.enabled || generation !== this.generation || index >= paths.length)
+            if (!this.enabled || !lisaSiteAudioAllowed('voice') || generation !== this.generation || index >= paths.length)
                 return;
             const audio = new Audio(this.base + paths[index]);
             this.voice = audio;
@@ -46,7 +47,7 @@ window.IrisAudio = class IrisAudio {
         next(0);
     }
     effect(name, cooldown = 150) {
-        if (!this.enabled || typeof Audio === 'undefined')
+        if (!this.enabled || !lisaSiteAudioAllowed('effects') || typeof Audio === 'undefined')
             return;
         const now = Date.now();
         if (now - (this.last.get(name) ?? -Infinity) < cooldown || this.effects.size >= 3)

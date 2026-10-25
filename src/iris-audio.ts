@@ -1,3 +1,4 @@
+import { allowsAudio } from './site-audio.mjs';
 /** Iris recordings: one narration channel, bounded effects, no autoplay on load. */
 export class IrisAudio {
   private voice: HTMLAudioElement | null = null;
@@ -15,14 +16,14 @@ export class IrisAudio {
   prompt(name: string, cooldown = 0) { this.say(`audio/prompts/${this.locale}/${name}.mp3`, cooldown); }
   say(path: string, cooldown = 0) { this.sequence([path], cooldown); }
   sequence(paths: string[], cooldown = 0) {
-    if (!this.enabled || typeof Audio === 'undefined' || !paths.length) return;
+    if (!this.enabled || !allowsAudio('voice') || typeof Audio === 'undefined' || !paths.length) return;
     const now = Date.now();
     if (now - (this.last.get(paths[0]) ?? -Infinity) < cooldown) return;
     this.last.set(paths[0], now);
     this.voice?.pause();
     const generation = ++this.generation;
     const next = (index: number) => {
-      if (!this.enabled || generation !== this.generation || index >= paths.length) return;
+      if (!this.enabled || !allowsAudio('voice') || generation !== this.generation || index >= paths.length) return;
       const audio = new Audio(this.base + paths[index]);
       this.voice = audio;
       audio.onended = () => { if (this.voice === audio) this.voice = null; next(index + 1); };
@@ -32,7 +33,7 @@ export class IrisAudio {
     next(0);
   }
   effect(name: string, cooldown = 150) {
-    if (!this.enabled || typeof Audio === 'undefined') return;
+    if (!this.enabled || !allowsAudio('effects') || typeof Audio === 'undefined') return;
     const now = Date.now();
     if (now - (this.last.get(name) ?? -Infinity) < cooldown || this.effects.size >= 3) return;
     this.last.set(name, now);

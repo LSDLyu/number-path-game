@@ -1,3 +1,4 @@
+import { subscribeAudio } from './site-audio.mjs';
 "use client";
 
 import {
@@ -343,8 +344,9 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const audio = useMemo(() => new IrisAudio(`${location.pathname.replace(/\/index\.html$/, '/').replace(/\/?$/, '/')}iris/`, locale), [locale]);
   useEffect(() => {
     const hide = () => { if (document.hidden) audio.stop(); };
+    const unsubscribe = subscribeAudio(() => audio.stop());
     document.addEventListener('visibilitychange', hide);
-    return () => { audio.stop(); document.removeEventListener('visibilitychange', hide); };
+    return () => { unsubscribe(); audio.stop(); document.removeEventListener('visibilitychange', hide); };
   }, [audio]);
   const [size, setSize] = useState<Size>(3);
   const [puzzleIndex, setPuzzleIndex] = useState(0);

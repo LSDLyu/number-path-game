@@ -15,7 +15,7 @@
       --ink: #173a5a;
       --paper: #fffaf0;
       --sky: #74c8f4;
-      --coral: #ff665c;
+      --coral: #b73932;
       --yellow: #ffd84f;
       --blue: #4b9fe6;
       --mint: #62c69f;
@@ -1333,6 +1333,7 @@
       }
 
       var irisAudio = new window.IrisAudio('iris/', "en");
+      window.addEventListener('zide-audio-change', function () { irisAudio.stop(); speechRunId++; stopWordAudio(); pendingSpeechLesson=null; if(window.speechSynthesis)window.speechSynthesis.cancel(); if (!lisaSiteAudioAllowed('effects')) audioContext?.suspend().catch(function(){}); });
       document.addEventListener('visibilitychange', function () { if (document.hidden) { irisAudio.stop(); speechRunId++; stopWordAudio(); if (window.speechSynthesis) window.speechSynthesis.cancel(); } });
 
       function primeSpeechSynthesis() { /* Recordings are unlocked by the player's gesture. */ }
@@ -1382,7 +1383,7 @@
       }
 
       function runWhenAudioReady(callback) {
-        if (!soundEnabled) return;
+        if (!soundEnabled || !lisaSiteAudioAllowed('effects')) return;
         var ready = initAudio();
         function safelyPlay() {
           try { callback(audioContext); } catch (error) { /* Audio must not stop a game frame. */ }
@@ -1392,7 +1393,7 @@
           return;
         }
         ready.then(function (isReady) {
-          if (isReady && soundEnabled && audioContext) safelyPlay();
+          if (isReady && soundEnabled && lisaSiteAudioAllowed('effects') && audioContext) safelyPlay();
         });
       }
 
@@ -1463,7 +1464,7 @@
 
       function speakLesson(lesson) {
         irisAudio.stop();
-        if (!soundEnabled) return;
+        if (!soundEnabled || !lisaSiteAudioAllowed('voice')) return;
         initAudio();
         var synth = window.speechSynthesis;
         stopWordAudio();
@@ -1500,7 +1501,7 @@
           if (!bytes) throw new Error("recording unavailable");
           return audioContext.decodeAudioData(bytes.slice(0));
         }).then(function (buffer) {
-          if (settled || runId !== speechRunId || !soundEnabled) return;
+          if (settled || runId !== speechRunId || !soundEnabled || !lisaSiteAudioAllowed('voice')) return;
           if (audioContext.state !== "running") { fallback(); return; }
           var source = audioContext.createBufferSource();
           source.buffer = buffer;

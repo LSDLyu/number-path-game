@@ -4,9 +4,13 @@
   window.__zideGameShell = true;
   const names = ['number-path', 'lisa-letter-adventure', 'typewriter', 'number-merge', 'lisa-wonder-house', 'huarong', 'shotgun', 'rourou'];
   const script = document.currentScript;
+  let audio;
+  import(new URL('site-audio.mjs', script?.src || new URL('/game-shell.js', location.href)).href).then(module => {
+    audio = module; module.subscribeAudio(updateAudio); updateAudio();
+  }).catch(() => { /* Individual game audio controls remain available. */ });
   const style = `
     :host{display:block;color:#243d34;font:15px/1.5 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;text-align:left}
-    *{box-sizing:border-box}a{color:inherit;text-decoration:none}a:focus-visible{outline:3px solid #b74c24;outline-offset:3px;border-radius:6px}
+    *{box-sizing:border-box}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;cursor:pointer}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b74c24;outline-offset:3px;border-radius:6px}
     .bar{background:#f7f1e6f7;border-bottom:1px solid #234b3c26;backdrop-filter:blur(14px)}
     .inner{max-width:1240px;margin:auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:var(--zgs-header-height,80px);transition:min-height .2s ease}
     .brand{display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:44px}.mark{display:grid;place-items:center;width:42px;height:42px;border:2px solid #234b3c;border-radius:47% 53% 50% 50%;background:#f1d77a;font:24px Georgia,serif;transform:rotate(-5deg)}
@@ -17,6 +21,9 @@
     .footer{border-top:1px solid #234b3c26;background:#f0e9dc;margin-top:0}.foot-inner{max-width:1240px;margin:auto;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:24px}.footer strong{font-size:19px}.footer p{margin:6px 0;color:#4d645b;font-size:13px}.footer small{font-size:11px;color:#4d645b}.footer nav{flex-wrap:wrap;gap:8px 20px}.footer nav a{font-size:13px}
     @media(max-width:600px){.inner{padding:0 16px;gap:10px}.brand{gap:7px}.mark{width:34px;height:34px;font-size:21px}strong{font-size:19px}.latin{font-size:8px}nav{gap:10px}nav a{font-size:12px}.language{padding:0 12px}.home{display:none}.foot-inner{padding:24px 18px;align-items:start;flex-direction:column;gap:12px}.footer nav{gap:8px 24px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+    .audio-toggle{min-width:44px;min-height:44px;border:1px solid #234b3c55;border-radius:50%;background:#fffaf0;font-size:18px}.audio-settings{border:0;background:transparent;min-height:44px;font-weight:650;font-size:13px}
+    dialog{color:#243d34;background:#fffaf0;border:2px solid #234b3c;border-radius:18px;padding:24px;width:min(420px,calc(100vw - 32px));max-height:85svh;overflow:auto}dialog::backdrop{background:#162c2766}dialog h2{margin:0 0 12px;font-size:23px}dialog p{font-size:14px;line-height:1.6}dialog label{display:flex;align-items:center;gap:12px;min-height:48px}dialog input{width:22px;height:22px;accent-color:#17685f}dialog button{min-height:44px;padding:8px 18px;border:1px solid #234b3c;border-radius:12px;background:#f1d77a}.audio-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}button:disabled{opacity:.6;cursor:default}
+    @media(max-width:400px){.inner{padding:0 10px;gap:8px}.mark{width:28px;height:28px;font-size:18px}strong{font-size:17px}.latin{font-size:7px}nav{gap:6px}nav a{font-size:11px}.language{padding:0 9px}.audio-toggle{min-width:44px}}
   `;
   let header, footer, lastLocale, frame = 0;
   const locale = () => new URLSearchParams(location.search).get('lang') === 'en' || location.pathname.startsWith('/en/') || document.documentElement.lang.startsWith('en') ? 'en' : 'zh';
@@ -31,6 +38,7 @@
     const origin = onSite ? '' : 'https://edu.alading.org';
     const base = en ? '/en' : '';
     let alternate = origin + (en ? '' : '/en') + '/games/' + (game === 'directory' ? '' : game + '/');
+    if (onSite && game === 'number-path') alternate += '?lang=' + (en ? 'zh' : 'en');
     if (!onSite) {
       const url = new URL(location.href);
       if (game === 'lisa-letter-adventure') url.pathname = url.pathname.replace(/(?:index(?:-en)?\.html)?$/, en ? 'index.html' : 'index-en.html');
@@ -46,13 +54,51 @@
     if (lastLocale === language && header?.shadowRoot.childElementCount) return;
     lastLocale = language;
     const en = language === 'en', href = links(en, game), brand = en ? 'Zide Learning' : '自得学园';
-    header.shadowRoot.innerHTML = `<style>${style}</style><header class="bar"><a class="skip" href="#zide-game-content">${en ? 'Skip to game' : '跳到游戏'}</a><div class="inner"><a class="brand" href="${href.home}" aria-label="${en ? 'Zide Learning home' : '自得学园首页'}"><span class="mark" aria-hidden="true">学</span><span><strong>${brand}</strong><span class="latin">${en ? '自驱成长，自得其乐' : 'ZIDE LEARNING'}</span></span></a><nav aria-label="${en ? 'Site navigation' : '网站导航'}"><a class="home" href="${href.home}">${en ? 'Home' : '首页'}</a><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a class="language" href="${escape(href.alternate)}" lang="${en ? 'zh-CN' : 'en'}" aria-label="${en ? '切换到中文' : 'Switch to English'}">${en ? '中文' : 'English'}</a></nav></div></header>`;
-    footer.shadowRoot.innerHTML = `<style>${style}</style><footer class="footer"><div class="foot-inner"><div><strong>${brand}</strong><p>${en ? 'Self-driven growth, joyfully discovered.' : '自驱成长，自得其乐'}</p><small>${en ? 'ChatGPT collaboration · human review' : 'ChatGPT 协力 · 人工复核'}</small></div><nav aria-label="${en ? 'Footer links' : '页尾链接'}"><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a href="${href.apply}">${en ? 'Request a sample' : '申请试读'}</a><a href="https://alading.org/">${en ? 'Back to alading.org' : '返回 alading.org'} ↗</a></nav></div></footer>`;
+    header.shadowRoot.innerHTML = `<style>${style}</style><header class="bar"><a class="skip" href="#zide-game-content">${en ? 'Skip to game' : '跳到游戏'}</a><div class="inner"><a class="brand" href="${href.home}" aria-label="${en ? 'Zide Learning home' : '自得学园首页'}"><span class="mark" aria-hidden="true">学</span><span><strong>${brand}</strong><span class="latin">${en ? '自驱成长，自得其乐' : 'ZIDE LEARNING'}</span></span></a><nav aria-label="${en ? 'Site navigation' : '网站导航'}"><a class="home" href="${href.home}">${en ? 'Home' : '首页'}</a><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a class="language" href="${escape(href.alternate)}" lang="${en ? 'zh-CN' : 'en'}" aria-label="${en ? '切换到中文' : 'Switch to English'}">${en ? '中文' : 'English'}</a><button class="audio-toggle" type="button" disabled aria-label="${en ? 'Mute all games' : '所有游戏静音'}">♫</button></nav></div></header>`;
+    footer.shadowRoot.innerHTML = `<style>${style}</style><footer class="footer"><div class="foot-inner"><div><strong>${brand}</strong><p>${en ? 'Self-driven growth, joyfully discovered.' : '自驱成长，自得其乐'}</p><small>${en ? 'ChatGPT collaboration · human review' : 'ChatGPT 协力 · 人工复核'}</small></div><nav aria-label="${en ? 'Footer links' : '页尾链接'}"><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a href="${href.apply}">${en ? 'Request a sample' : '申请试读'}</a><a href="https://alading.org/">${en ? 'Back to alading.org' : '返回 alading.org'} ↗</a><button class="audio-settings" type="button">${en ? 'Sound settings' : '声音设置'}</button></nav></div></footer><dialog aria-labelledby="sound-title"><h2 id="sound-title">${en ? 'Sounds for every game' : '一起调好声音'}</h2><p>${en ? 'Shared on this browser. Each game keeps its own sound switches, too.' : '在这个浏览器里，所有游戏一起记住。每款游戏也保留自己的声音开关。'}</p>${[['muted',en?'Mute all games':'所有游戏静音'],['music',en?'Music':'音乐'],['effects',en?'Sound effects':'音效'],['voice',en?'Words and spoken hints':'单词发音与语音提示']].map(([key,label])=>`<label><input type="checkbox" disabled data-audio="${key}">${label}</label>`).join('')}<div class="audio-actions"><button class="try-sound" type="button">${en ? 'Try a chime' : '试听一声铃'}</button><button class="close-sound" type="button">${en ? 'Done' : '调好了'}</button></div></dialog>`;
+    header.shadowRoot.querySelector('.audio-toggle').addEventListener('click', () => audio?.setAudioPreferences({muted: !audio.readAudioPreferences().muted}));
+    const dialog = footer.shadowRoot.querySelector('dialog');
+    footer.shadowRoot.querySelector('.audio-settings').addEventListener('click', () => { updateAudio(); dialog.showModal(); });
+    footer.shadowRoot.querySelector('.close-sound').addEventListener('click', () => dialog.close());
+    dialog.querySelectorAll('[data-audio]').forEach(input => input.addEventListener('change', () => audio?.setAudioPreferences({[input.dataset.audio]:input.checked})));
+    dialog.querySelector('.try-sound').addEventListener('click', () => {
+      if (!audio?.allowsAudio('effects')) return;
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      const context = new Context();
+      context.resume().then(() => {
+        if (!audio.allowsAudio('effects')) { context.close(); return; }
+        const oscillator = context.createOscillator(), gain = context.createGain(), now = context.currentTime;
+        oscillator.frequency.value = 660; gain.gain.setValueAtTime(.04,now); gain.gain.exponentialRampToValueAtTime(.001,now+.22);
+        oscillator.connect(gain).connect(context.destination); oscillator.start(); oscillator.stop(now+.24); oscillator.onended=()=>context.close();
+      }).catch(()=>context.close());
+    });
+    const mainTarget=document.querySelector('main');
+    if(mainTarget){if(!mainTarget.id)mainTarget.id='zide-game-content';header.shadowRoot.querySelector('.skip').setAttribute('href','#'+mainTarget.id);}
+    updateAudio();
     header.shadowRoot.querySelector('.skip').addEventListener('click', event => {
       event.preventDefault();
       const main = document.querySelector('main');
-      if (main) { if (!main.hasAttribute('tabindex')) main.tabIndex = -1; main.focus({preventScroll:true}); main.scrollIntoView({block:'start'}); }
+      if (main) { if (!main.id) main.id='zide-game-content'; if (!main.hasAttribute('tabindex')) main.tabIndex = -1; main.focus({preventScroll:true}); main.scrollIntoView({block:'start'}); }
     });
+  }
+  function updateAudio() {
+    if (!audio || !header?.shadowRoot || !footer?.shadowRoot) return;
+    const prefs = audio.readAudioPreferences(), en = locale() === 'en', button = header.shadowRoot.querySelector('.audio-toggle');
+    if (button) { button.disabled=false; button.textContent=prefs.muted?'🔇':'♫'; button.setAttribute('aria-pressed',String(prefs.muted)); button.setAttribute('aria-label',en?(prefs.muted?'Unmute all games':'Mute all games'):(prefs.muted?'取消所有游戏静音':'所有游戏静音')); }
+    footer.shadowRoot.querySelectorAll('[data-audio]').forEach(input => { input.checked=prefs[input.dataset.audio]; input.disabled=false; });
+    const preview=footer.shadowRoot.querySelector('.try-sound'); if(preview)preview.disabled=!audio.allowsAudio('effects');
+    // The vendored motion lab keeps its own implementation. Use its existing
+    // change handler to silence it, without altering upstream source or choices.
+    if (gameName()==='shotgun') {
+      const control=document.querySelector('#sound');
+      if(control){
+        if(!control.dataset.zideAudio){ control.dataset.zideAudio='ready'; control.dataset.wanted=String(control.checked); control.addEventListener('change',()=>{if(!control.disabled)control.dataset.wanted=String(control.checked);}); }
+        const blocked=!audio.allowsAudio('effects');
+        if(blocked&&!control.disabled){control.dataset.wanted=String(control.checked);control.disabled=true;control.checked=false;control.dispatchEvent(new Event('change'));}
+        else if(!blocked&&control.disabled){control.disabled=false;control.checked=control.dataset.wanted==='true';control.dispatchEvent(new Event('change'));}
+      }
+    }
   }
   function scroll() {
     if (frame) return;
@@ -69,7 +115,7 @@
     if (!game || !document.body) return;
     if (!document.getElementById('zgs-style')) {
       const css = document.createElement('style'); css.id = 'zgs-style';
-      css.textContent = `html.zgs-ui{--zgs-header-height:80px;scroll-padding-top:68px}html.zgs-ui.zgs-compact{--zgs-header-height:52px}#zgs-header{display:block;width:100%;position:sticky;top:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:#f7f1e6}#zgs-footer{display:block;width:100%;clear:both;padding-bottom:env(safe-area-inset-bottom,0px);background:#f0e9dc}.zgs-ui .site-header,.zgs-ui .site-footer,.zgs-ui .z-header,.zgs-ui .z-footer{display:none!important}.zgs-ui[data-zgs-game="shotgun"] #lab>.header{display:none!important}.zgs-ui[data-zgs-game="directory"] .header,.zgs-ui[data-zgs-game="directory"] body>footer{display:none!important}.zgs-ui[data-zgs-game="lisa-wonder-house"] .bottom-line{display:none!important}html.zgs-ui[data-zgs-game="lisa-letter-adventure"],.zgs-ui[data-zgs-game="lisa-letter-adventure"] body{height:auto;min-height:100%;overflow:visible;overscroll-behavior-y:auto;touch-action:pan-y;background:#f7f1e6}.zgs-ui[data-zgs-game="lisa-letter-adventure"] body{display:block;place-items:normal}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .game-shell{margin:0 auto;width:min(100vw,calc((100svh - var(--zgs-header-height)) * 16 / 9));height:min(calc(100svh - var(--zgs-header-height)),calc(100vw * 9 / 16));touch-action:none;overflow:clip}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .panel{max-height:calc(100svh - var(--zgs-header-height) - 24px);overflow:auto;overscroll-behavior:contain}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .overlay{padding:12px}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .letter-card.show{max-height:calc(100svh - var(--zgs-header-height) - 24px)}@media(max-width:600px){html.zgs-ui{--zgs-header-height:72px}html.zgs-ui.zgs-compact{--zgs-header-height:52px}}@media(orientation:portrait) and (max-width:820px){.zgs-ui[data-zgs-game="lisa-letter-adventure"] .game-shell{width:100%;height:calc(100svh - var(--zgs-header-height));min-height:500px;max-height:none}}`;
+      css.textContent = `html.zgs-ui{--zgs-header-height:80px;scroll-padding-top:68px}html.zgs-ui.zgs-compact{--zgs-header-height:52px}#zgs-header{display:block;width:100%;position:sticky;top:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:#f7f1e6}#zgs-footer{display:block;width:100%;clear:both;padding-bottom:env(safe-area-inset-bottom,0px);background:#f0e9dc}.zgs-ui .site-header,.zgs-ui .site-footer,.zgs-ui .z-header,.zgs-ui .z-footer{display:none!important}.zgs-ui[data-zgs-game="shotgun"] #lab>.header{display:none!important}.zgs-ui[data-zgs-game="directory"] .header,.zgs-ui[data-zgs-game="directory"] body>footer{display:none!important}.zgs-ui[data-zgs-game="lisa-wonder-house"] .bottom-line,.zgs-ui[data-zgs-game="lisa-wonder-house"] #languageLink{display:none!important}.zgs-ui .z-skip,.zgs-ui body>.skip-link,.zgs-ui[data-zgs-game="directory"] body>.skip{display:none!important}html.zgs-ui[data-zgs-game="lisa-letter-adventure"],.zgs-ui[data-zgs-game="lisa-letter-adventure"] body{height:auto;min-height:100%;overflow:visible;overscroll-behavior-y:auto;touch-action:pan-y;background:#f7f1e6}.zgs-ui[data-zgs-game="lisa-letter-adventure"] body{display:block;place-items:normal}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .game-shell{margin:0 auto;width:min(100vw,calc((100svh - var(--zgs-header-height)) * 16 / 9));height:min(calc(100svh - var(--zgs-header-height)),calc(100vw * 9 / 16));touch-action:none;overflow:clip}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .panel{max-height:calc(100svh - var(--zgs-header-height) - 24px);overflow:auto;overscroll-behavior:contain}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .overlay{padding:12px}.zgs-ui[data-zgs-game="lisa-letter-adventure"] .letter-card.show{max-height:calc(100svh - var(--zgs-header-height) - 24px)}@media(max-width:600px){html.zgs-ui{--zgs-header-height:72px}html.zgs-ui.zgs-compact{--zgs-header-height:52px}}@media(orientation:portrait) and (max-width:820px){.zgs-ui[data-zgs-game="lisa-letter-adventure"] .game-shell{width:100%;height:calc(100svh - var(--zgs-header-height));min-height:500px;max-height:none}}`;
       document.head.append(css);
     }
     if (!header?.isConnected) {
@@ -80,6 +126,7 @@
     document.documentElement.classList.add('zgs-ui');
     document.documentElement.dataset.zgsGame = game;
     render(game); scroll();
+    if (game !== 'directory') { try { localStorage.setItem('zide-last-game-v1',JSON.stringify({game,locale:locale()})); } catch { /* Optional history. */ } }
   }
   document.addEventListener('zide-game-shell:mount', mount);
   document.addEventListener('zide-game-shell:unmount', () => {
