@@ -176,7 +176,7 @@ describe("focused play experience", () => {
     fireEvent.click(screen.getByRole("button", { name: "给我一条线索" }));
     await act(() => vi.advanceTimersByTimeAsync(1500));
     expect(terminate).toHaveBeenCalledOnce();
-    expect(screen.getByText(/暂时还没找到可靠的下一步/)).toBeTruthy();
+    expect(screen.getByText(/暂时还没找到可行的下一步/)).toBeTruthy();
     expect(screen.queryByText(/这条路线无法走满棋盘/)).toBeNull();
     expect((screen.getByRole("button", { name: "给我一条线索" }) as HTMLButtonElement).disabled).toBe(false);
   });

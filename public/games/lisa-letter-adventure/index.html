@@ -596,7 +596,7 @@
     @media(max-height:500px) { .learning-dialog { padding:14px; } .letter-card.show { padding:12px; } .demo-motion { font-size:30px; padding:4px; } }
       img.hero-sprite:not([data-loaded]){visibility:hidden}.hero-placeholder{font-size:clamp(40px,7vw,80px);line-height:1;pointer-events:none}.hero-placeholder[hidden],.art-status[hidden]{display:none}.art-status{position:fixed;z-index:45;top:calc(var(--zgs-header-height,0px) + 64px);left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);margin:0;padding:10px;background:#fff7dc;color:#473360;border-radius:12px;font:16px/1.5 system-ui}.art-status button{min-height:44px;padding:8px 14px;margin-left:8px;border:1px solid #73539c;border-radius:8px;background:#fff;color:#473360;font:inherit}
   </style>
-<script src="game-shell.js?v=20261026" data-zide-game="lisa-letter-adventure" defer></script>
+<script src="game-shell.js?v=20261026-copy" data-zide-game="lisa-letter-adventure" defer></script>
 </head>
 <body>
   <main class="game-shell" id="gameShell" aria-label="Lisa的字母冒险游戏">
@@ -620,7 +620,7 @@
 
     <div class="level-pill" id="levelPill">第一关 · 字母森林 · A–E</div>
     <div class="coach" id="coach" aria-live="polite"></div>
-    <div class="letter-card" id="letterCard" role="dialog" aria-modal="true" aria-label="安全学习时刻" aria-live="polite" inert>
+    <div class="letter-card" id="letterCard" role="dialog" aria-modal="true" aria-label="停下来学个单词" aria-live="polite" inert>
       <strong class="letter-big" id="letterBig">A</strong>
       <div class="letter-copy">
         <span class="letter-word" id="letterWord">apple</span>
@@ -675,7 +675,7 @@
     </nav>
   </main>
 
-  <aside id="artStatus" class="art-status" role="status" hidden>图片还没到齐，可以稍等一下，或再试一次。<button id="retryArt" type="button">重试图片</button></aside>
+  <aside id="artStatus" class="art-status" role="status" hidden>有些图片还没加载出来，可以稍等一下，或再试一次。<button id="retryArt" type="button">重试图片</button></aside>
   <script src="audio/manifest.js"></script>
   <script src="audio/accents.js"></script>
   <script src="iris-audio.js"></script>
@@ -1187,7 +1187,7 @@
         if (learningMode === "lesson") return;
         saveLearning();
         var choices = LEVELS.map(function (level,index) { return '<button data-learning="level" data-level="'+(index+1)+'" '+(index+1>learningProgress.unlocked?'disabled':'')+'>'+(index+1)+'. '+level.name+(learningProgress.completed[index+1]?' ✓':'')+'</button>'; }).join("");
-        showLearningDialog(kind, '<h2 id="dialogTitle">'+(kind==="defeat"?'歇一歇，再出发':'冒险菜单')+'</h2><p>'+(kind==="defeat"?'找到的字母已经留下了。补满爱心，从安全点继续吧！':'进度自动保存在这台设备，已解锁的关卡可以重玩。')+'</p>'+
+        showLearningDialog(kind, '<h2 id="dialogTitle">'+(kind==="defeat"?'歇一歇，再出发':'冒险菜单')+'</h2><p>'+(kind==="defeat"?'找到的字母都保留着。补满爱心，从安全点继续吧！':'进度自动保存在这台设备，已解锁的关卡可以重玩。')+'</p>'+
           (kind==="defeat"?'<button class="primary" data-learning="retry">补满爱心，继续本关</button>':'<button class="primary" data-learning="resume">'+(started?'继续冒险':'返回开始画面')+'</button>')+
           '<button data-learning="restart">重新开始本关</button><button data-learning="tutorial">玩法演示</button><button data-learning="records">学习记录 · 家长查看</button><details><summary>选关</summary>'+choices+'</details><p><a href="https://edu.alading.org/games/">← 游戏大厅</a> · <a href="audio/credits.html">录音来源</a></p>');
       }
@@ -1203,7 +1203,7 @@
           var record = learningProgress.words[word.word];
           return '<div class="record-row"><strong>'+word.char+' '+word.word+'</strong> · '+word.meaning+' · 收集 '+record.seen+' 次 · '+(record.attempts?'首次答对 '+record.correct+'/'+record.attempts+(record.correct<record.attempts?' · 建议再练':' · 可继续复习'):'尚未复习')+'</div>';
         }).join("");
-        showLearningDialog("records",'<h2 id="dialogTitle">学习记录</h2><p>已收集 '+words.length+' / 52 个词，复习过 '+practiced+' 个。收集表示遇见过，不代表已经掌握。</p><p>孩子不扣爱心地练习；家长可关注反复答错的词。记录仅在本设备保存。</p>'+(rows||'<p>开始冒险后，这里会出现单词记录。</p>')+'<button data-learning="menu">返回菜单</button>');
+        showLearningDialog("records",'<h2 id="dialogTitle">学习记录</h2><p>已收集 '+words.length+' / 52 个词，复习过 '+practiced+' 个。收集表示遇见过，不代表已经掌握。</p><p>复习答错也不扣爱心，可以放心练习；家长可以留意孩子反复答错的词。记录仅保存在这台设备。</p>'+(rows||'<p>开始冒险后，这里会出现单词记录。</p>')+'<button data-learning="menu">返回菜单</button>');
       }
       function beginReview() {
         document.getElementById("finishOverlay").classList.add("hidden");

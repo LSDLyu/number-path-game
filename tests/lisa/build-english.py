@@ -37,7 +37,7 @@ source = re.sub(
 )
 
 translations = {
-    "图片还没到齐，可以稍等一下，或再试一次。": "Some pictures are still loading. Wait a little, or try again.",
+    "有些图片还没加载出来，可以稍等一下，或再试一次。": "Some pictures are still loading. Wait a little, or try again.",
     "重试图片": "Retry pictures",
     "录音暂时没播放出来，点“再听一次”试试。": "The recording did not play. Tap Listen again to retry.",
     "美式真人发音": "US English recording",
@@ -52,7 +52,7 @@ translations = {
     "关闭声音": "Mute sound",
     "打开声音": "Turn on sound",
     "暂停与菜单": "Pause and menu",
-    "安全学习时刻": "Word learning pause",
+    "停下来学个单词": "Word learning pause",
     "苹果手绘图": "Apple illustration",
     "手绘图": " illustration",
     "游戏控制按钮": "Game controls",
@@ -106,7 +106,7 @@ translations = {
     "存档不可用，请不要关闭页面": "Saving is unavailable; keep this page open",
     "歇一歇，再出发": "Take a break, then try again",
     "冒险菜单": "Adventure menu",
-    "找到的字母已经留下了。补满爱心，从安全点继续吧！": "Your letters are safe. Restore your hearts and continue from a safe spot.",
+    "找到的字母都保留着。补满爱心，从安全点继续吧！": "Your letters are safe. Restore your hearts and continue from a safe spot.",
     "进度自动保存在这台设备，已解锁的关卡可以重玩。": "Progress is saved on this device. You can replay unlocked levels.",
     "补满爱心，继续本关": "Restore hearts and retry",
     "继续冒险": "Continue adventure",
@@ -128,7 +128,7 @@ translations = {
     "已收集 ": "Collected ",
     " / 52 个词，复习过 ": " / 52 words; reviewed ",
     " 个。收集表示遇见过，不代表已经掌握。": ". Collecting a word means you met it, not that you have mastered it.",
-    "孩子不扣爱心地练习；家长可关注反复答错的词。记录仅在本设备保存。": "Review never costs hearts. Parents can revisit words that need more practice. Records stay on this device.",
+    "复习答错也不扣爱心，可以放心练习；家长可以留意孩子反复答错的词。记录仅保存在这台设备。": "Review never costs hearts. Parents can revisit words that need more practice. Records stay on this device.",
     "开始冒险后，这里会出现单词记录。": "Your word record will appear here after you start.",
     "学习记录": "Learning record",
     "返回菜单": "Back to menu",

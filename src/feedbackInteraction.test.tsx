@@ -84,7 +84,7 @@ describe("game feedback", () => {
     const view = await start();
     fireEvent.click(screen.getByRole("button", { name: "体验设置" }));
     expect((screen.getByLabelText("震动反馈") as HTMLInputElement).disabled).toBe(true);
-    expect(screen.getByText(/已跟随系统减少动态效果/)).toBeTruthy();
+    expect(screen.getByText(/已按系统设置减少动画/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "关闭面板" }));
     puzzles["3"][0].route.slice(1).forEach(step);
     await waitFor(() => expect(screen.getByText("破案成功！")).toBeTruthy());
