@@ -7,7 +7,7 @@
   let audio;
   import(new URL('site-audio.mjs', script?.src || new URL('/game-shell.js', location.href)).href).then(module => {
     audio = module; module.subscribeAudio(updateAudio); updateAudio();
-  }).catch(() => { /* Individual game audio controls remain available. */ });
+  }).catch(() => { /* Keep the control disabled when preferences cannot load. */ });
   const style = `
     :host{display:block;color:#243d34;font:15px/1.5 "PingFang SC","Microsoft YaHei",system-ui,sans-serif;text-align:left}
     *{box-sizing:border-box}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;cursor:pointer}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #b74c24;outline-offset:3px;border-radius:6px}
@@ -55,7 +55,7 @@
     lastLocale = language;
     const en = language === 'en', href = links(en, game), brand = en ? 'Zide Learning' : '自得学园';
     header.shadowRoot.innerHTML = `<style>${style}</style><header class="bar"><a class="skip" href="#zide-game-content">${en ? 'Skip to game' : '跳到游戏'}</a><div class="inner"><a class="brand" href="${href.home}" aria-label="${en ? 'Zide Learning home' : '自得学园首页'}"><span class="mark" aria-hidden="true">学</span><span><strong>${brand}</strong><span class="latin">${en ? '自驱成长，自得其乐' : 'ZIDE LEARNING'}</span></span></a><nav aria-label="${en ? 'Site navigation' : '网站导航'}"><a class="home" href="${href.home}">${en ? 'Home' : '首页'}</a><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a class="language" href="${escape(href.alternate)}" lang="${en ? 'zh-CN' : 'en'}" aria-label="${en ? '切换到中文' : 'Switch to English'}">${en ? '中文' : 'English'}</a><button class="audio-toggle" type="button" disabled aria-label="${en ? 'Mute all games' : '所有游戏静音'}">♫</button></nav></div></header>`;
-    footer.shadowRoot.innerHTML = `<style>${style}</style><footer class="footer"><div class="foot-inner"><div><strong>${brand}</strong><p>${en ? 'Self-driven growth, joyfully discovered.' : '自驱成长，自得其乐'}</p><small>${en ? 'ChatGPT collaboration · human review' : 'ChatGPT 协力 · 人工复核'}</small></div><nav aria-label="${en ? 'Footer links' : '页尾链接'}"><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a href="${href.apply}">${en ? 'Request a sample' : '申请试读'}</a><a href="https://alading.org/">${en ? 'Back to alading.org' : '返回 alading.org'} ↗</a><button class="audio-settings" type="button">${en ? 'Sound settings' : '声音设置'}</button></nav></div></footer><dialog aria-labelledby="sound-title"><h2 id="sound-title">${en ? 'Sounds for every game' : '一起调好声音'}</h2><p>${en ? 'Shared on this browser. Each game keeps its own sound switches, too.' : '在这个浏览器里，所有游戏一起记住。每款游戏也保留自己的声音开关。'}</p>${[['muted',en?'Mute all games':'所有游戏静音'],['music',en?'Music':'音乐'],['effects',en?'Sound effects':'音效'],['voice',en?'Words and spoken hints':'单词发音与语音提示']].map(([key,label])=>`<label><input type="checkbox" disabled data-audio="${key}">${label}</label>`).join('')}<div class="audio-actions"><button class="try-sound" type="button">${en ? 'Try a chime' : '试听一声铃'}</button><button class="close-sound" type="button">${en ? 'Done' : '调好了'}</button></div></dialog>`;
+    footer.shadowRoot.innerHTML = `<style>${style}</style><footer class="footer"><div class="foot-inner"><div><strong>${brand}</strong><p>${en ? 'Self-driven growth, joyfully discovered.' : '自驱成长，自得其乐'}</p><small>${en ? 'ChatGPT collaboration · human review' : 'ChatGPT 协力 · 人工复核'}</small></div><nav aria-label="${en ? 'Footer links' : '页尾链接'}"><a href="${href.games}">${en ? 'All games' : '全部游戏'}</a><a href="${href.apply}">${en ? 'Request a sample' : '申请试读'}</a><a href="https://alading.org/">${en ? 'Back to alading.org' : '返回 alading.org'} ↗</a><button class="audio-settings" type="button">${en ? 'Sound settings' : '声音设置'}</button></nav></div></footer><dialog aria-labelledby="sound-title"><h2 id="sound-title">${en ? 'Sounds for every game' : '一起调好声音'}</h2><p>${en ? 'One sound switch at the top, shared across games on this browser. Choose sound types here.' : '顶部统一控制声音，所有游戏一起记住。这里可以选择要听的声音类型。'}</p>${[['music',en?'Music':'音乐'],['effects',en?'Sound effects':'音效'],['voice',en?'Words and spoken hints':'单词发音与语音提示']].map(([key,label])=>`<label><input type="checkbox" disabled data-audio="${key}">${label}</label>`).join('')}<div class="audio-actions"><button class="try-sound" type="button">${en ? 'Try a chime' : '试听一声铃'}</button><button class="close-sound" type="button">${en ? 'Done' : '调好了'}</button></div></dialog>`;
     header.shadowRoot.querySelector('.audio-toggle').addEventListener('click', () => audio?.setAudioPreferences({muted: !audio.readAudioPreferences().muted}));
     const dialog = footer.shadowRoot.querySelector('dialog');
     footer.shadowRoot.querySelector('.audio-settings').addEventListener('click', () => { updateAudio(); dialog.showModal(); });
@@ -88,17 +88,19 @@
     if (button) { button.disabled=false; button.textContent=prefs.muted?'🔇':'♫'; button.setAttribute('aria-pressed',String(prefs.muted)); button.setAttribute('aria-label',en?(prefs.muted?'Unmute all games':'Mute all games'):(prefs.muted?'取消所有游戏静音':'所有游戏静音')); }
     footer.shadowRoot.querySelectorAll('[data-audio]').forEach(input => { input.checked=prefs[input.dataset.audio]; input.disabled=false; });
     const preview=footer.shadowRoot.querySelector('.try-sound'); if(preview)preview.disabled=!audio.allowsAudio('effects');
-    // The vendored motion lab keeps its own implementation. Use its existing
-    // change handler to silence it, without altering upstream source or choices.
+    // Bridge the unmodified upstream motion lab to the single shared switch.
     if (gameName()==='shotgun') {
       const control=document.querySelector('#sound');
       if(control){
-        if(!control.dataset.zideAudio){ control.dataset.zideAudio='ready'; control.dataset.wanted=String(control.checked); control.addEventListener('change',()=>{if(!control.disabled)control.dataset.wanted=String(control.checked);}); }
-        const blocked=!audio.allowsAudio('effects');
-        if(blocked&&!control.disabled){control.dataset.wanted=String(control.checked);control.disabled=true;control.checked=false;control.dispatchEvent(new Event('change'));}
-        else if(!blocked&&control.disabled){control.disabled=false;control.checked=control.dataset.wanted==='true';control.dispatchEvent(new Event('change'));}
+        control.closest('.setting-row').hidden=true;
+        const enabled=audio.allowsAudio('effects');
+        control.disabled=false;
+        if(control.checked!==enabled){control.checked=enabled;control.dispatchEvent(new Event('change'));}
+        const note=document.querySelector('#feedback-note');
+        if(note)note.textContent=en?'Use the sound switch at the top. Animations and mechanical sounds are learning demonstrations.':'声音由顶部统一控制。部件动画与机械声均为教学演示。';
       }
     }
+
   }
   function scroll() {
     if (frame) return;
