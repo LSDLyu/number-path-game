@@ -358,7 +358,6 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
   const [progress, setProgress] = useState<SavedProgress>(emptyProgress);
   const [hydrated, setHydrated] = useState(false);
   const [feedback, setFeedback] = useState(loadFeedback);
-  useEffect(() => { audio.setEnabled(feedback.sound); }, [audio, feedback.sound]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const lastDeadEnd = useRef("");
@@ -431,7 +430,6 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
   const updateFeedback = (key: keyof FeedbackSettings, value: boolean) => {
     const next = { ...feedback, [key]: value };
-    if (key === "sound") { audio.setEnabled(value); if (value) audio.prompt("path_start_one"); }
     setFeedback(next);
     try { window.localStorage.setItem(feedbackKey, JSON.stringify(next)); } catch { /* Optional storage. */ }
     if (key === "effects" && !value) setCelebrating(false);
@@ -976,7 +974,6 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
 
       <GameDialog open={panel === "settings"} title={copy.settings} closeLabel={copy.close} onClose={() => setPanel(null)}>
         <div className={styles.settingsPanel}>
-          <label><span>{locale === "zh" ? "声音与语音" : "Sound and voice"}</span><input type="checkbox" checked={feedback.sound} onChange={event => updateFeedback("sound", event.target.checked)} /></label>
           <label><span>{copy.effects}</span><input type="checkbox" checked={feedback.effects} onChange={(event) => updateFeedback("effects", event.target.checked)} /></label>
           <label><span>{copy.haptics}</span><input type="checkbox" checked={feedback.haptics && supportsVibration} disabled={!supportsVibration} onChange={(event) => updateFeedback("haptics", event.target.checked)} /></label>
           <p>{supportsVibration ? copy.vibrationNote : copy.vibrationUnavailable}</p>
@@ -989,7 +986,7 @@ export function NumberPathGame({ locale = "zh" }: { locale?: Locale }) {
       </GameDialog>
 
       <GameDialog open={panel === "help"} title={copy.help} closeLabel={copy.close} onClose={() => setPanel(null)}>
-        <button type="button" disabled={!feedback.sound} onClick={() => audio.prompt("path_rules")}>{locale === "zh" ? "再听一次玩法" : "Listen to instructions again"}</button>
+        <button type="button" onClick={() => audio.prompt("path_rules")}>{locale === "zh" ? "再听一次玩法" : "Listen to instructions again"}</button>
         <p className={styles.helpLead}>{copy.shortRules}</p>
         <ol className={styles.rules}><li>{copy.ruleStart}</li><li>{copy.ruleMove}</li><li>{copy.ruleOrder}</li><li><strong>{copy.ruleEnd}</strong></li></ol>
         <p>{copy.inputNote}</p><p>{copy.unlockRule}</p>

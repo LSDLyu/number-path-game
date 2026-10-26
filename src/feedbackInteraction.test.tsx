@@ -54,9 +54,9 @@ describe("game feedback", () => {
   it("persists all switches and completes silently when effects and vibration are off", async () => {
     let view = await start();
     fireEvent.click(screen.getByRole("button", { name: "体验设置" }));
-    ["声音与语音", "通关动效", "震动反馈", "自动聚焦棋盘"].forEach((name) => fireEvent.click(screen.getByLabelText(name)));
+    ["通关动效", "震动反馈", "自动聚焦棋盘"].forEach((name) => fireEvent.click(screen.getByLabelText(name)));
     fireEvent.click(screen.getByRole("button", { name: "关闭面板" }));
-    expect(JSON.parse(localStorage.getItem(feedbackKey)!)).toEqual({ sound: false, effects: false, haptics: false, focus: false, timer: true, steps: false });
+    expect(JSON.parse(localStorage.getItem(feedbackKey)!)).toEqual({ sound: true, effects: false, haptics: false, focus: false, timer: true, steps: false });
     view.unmount();
     view = await start();
     vibration.mockClear();

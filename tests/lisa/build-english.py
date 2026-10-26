@@ -37,6 +37,8 @@ source = re.sub(
 )
 
 translations = {
+    "图片还没到齐，可以稍等一下，或再试一次。": "Some pictures are still loading. Wait a little, or try again.",
+    "重试图片": "Retry pictures",
     "录音暂时没播放出来，点“再听一次”试试。": "The recording did not play. Tap Listen again to retry.",
     "美式真人发音": "US English recording",
     "英式真人发音": "British English recording",

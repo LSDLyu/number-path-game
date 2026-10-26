@@ -590,14 +590,15 @@
     .demo-motion { display:block; text-align:center; font-size:44px; padding:12px; animation:demo-hop 1.6s ease-in-out infinite; }
     @keyframes demo-hop { 50% { transform:translateY(-16px); } }
     @media(max-height:500px) { .learning-dialog { padding:14px; } .letter-card.show { padding:12px; } .demo-motion { font-size:30px; padding:4px; } }
+      img.hero-sprite:not([data-loaded]){visibility:hidden}.hero-placeholder{font-size:clamp(40px,7vw,80px);line-height:1;pointer-events:none}.hero-placeholder[hidden],.art-status[hidden]{display:none}.art-status{position:fixed;z-index:45;top:calc(var(--zgs-header-height,0px) + 64px);left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);margin:0;padding:10px;background:#fff7dc;color:#473360;border-radius:12px;font:16px/1.5 system-ui}.art-status button{min-height:44px;padding:8px 14px;margin-left:8px;border:1px solid #73539c;border-radius:8px;background:#fff;color:#473360;font:inherit}
   </style>
-<script src="game-shell.js" data-zide-game="lisa-letter-adventure" defer></script>
+<script src="game-shell.js?v=20261026" data-zide-game="lisa-letter-adventure" defer></script>
 </head>
 <body>
   <main class="game-shell" id="gameShell" aria-label="Lisa’s Letter Adventure game">
     <div class="playfield" id="playfield">
       <canvas id="gameCanvas" width="1280" height="720" aria-label="Side-scrolling game"></canvas>
-      <img class="hero-sprite" id="heroSprite" src="assets/lisa-hero-sprite.png?v=9" alt="" aria-hidden="true" draggable="false">
+      <img class="hero-sprite" id="heroSprite" src="assets/lisa-hero-sprite-compact.webp" fetchpriority="high" alt="" aria-hidden="true" draggable="false"><span id="heroFallback" class="hero-sprite hero-placeholder" aria-hidden="true">👧</span>
     </div>
 
     <div class="top-hud">
@@ -609,7 +610,6 @@
         <span class="heart" aria-hidden="true">♥</span>
       </div>
       <div class="hud-actions">
-        <button class="icon-btn" id="soundBtn" type="button" aria-label="Mute sound">🔊</button>
         <button class="icon-btn" id="restartBtn" type="button" aria-label="Pause and menu">☰</button>
       </div>
     </div>
@@ -671,6 +671,7 @@
     </nav>
   </main>
 
+  <aside id="artStatus" class="art-status" role="status" hidden>Some pictures are still loading. Wait a little, or try again.<button id="retryArt" type="button">Retry pictures</button></aside>
   <script src="audio/manifest.js"></script>
   <script src="audio/accents.js"></script>
   <script src="iris-audio.js"></script>
@@ -696,7 +697,7 @@
       var currentLevel = 1;
       var MAX_HEARTS = 5;
       var soundEnabled = true;
-      try { soundEnabled = localStorage.getItem("lisa-letter-sound-v2") !== "off"; } catch (error) { /* Storage is optional. */ }
+      // The shared header owns mute; legacy per-game preferences cannot block it.
       var audioContext = null;
       var audioReadyPromise = null;
       var speechPrimed = false;
@@ -1333,7 +1334,7 @@
       }
 
       var irisAudio = new window.IrisAudio('iris/', "en");
-      window.addEventListener('zide-audio-change', function () { irisAudio.stop(); speechRunId++; stopWordAudio(); pendingSpeechLesson=null; if(window.speechSynthesis)window.speechSynthesis.cancel(); if (!lisaSiteAudioAllowed('effects')) audioContext?.suspend().catch(function(){}); });
+      window.addEventListener('zide-audio-change', function () { setSound(window.ZideAudio?.read().muted !== true); irisAudio.stop(); speechRunId++; stopWordAudio(); pendingSpeechLesson=null; if(window.speechSynthesis)window.speechSynthesis.cancel(); if (!lisaSiteAudioAllowed('effects')) audioContext?.suspend().catch(function(){}); });
       document.addEventListener('visibilitychange', function () { if (document.hidden) { irisAudio.stop(); speechRunId++; stopWordAudio(); if (window.speechSynthesis) window.speechSynthesis.cancel(); } });
 
       function primeSpeechSynthesis() { /* Recordings are unlocked by the player's gesture. */ }
@@ -1517,10 +1518,7 @@
       function setSound(enabled) {
         soundEnabled = enabled; irisAudio.setEnabled(enabled);
         if (!enabled) { speechRunId += 1; stopWordAudio(); pendingSpeechLesson = null; activeUtterance = null; }
-        try { localStorage.setItem("lisa-letter-sound-v2", enabled ? "on" : "off"); } catch (error) { /* Keep playing without saved preferences. */ }
-        var btn = document.getElementById("soundBtn");
-        btn.textContent = enabled ? "🔊" : "🔇";
-        btn.setAttribute("aria-label", enabled ? "Mute sound" : "Turn on sound");
+
         if (!enabled && "speechSynthesis" in window && window.speechSynthesis) {
           speechRunId += 1;
           try {
@@ -3793,6 +3791,7 @@
         heroSprite.style.height = ((player.h + 42) / H * 100) + "%";
         heroSprite.style.transform = "translate(-50%, -100%) scaleX(" + player.facing + ")";
         heroSprite.style.opacity = flicker ? "0" : "1";
+        document.getElementById("heroFallback").style.cssText = heroSprite.style.cssText;
       }
 
       function drawPlayer() {
@@ -4028,27 +4027,45 @@
         if (learningMode !== "lesson") openLearningMenu("pause");
       });
 
-      document.getElementById("soundBtn").addEventListener("click", function () {
-        var enabling = !soundEnabled;
-        setSound(enabling);
-        if (enabling) {
-          unlockAudio(); tone(660, .18, "sine", .07);
-        }
-      });
-
       document.getElementById("replayLessonBtn").addEventListener("click", function () {
         unlockAudio();
         if (lastLesson) speakLesson(lastLesson);
       });
 
       initializeLearning();
-      setSound(soundEnabled);
+      setSound(window.ZideAudio?.read().muted !== true);
       resetLevel(false);
-      heroSprite.addEventListener("error", function () {
-        if (heroSprite.getAttribute("src").indexOf("lisa-hero-sprite.png") !== -1) {
-          heroSprite.src = "assets/lisa-hero.webp?v=9";
+      // Critical art gets bounded retries; the player remains visible while offline.
+      var artPending = new Set(), artRetries = [], showArtNotice = false;
+      var artStatus = document.getElementById('artStatus');
+      function watchArt(image, sources, loaded) {
+        var attempt = 0, generation = 0, timer, retryTimer;
+        function status(overdue) { if (overdue) showArtNotice = true; artStatus.hidden = !showArtNotice || artPending.size === 0; }
+        function begin(manual) {
+          clearTimeout(timer); clearTimeout(retryTimer); generation++; attempt = 0; artPending.add(image);
+          image.src = sources[0] + (manual ? '?retry=' + Date.now() : '');
+          timer = setTimeout(function () { status(true); }, 8000);
         }
+        image.addEventListener('load', function () { clearTimeout(timer); clearTimeout(retryTimer); artPending.delete(image); if (loaded) loaded(true); status(); });
+        image.addEventListener('error', function () {
+          if (loaded) loaded(false);
+          artPending.add(image);
+          var source = sources[++attempt], token = generation;
+          if (source) retryTimer = setTimeout(function () { if (token === generation) image.src = source; }, 600 * attempt);
+          else { clearTimeout(timer); status(true); }
+        });
+        artRetries.push(function () { if (artPending.has(image)) begin(true); });
+        artPending.add(image);
+        if (image.complete && image.naturalWidth) { artPending.delete(image); if (loaded) loaded(true); }
+        else if (image.complete) begin(false);
+        timer = setTimeout(function () { status(true); }, 8000);
+      }
+      watchArt(heroSprite, ['assets/lisa-hero-sprite-compact.webp','assets/lisa-hero-sprite.png?v=9','assets/lisa-hero.webp?v=9'], function (ready) {
+        heroSprite.toggleAttribute('data-loaded', ready); document.getElementById('heroFallback').hidden = ready;
       });
+      watchArt(bgImage, ['assets/storybook-bg.webp','assets/storybook-bg.webp?retry=1','assets/storybook-bg.webp?retry=2']);
+      document.getElementById('retryArt').addEventListener('click', function () { showArtNotice = false; artStatus.hidden = true; artRetries.forEach(function (retry) { retry(); }); });
+      window.addEventListener('online', function () { if (artPending.size) artRetries.forEach(function (retry) { retry(); }); });
       syncHeroSprite();
       requestAnimationFrame(loop);
     }());
