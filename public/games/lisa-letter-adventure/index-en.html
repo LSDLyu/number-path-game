@@ -592,7 +592,7 @@
     @media(max-height:500px) { .learning-dialog { padding:14px; } .letter-card.show { padding:12px; } .demo-motion { font-size:30px; padding:4px; } }
       img.hero-sprite:not([data-loaded]){visibility:hidden}.hero-placeholder{font-size:clamp(40px,7vw,80px);line-height:1;pointer-events:none}.hero-placeholder[hidden],.art-status[hidden]{display:none}.art-status{position:fixed;z-index:45;top:calc(var(--zgs-header-height,0px) + 64px);left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);margin:0;padding:10px;background:#fff7dc;color:#473360;border-radius:12px;font:16px/1.5 system-ui}.art-status button{min-height:44px;padding:8px 14px;margin-left:8px;border:1px solid #73539c;border-radius:8px;background:#fff;color:#473360;font:inherit}
   </style>
-<script src="game-shell.js?v=20261110-lockup" data-zide-game="lisa-letter-adventure" defer></script>
+<script src="game-shell.js?v=20261111-mainland" data-zide-game="lisa-letter-adventure" defer></script>
 </head>
 <body>
   <main class="game-shell" id="gameShell" aria-label="Lisa’s Letter Adventure game">
@@ -724,6 +724,7 @@
       var particles = [];
 
       var bgImage = new Image();
+      bgImage.fetchPriority = "high";
       bgImage.src = "assets/storybook-bg.webp";
 
       var input = {
@@ -800,25 +801,86 @@
       var goalHintTimer = 0;
       var adventure = { platforms: [], badges: [], kind: "", carrier: null };
       var platformArt = {};
+      // Keep draw-time placeholders, but only download art used by the current level.
       ["trampoline", "train", "cloud", "mushroom", "boat", "balloon", "rainbow", "gift", "shark", "fish", "bubble"].forEach(function (kind) {
         platformArt[kind] = new Image();
-        platformArt[kind].src = "assets/platform-" + kind + ".png";
       });
+      function preparePlatformArt(levelNumber) {
+        var kind = LEVELS[levelNumber - 1].kind;
+        if (!kind) return;
+        var needed = [kind, "cloud", levelNumber === 10 ? "gift" : "rainbow"];
+        if (kind === "boat") needed = needed.concat(["shark", "fish", "bubble"]);
+        needed.forEach(function (name) {
+          var image = platformArt[name];
+          if (image.platformRequested) return;
+          image.platformRequested = true;
+          image.fetchPriority = "high";
+          var base = "assets/platform-" + name;
+          image.src = base + ".webp";
+          watchArt(image, [base + ".webp", base + ".webp?retry=1", base + ".png"]);
+        });
+      }
+
+      var assetPrefetchGeneration = 0, assetPrefetchIdle = null, assetPrefetchAbort = null;
+      function stopAssetPrefetch() {
+        assetPrefetchGeneration++;
+        if (assetPrefetchIdle !== null) {
+          if (window.cancelIdleCallback) window.cancelIdleCallback(assetPrefetchIdle);
+          else clearTimeout(assetPrefetchIdle);
+          assetPrefetchIdle = null;
+        }
+        if (assetPrefetchAbort) assetPrefetchAbort.abort();
+        assetPrefetchAbort = null;
+      }
+      function allowsAssetPrefetch() {
+        var connection = window.navigator && window.navigator.connection;
+        return !document.hidden && !(connection && (connection.saveData ||
+          /^(slow-2g|2g|3g)$/.test(connection.effectiveType || "") ||
+          (connection.downlink > 0 && connection.downlink < 2) || connection.rtt > 300));
+      }
+      function preloadLessonArt(lesson) {
+        if (!lesson.art) return Promise.resolve();
+        var image = lesson.preloadImage;
+        if (image && image.complete && image.naturalWidth) return Promise.resolve();
+        return new Promise(function (resolve) {
+          image = lesson.preloadImage = new Image();
+          image.fetchPriority = "low";
+          image.onload = image.onerror = function () { resolve(); };
+          image.src = lesson.art;
+        });
+      }
+      function queueLevelAssetPrefetch(levelNumber) {
+        stopAssetPrefetch();
+        if (!started || !allowsAssetPrefetch()) return;
+        var generation = assetPrefetchGeneration;
+        var controller = window.AbortController ? new AbortController() : null;
+        assetPrefetchAbort = controller;
+        var tasks = [];
+        LEVEL_LESSON_SETS[levelNumber - 1].forEach(function (index) {
+          tasks.push(function () { return preloadLessonArt(letterLessons[index]); });
+          wordPools[index].forEach(function (entry) {
+            tasks.push(function () {
+              if (!soundEnabled || !lisaSiteAudioAllowed('voice')) return;
+              return preloadWordAudio(entry.word, controller ? { signal: controller.signal, priority: "low" } : { priority: "low" });
+            });
+          });
+        });
+        function schedule() {
+          if (generation !== assetPrefetchGeneration || currentLevel !== levelNumber || !allowsAssetPrefetch() || !tasks.length) return;
+          var run = function () {
+            assetPrefetchIdle = null;
+            if (generation !== assetPrefetchGeneration || currentLevel !== levelNumber || !allowsAssetPrefetch()) return;
+            // One speculative transfer at a time; later levels never compete with play.
+            Promise.resolve().then(tasks.shift()).catch(function () {}).then(schedule);
+          };
+          assetPrefetchIdle = window.requestIdleCallback ? window.requestIdleCallback(run, { timeout: 2000 }) : setTimeout(run, 600);
+        }
+        schedule();
+      }
 
       function lessonForLevel(levelNumber, offset) {
         var set = LEVEL_LESSON_SETS[levelNumber - 1];
         return letterLessons[set[offset % set.length]];
-      }
-
-      function preloadLevelLessonArt(levelNumber) {
-        LEVEL_LESSON_SETS[levelNumber - 1].forEach(function (lessonIndex) {
-          wordPools[lessonIndex].forEach(function (entry) { preloadWordAudio(entry.word); });
-          var lesson = letterLessons[lessonIndex];
-          if (!lesson.preloadImage) {
-            lesson.preloadImage = new Image();
-            lesson.preloadImage.src = lesson.art;
-          }
-        });
       }
 
       var player = {};
@@ -1034,11 +1096,11 @@
         confetti = [];
         resetPlayer();
         resetLetter(true);
-        preloadLevelLessonArt(currentLevel);
+        stopAssetPrefetch();
+        preparePlatformArt(currentLevel);
         if (currentLevel === 2) resetLevelTwo();
         if (currentLevel === 3) resetLevelThree();
         if (currentLevel >= 4) resetAdventure();
-        if (currentLevel < LEVELS.length) preloadLevelLessonArt(currentLevel + 1);
         updateLevelLabel();
         updateHearts();
         hideLetterLesson();
@@ -1173,6 +1235,7 @@
         currentLevel = number; resetLevel(false); levelWords = {}; slopeBlockedTime = 0; slopeDemoShown = false;
         restoreLearning(snapshot,refill);
         unlockAudio(); started = true; paused = false;
+        queueLevelAssetPrefetch(currentLevel);
         tone(520, .12, "sine", .045);
         document.getElementById("startOverlay").classList.add("hidden");
         saveLearning();
@@ -1334,7 +1397,7 @@
       }
 
       var irisAudio = new window.IrisAudio('iris/', "en");
-      window.addEventListener('zide-audio-change', function () { setSound(window.ZideAudio?.read().muted !== true); irisAudio.stop(); speechRunId++; stopWordAudio(); pendingSpeechLesson=null; if(window.speechSynthesis)window.speechSynthesis.cancel(); if (!lisaSiteAudioAllowed('effects')) audioContext?.suspend().catch(function(){}); });
+      window.addEventListener('zide-audio-change', function () { setSound(window.ZideAudio?.read().muted !== true); queueLevelAssetPrefetch(currentLevel); irisAudio.stop(); speechRunId++; stopWordAudio(); pendingSpeechLesson=null; if(window.speechSynthesis)window.speechSynthesis.cancel(); if (!lisaSiteAudioAllowed('effects')) audioContext?.suspend().catch(function(){}); });
       document.addEventListener('visibilitychange', function () { if (document.hidden) { irisAudio.stop(); speechRunId++; stopWordAudio(); if (window.speechSynthesis) window.speechSynthesis.cancel(); } });
 
       function primeSpeechSynthesis() { /* Recordings are unlocked by the player's gesture. */ }
@@ -1453,14 +1516,18 @@
         }
       }
 
-      function preloadWordAudio(word) {
+      function preloadWordAudio(word, options) {
         var path = (window.LISA_WORD_AUDIO || {})[word];
         if (!path || !window.fetch || audioCache[word]) return audioCache[word];
-        audioCache[word] = window.fetch(path).then(function (response) {
+        var pending = window.fetch(path, options || { priority: "high" }).then(function (response) {
           if (!response.ok) throw new Error("recording unavailable");
           return response.arrayBuffer();
-        }).catch(function () { return null; });
-        return audioCache[word];
+        }).catch(function () {
+          if (audioCache[word] === pending) delete audioCache[word];
+          return null;
+        });
+        audioCache[word] = pending;
+        return pending;
       }
 
       function speakLesson(lesson) {
@@ -2495,7 +2562,7 @@
             if (adventure.kind === "rainbow") showCoach("Rainbow keys " + Object.keys(learnedThisLevel).length + "/6！", 1800);
             return;
           }
-          if (["boat", "boat", "train"].indexOf(adventure.kind) >= 0) return;
+          if (["boat", "rainbow", "train"].indexOf(adventure.kind) >= 0) return;
           if (!rectOverlap(player, box)) return;
           var centerBelow = player.y + player.h / 2 > box.y + box.h / 2;
           if (player.vy < -30 && centerBelow) {
@@ -4011,8 +4078,8 @@
       document.addEventListener("visibilitychange", function () {
         clearControls();
         lastTime = 0;
-        if (document.hidden) { audioNeedsGesture = true; speechPrimed = false; if (started && !paused) openLearningMenu("pause"); saveLearning(); }
-        else if (soundEnabled) initAudio();
+        if (document.hidden) { stopAssetPrefetch(); audioNeedsGesture = true; speechPrimed = false; if (started && !paused) openLearningMenu("pause"); saveLearning(); }
+        else { if (soundEnabled) initAudio(); queueLevelAssetPrefetch(currentLevel); }
       });
 
       document.getElementById("startBtn").addEventListener("click", function () {
@@ -4066,6 +4133,9 @@
       watchArt(bgImage, ['assets/storybook-bg.webp','assets/storybook-bg.webp?retry=1','assets/storybook-bg.webp?retry=2']);
       document.getElementById('retryArt').addEventListener('click', function () { showArtNotice = false; artStatus.hidden = true; artRetries.forEach(function (retry) { retry(); }); });
       window.addEventListener('online', function () { if (artPending.size) artRetries.forEach(function (retry) { retry(); }); });
+      window.addEventListener('pagehide', stopAssetPrefetch);
+      var assetConnection = window.navigator && window.navigator.connection;
+      if (assetConnection && assetConnection.addEventListener) assetConnection.addEventListener('change', function () { queueLevelAssetPrefetch(currentLevel); });
       syncHeroSprite();
       requestAnimationFrame(loop);
     }());

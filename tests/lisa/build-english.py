@@ -23,17 +23,25 @@ source = source.replace('https://edu.alading.org/games/', 'https://edu.alading.o
 source = source.replace('https://edu.alading.org/"', 'https://edu.alading.org/en"')
 source = source.replace('audio/credits.html', 'audio/credits-en.html')
 
-# The meanings are Chinese translations in the original learning data. On the
-# English page, the spoken English word also serves as the visible meaning.
-source = re.sub(
+# Localize only the two word-data declarations. Other three-string arrays
+# (for example ["shark", "fish", "bubble"] in the asset loader) are identifiers.
+def localize_meanings(text, start_marker, end_marker, pattern):
+    start = text.index(start_marker)
+    end = text.index(end_marker, start)
+    words = re.sub(
+        pattern,
+        lambda match: match.group(1) + '"' + match.group(2) + '"' + match.group(3),
+        text[start:end],
+    )
+    return text[:start] + words + text[end:]
+
+source = localize_meanings(
+    source, '      var letterLessons = [', '      ].map(function',
     r'(\["[A-Z]", "([^"]+)", )"[^"]*"(, "[^"]+"\])',
-    lambda match: match.group(1) + '"' + match.group(2) + '"' + match.group(3),
-    source,
 )
-source = re.sub(
+source = localize_meanings(
+    source, '      var extraWords = [', '      ];',
     r'(\["([a-z-]+)", )"[^"]*"(, "[^"]+"\])',
-    lambda match: match.group(1) + '"' + match.group(2) + '"' + match.group(3),
-    source,
 )
 
 translations = {
