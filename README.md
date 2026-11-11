@@ -78,3 +78,26 @@ Lisa 的 52 个词已全部接入 Wikimedia Commons 真人录音。以美式为�
 数学路径移除设置中的第二个声音总开关；字母冒险移除游戏画面内的喇叭按钮。声音统一由页首控制，页尾保留语音、音效和音乐的分项选择。旧的游戏静音状态不再与顶部开关冲突，字母单词真人录音保持不变。
 
 北京联通素材缺失反馈：Lisa 主角优先使用同尺寸的 22 KB WebP（原 PNG 96 KB）。图片加载失败时自动有限重试，保留临时小人和可点击的“重试图片”，成功后还原原角色；原始素材保留。提示覆盖在游戏可见区域，不要求滚动查找。
+
+## 2026-11-11 大陆网络体验
+
+Lisa 的开始画面只加载当前画面图片，不预取平台或单词录音。进入关卡后，仅当前关的词图和录音在空闲时逐项预取；省流量、2G/3G、低带宽或高延迟连接跳过预取，关卡切换和后台会取消后续任务。关闭声音或人声时不预取录音，实际收集字母时仍可按需获取课程素材。第 4–10 关只请求本关使用的平台图；优先无损 WebP，失败时有限重试并回退原 PNG，保留原有手动重试入口。
+
+平台 WebP 保留 PNG 原尺寸和可见像素；使用 FFmpeg/libwebp 可重复生成（原 PNG 不删除）：
+
+```bash
+for source in public/games/lisa-letter-adventure/assets/platform-*.png; do
+  ffmpeg -y -loglevel error -i "$source" -frames:v 1 -c:v libwebp -lossless 1 -compression_level 6 -q:v 100 "${source%.png}.webp"
+done
+```
+
+英文页面仍由 `python3 tests/lisa/build-english.py` 生成；翻译仅修改单词数据声明内的释义，避免改动平台资源标识。除 `pnpm test`、`pnpm build` 和录音校验外，真实 Chromium 回归覆盖首次加载、当前关预取范围及串行请求、省流/3G/静音、移动与跳跃、学习暂停与存档、中英文第 4/8 关平台、录音和图片失败重试：
+
+```bash
+# 需要 Python Playwright 和本机 Chromium；另一个终端启动静态服务：
+python3 -m http.server 4201 --bind 127.0.0.1 --directory public
+# 运行回归；可用 LISA_TEST_BASE_URL / CHROMIUM_EXECUTABLE 指定环境。
+python3 tests/lisa/asset-loading-browser.py
+```
+
+数学路径入口的原始 HTML 增加中文玩法说明与游戏目录链接，JavaScript 加载成功后由 React 替换。英文界面仍在客户端根据路径或语言偏好显示，这次没有新增服务端英文渲染。
