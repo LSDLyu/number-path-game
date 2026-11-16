@@ -1251,7 +1251,7 @@
           '<button data-learning="restart">Restart this level</button><button data-learning="tutorial">How to play</button><button data-learning="records">Learning record · for parents</button><details><summary>Choose a level</summary>'+choices+'</details><p><a href="https://edu.alading.org/en/games/">← Games</a> · <a href="audio/credits-en.html">Audio credits</a></p>');
       }
       function showLevelTutorial() {
-        irisAudio.sequence(["audio/prompts/en/lisa_jump.mp3", "audio/prompts/en/lisa_slow.mp3"]);
+        irisAudio.sequence(["audio/prompts/en/lisa_jump.mp3"]);
         var demos = ["← 👧 ↑ A →","👧⚽ ↑ 🔺 · 👧 → ⚽ ⛰️","🧺 ↑ ↓ · K L M","👧 ↑ 🟣 → 🟣","👧 ↓ U → Lisa","☁️ ↑ ↓ · 👧 ↑","🍄 ↑ 👧 · ↓ stop","🦈 · 🫧 👧 · 🐟 K","🎈 ← ↑ ↓ →","U ↓ 🌈 · 🎁 ↑"];
         showLearningDialog("tutorial",'<h2 id="dialogTitle">'+currentLevel+' / 10 · '+LEVELS[currentLevel-1].name+'</h2><span class="demo-motion" aria-hidden="true">'+demos[currentLevel-1]+'</span><p>'+LEVELS[currentLevel-1].hint+'</p><p>Tap Jump for a small jump or hold it to jump higher. After collecting a letter, listen to the word before continuing.</p><button class="primary" data-learning="go">Got it, let’s go!</button>');
       }

@@ -1255,7 +1255,7 @@
           '<button data-learning="restart">重新开始本关</button><button data-learning="tutorial">玩法演示</button><button data-learning="records">学习记录 · 家长查看</button><details><summary>选关</summary>'+choices+'</details><p><a href="https://edu.alading.org/games/">← 游戏大厅</a> · <a href="audio/credits.html">录音来源</a></p>');
       }
       function showLevelTutorial() {
-        irisAudio.sequence(["audio/prompts/zh/lisa_jump.mp3", "audio/prompts/zh/lisa_slow.mp3"]);
+        irisAudio.sequence(["audio/prompts/zh/lisa_jump.mp3"]);
         var demos = ["← 👧 ↑ A →","👧⚽ ↑ 🔺 · 👧 → ⚽ ⛰️","🧺 ↑ ↓ · K L M","👧 ↑ 🟣 → 🟣","👧 ↓ U → Lisa","☁️ ↑ ↓ · 👧 ↑","🍄 ↑ 👧 · ↓ 停","🦈 · 🫧 👧 · 🐟 K","🎈 ← ↑ ↓ →","U ↓ 🌈 · 🎁 ↑"];
         showLearningDialog("tutorial",'<h2 id="dialogTitle">'+currentLevel+' / 10 · '+LEVELS[currentLevel-1].name+'</h2><span class="demo-motion" aria-hidden="true">'+demos[currentLevel-1]+'</span><p>'+LEVELS[currentLevel-1].hint+'</p><p>短按跳跃是小跳，长按跳得更高。收集字母后会暂停，听完单词再继续。</p><button class="primary" data-learning="go">明白了，出发！</button>');
       }
