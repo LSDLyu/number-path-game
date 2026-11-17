@@ -1,0 +1,54 @@
+{
+  "updated": "2026-11-17",
+  "scope": "Three Chinese number-path prompts only. Supersedes historical manifest.json provenance for these files; all other entries unchanged.",
+  "clips": [
+    {
+      "id": "path_rules_zh",
+      "game": "numberpath",
+      "event": "rules",
+      "language": "zh",
+      "filename": "audio/prompts/zh/path_rules.mp3",
+      "source": "User-provided original recording, final approved clip; not synthesized or pitch-shifted",
+      "source_clip": "01_path_rules_zh.mp3",
+      "text_note": "Purpose label only; historical scripts.txt is not a verbatim transcript of this recording.",
+      "take": 1,
+      "sha256": "6a1c3b5eb5885ffac43ad6f0ec06b6b3b3974ee3a91e76a57091a356b1fb6cf2",
+      "duration_seconds": 7.131429,
+      "sample_rate_hz": 44100,
+      "channels": 1,
+      "decode_verified": true
+    },
+    {
+      "id": "path_dead_end_zh",
+      "game": "numberpath",
+      "event": "dead_end",
+      "language": "zh",
+      "filename": "audio/prompts/zh/path_dead_end.mp3",
+      "source": "User-provided original recording, final approved clip; not synthesized or pitch-shifted",
+      "source_clip": "02_path_dead_end_zh.mp3",
+      "text_note": "Purpose label only; historical scripts.txt is not a verbatim transcript of this recording.",
+      "take": 2,
+      "sha256": "e0310d6e2a5b8400496c83521d8f57dfc01ef973919b177ce92f830733b3a3c4",
+      "duration_seconds": 7.183673,
+      "sample_rate_hz": 44100,
+      "channels": 1,
+      "decode_verified": true
+    },
+    {
+      "id": "path_solved_zh",
+      "game": "numberpath",
+      "event": "solved",
+      "language": "zh",
+      "filename": "audio/prompts/zh/path_solved.mp3",
+      "source": "User-provided original recording, final approved clip; not synthesized or pitch-shifted",
+      "source_clip": "03_path_solved_zh.mp3",
+      "text_note": "Purpose label only; historical scripts.txt is not a verbatim transcript of this recording.",
+      "take": 1,
+      "sha256": "38cebc08405c6dba5233ad4c967adaf0148aa150e2f13426a44caae833810a80",
+      "duration_seconds": 1.880816,
+      "sample_rate_hz": 44100,
+      "channels": 1,
+      "decode_verified": true
+    }
+  ]
+}
